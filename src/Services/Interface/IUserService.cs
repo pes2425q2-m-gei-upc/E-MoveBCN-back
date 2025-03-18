@@ -5,6 +5,5 @@ using Dto;
 namespace Services.Interface;
 
 public interface IUserService {
-    
     public List<UserDto> GetAllUsers();
 }

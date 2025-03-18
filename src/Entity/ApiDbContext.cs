@@ -54,6 +54,14 @@ public class ApiDbContext : DbContext
       entity.Property(e => e.Email)
         .HasColumnName("email")
         .HasColumnType("text");
+
+      entity.Property(e => e.PasswordHash)
+        .HasColumnName("password_hash")
+        .HasColumnType("text");
+
+      entity.Property(e => e.Idioma)
+        .HasColumnName("idioma")
+        .HasColumnType("text");
     });
   }
 }
