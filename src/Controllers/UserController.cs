@@ -2,6 +2,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Services.Interface;
 using BCrypt.Net;
+using Dto;
+using System;
 
 
 namespace Controllers;
@@ -27,6 +29,31 @@ public class UserController : ControllerBase
         };
 
         return Ok(users);
+    }
+
+    //POST: /api/user/createuser
+    [HttpPost("createuser")]
+    public IActionResult CreateUser([FromBody] UserCreate user)
+    {
+        if (user == null)
+        {
+            return BadRequest("Invalid data");
+        }
+
+        try
+        {
+            var isCreated = _userService.CreateUser(user);
+
+            if (isCreated)
+            {
+                return Ok("User created successfully");
+            }
+            return BadRequest("Error");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error en el servidor: {ex.Message}");
+        }
     }
 
     // GET: /api/user/getusers

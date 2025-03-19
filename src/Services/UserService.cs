@@ -16,4 +16,7 @@ public class UserService : IUserService
     public List<UserDto> GetAllUsers() {
         return  _userRepository.GetAllUsers();
     }
+    public bool CreateUser(UserCreate user) {
+        return _userRepository.CreateUser(user);
+    }
 }

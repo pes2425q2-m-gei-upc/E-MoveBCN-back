@@ -156,6 +156,8 @@ public class ApiDbContext : DbContext
         .HasColumnName("hour_end")
         .HasColumnType("time");
 
+      //Relations 
+      
       entity.HasMany(e => e.Hosts)
         .WithOne(e => e.Location)
         .HasForeignKey(e => e.LocationId);
@@ -163,6 +165,7 @@ public class ApiDbContext : DbContext
       entity.HasMany(e => e.Stations)
         .WithOne(e => e.Location)
         .HasForeignKey(e => e.LocationId);
+
 
         
     });
