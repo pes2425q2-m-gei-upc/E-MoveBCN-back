@@ -1,6 +1,8 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Services.Interface;
+using BCrypt.Net;
+
 
 namespace Controllers;
 
@@ -20,8 +22,8 @@ public class UserController : ControllerBase
     public IActionResult GetUserstest()
     {
         var users = new[] {
-            new { Id = 1, Name = "Juan" },
-            new { Id = 2, Name = "Ana" }
+            new { Id = 1, Name = "Juan", Email = "juan@example.com", PasswordHash = "password123", Idioma = "es" },
+            new { Id = 2, Name = "Ana", Email = "ana@example.com", PasswordHash = "password456", Idioma = "en" }
         };
 
         return Ok(users);
@@ -34,5 +36,4 @@ public class UserController : ControllerBase
         var users = _userService.GetAllUsers();
         return Ok(users);
     }
-
 }
