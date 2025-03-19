@@ -1,15 +1,15 @@
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Services.Interface;
-using BCrypt.Net;
 using Dto;
 using System;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace Controllers;
 
 [Route("api/[controller]")]  // Base route: api/user
 [ApiController]
+[Authorize]
 public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
@@ -20,7 +20,7 @@ public class UserController : ControllerBase
     }
 
     // GET: /api/user/getuserstest
-    [HttpGet("getuserstest")]  // Solo ruta adicional
+    [HttpGet("getuserstest")]
     public IActionResult GetUserstest()
     {
         var users = new[] {
@@ -57,7 +57,7 @@ public class UserController : ControllerBase
     }
 
     // GET: /api/user/getusers
-    [HttpGet("getusers")]  // Solo ruta adicional
+    [HttpGet("getusers")]
     public IActionResult GetUsers()
     {
         var users = _userService.GetAllUsers();

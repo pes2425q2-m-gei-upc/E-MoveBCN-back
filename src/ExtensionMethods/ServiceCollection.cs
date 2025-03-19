@@ -1,3 +1,5 @@
+using Helpers;
+using Helpers.Interface;
 using Microsoft.Extensions.DependencyInjection;
 using Repositories;
 using Repositories.Interface;
@@ -10,7 +12,7 @@ public static class ServiceCollection
 {
     public static void AddServices(this IServiceCollection services) {
         //Helper
-
+        services.AddScoped<IAuthenticationHelper, AuthenticationHelper>();
         //Services
         services.AddScoped<IUserService, UserService>();
 

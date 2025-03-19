@@ -5,6 +5,8 @@ using Dto;
 namespace Services.Interface;
 
 public interface IUserService {
-    public List<UserDto> GetAllUsers();
-    public bool CreateUser(UserCreate user);
+    List<UserDto> GetAllUsers();
+    bool CreateUser(UserCreate user);
+
+    Task<UserDto> Authenticate(UserCredentials userCredentials);
 }

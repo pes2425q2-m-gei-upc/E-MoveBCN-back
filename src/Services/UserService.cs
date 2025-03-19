@@ -3,6 +3,8 @@ using Repositories.Interface;
 using System.Collections.Generic;
 using Dto;
 using System.Threading.Tasks;
+using Helpers;
+using Microsoft.AspNetCore.Identity;
 namespace Services;
 
 public class UserService : IUserService
@@ -18,5 +20,20 @@ public class UserService : IUserService
     }
     public bool CreateUser(UserCreate user) {
         return _userRepository.CreateUser(user);
+    }
+    public async Task<UserDto?> Authenticate(UserCredentials userCredentials) {
+        var user = await _userRepository.GetUserByUsername(userCredentials.Username);
+        if (user == null) {
+            return null;
+        }
+        var passwordHasher = new PasswordHasherHelper();
+        var verificationResult = passwordHasher.VerifyHashedPassword(user.PasswordHash, userCredentials.Password);
+        if (verificationResult == PasswordVerificationResult.Failed) {
+            return null;
+        }
+        return user;
+
+
+
     }
 }

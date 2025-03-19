@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using AutoMapper;
 using System;
+using Helpers;
 
 namespace Repositories;
 
@@ -40,13 +41,15 @@ public class UserRepository : IUserRepository
     {
         try
         {
+            var passwordHasher = new PasswordHasherHelper();
+            var password = passwordHasher.HashPassword(userDto.PasswordHash);
 
             var user = new UserEntity
             {
                 UserId = Guid.NewGuid(),
                 Name = userDto.Name,
                 Email = userDto.Email,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(userDto.PasswordHash),
+                PasswordHash = password,
                 Idioma = userDto.Idioma
             };
 
@@ -57,5 +60,12 @@ public class UserRepository : IUserRepository
         {
             return false;
         }
+    }
+    public async Task<UserDto> GetUserByUsername(string username)
+    {
+        var user = await _Dbcontext.Users
+            .FirstOrDefaultAsync(u => u.Name == username);
+
+        return _mapper.Map<UserDto>(user);
     }
 }
