@@ -6,6 +6,7 @@ using Entity;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using AutoMapper;
+using System;
 
 namespace Repositories;
 
@@ -27,7 +28,9 @@ public class UserRepository : IUserRepository
             {
                 UserId = u.UserId.ToString(),
                 Name = u.Name,
-                Email = u.Email
+                Email = u.Email,
+                PasswordHash = u.PasswordHash,
+                Idioma = u.Idioma
             })
             .ToList();
         return _mapper.Map<List<UserDto>>(entities);
