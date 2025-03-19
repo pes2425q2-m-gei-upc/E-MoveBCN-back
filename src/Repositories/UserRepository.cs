@@ -35,4 +35,27 @@ public class UserRepository : IUserRepository
             .ToList();
         return _mapper.Map<List<UserDto>>(entities);
     }
+
+    public bool CreateUser(UserCreate userDto)
+    {
+        try
+        {
+
+            var user = new UserEntity
+            {
+                UserId = Guid.NewGuid(),
+                Name = userDto.Name,
+                Email = userDto.Email,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(userDto.PasswordHash),
+                Idioma = userDto.Idioma
+            };
+
+            _Dbcontext.Users.Add(user);
+            return _Dbcontext.SaveChanges() > 0;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
 }

@@ -6,4 +6,5 @@ namespace Services.Interface;
 
 public interface IUserService {
     public List<UserDto> GetAllUsers();
+    public bool CreateUser(UserCreate user);
 }

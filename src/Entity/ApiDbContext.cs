@@ -163,7 +163,6 @@ public class ApiDbContext : DbContext
       entity.HasMany(e => e.Stations)
         .WithOne(e => e.Location)
         .HasForeignKey(e => e.LocationId);
-
         
     });
 
