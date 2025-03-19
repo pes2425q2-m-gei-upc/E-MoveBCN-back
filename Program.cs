@@ -7,6 +7,7 @@ using Mapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
+using Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
