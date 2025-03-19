@@ -6,8 +6,6 @@ namespace Entity;
 
 public class StateBicingEntity
 {
-    [Key]
-    [ForeignKey("BicingStation")]
     public int BicingId { get; set; }
     public int NumBikesAvailable { get; set; }
     public int NumBikesAvailableMechanical { get; set; }
