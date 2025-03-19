@@ -7,4 +7,5 @@ namespace Repositories.Interface;
 public interface IUserRepository {
     public List<UserDto> GetAllUsers();
     public bool CreateUser(UserCreate user);
+    public Task<UserDto> GetUserByUsername(string username);
 }
