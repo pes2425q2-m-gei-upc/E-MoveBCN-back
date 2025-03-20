@@ -32,8 +32,18 @@ public class UserService : IUserService
             return null;
         }
         return user;
+    }
 
-
-
+    public async Task<bool> DeleteUser(UserCredentials userCredentials) {
+        var user = await _userRepository.GetUserByUsername(userCredentials.Username);
+        if (user == null) {
+            return false;
+        }
+        var passwordHasher = new PasswordHasherHelper();
+        var verificationResult = passwordHasher.VerifyHashedPassword(user.PasswordHash, userCredentials.Password);
+        if (verificationResult == PasswordVerificationResult.Failed) {
+            return false;
+        }
+        return await _userRepository.DeleteUser(user.UserId);
     }
 }
