@@ -68,4 +68,17 @@ public class UserRepository : IUserRepository
 
         return _mapper.Map<UserDto>(user);
     }
+
+    public async Task<bool> DeleteUser(string userId)
+{
+    if (!Guid.TryParse(userId, out Guid parsedUserId))
+        return false; 
+
+    int deletedRows = await _Dbcontext.Users
+        .Where(u => u.UserId == parsedUserId)
+        .ExecuteDeleteAsync();
+
+    return deletedRows > 0;
+}
+
 }

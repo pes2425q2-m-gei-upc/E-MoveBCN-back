@@ -7,6 +7,6 @@ namespace Services.Interface;
 public interface IUserService {
     List<UserDto> GetAllUsers();
     bool CreateUser(UserCreate user);
-
+    Task<bool> DeleteUser(UserCredentials userCredentials);
     Task<UserDto> Authenticate(UserCredentials userCredentials);
 }

@@ -3,6 +3,7 @@ using Services.Interface;
 using Dto;
 using System;
 using Microsoft.AspNetCore.Authorization;
+using System.Threading.Tasks;
 
 
 namespace Controllers;
@@ -55,7 +56,30 @@ public class UserController : ControllerBase
             return StatusCode(500, $"Error en el servidor: {ex.Message}");
         }
     }
+    //DELETE /api/user/deleteuser
+    [HttpDelete("deleteuser")]
+    public async Task<IActionResult> DeleteUser([FromBody] UserCredentials user)
+    {
+        if (user == null)
+        {
+            return BadRequest("Invalid data");
+        }
 
+        try
+        {
+            var isDeleted = await _userService.DeleteUser(user);
+
+            if (isDeleted)
+            {
+                return Ok("User deleted successfully");
+            }
+            return BadRequest("Incorrect credentials");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error en el servidor: {ex.Message}");
+        }
+    }
     // GET: /api/user/getusers
     [HttpGet("getusers")]
     public IActionResult GetUsers()
