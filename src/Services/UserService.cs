@@ -46,4 +46,7 @@ public class UserService : IUserService
         }
         return await _userRepository.DeleteUser(user.UserId);
     }
+    public async Task<bool> ModifyUser(UserDto userModify) {
+        return await _userRepository.ModifyUser(userModify);
+    }
 }

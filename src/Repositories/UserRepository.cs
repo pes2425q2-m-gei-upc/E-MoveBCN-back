@@ -70,15 +70,34 @@ public class UserRepository : IUserRepository
     }
 
     public async Task<bool> DeleteUser(string userId)
-{
-    if (!Guid.TryParse(userId, out Guid parsedUserId))
-        return false; 
+    {
+        if (!Guid.TryParse(userId, out Guid parsedUserId))
+            return false; 
 
-    int deletedRows = await _Dbcontext.Users
-        .Where(u => u.UserId == parsedUserId)
-        .ExecuteDeleteAsync();
+        int deletedRows = await _Dbcontext.Users
+            .Where(u => u.UserId == parsedUserId)
+            .ExecuteDeleteAsync();
 
-    return deletedRows > 0;
-}
+        return deletedRows > 0;
+    }
 
+    public async Task<bool> ModifyUser(UserDto userModify) 
+    {
+        var user = await _Dbcontext.Users.FirstOrDefaultAsync(u => u.UserId == Guid.Parse(userModify.UserId));
+        if (user == null)
+        {
+            return false;
+        }
+
+        var passwordHasher = new PasswordHasherHelper();
+        var password = passwordHasher.HashPassword(userModify.PasswordHash);
+
+        user.Name = userModify.Name;
+        user.Email = userModify.Email;
+        user.PasswordHash = password;
+        user.Idioma = userModify.Idioma;
+
+        _Dbcontext.Users.Update(user);
+        return await _Dbcontext.SaveChangesAsync() > 0;
+    }
 }
