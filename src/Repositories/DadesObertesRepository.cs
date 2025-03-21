@@ -10,11 +10,11 @@ namespace Repositories;
 
 public class DadesObertesRepository : IDadesObertesRepository
 {
-    private readonly ApiDbContext _context;
+    private readonly ApiDbContext _Dbcontext;
     private readonly IMapper _mapper;
-    public DadesObertesRepository(ApiDbContext context, IMapper mapper)
+    public DadesObertesRepository(ApiDbContext Dbcontext, IMapper mapper)
     {
-            _context = context;
+            _Dbcontext = Dbcontext;
             _mapper = mapper;
     }
 
@@ -34,8 +34,8 @@ public class DadesObertesRepository : IDadesObertesRepository
             LastUpdated = location.LastUpdated
         };
 
-        _context.LocationEntity.Add(entity);
-        await _context.SaveChangesAsync();
+        _Dbcontext.LocationEntity.Add(entity);
+        await _Dbcontext.SaveChangesAsync();
     }
 
     public async Task AddHostAsync(HostDto host)
@@ -52,8 +52,8 @@ public class DadesObertesRepository : IDadesObertesRepository
             LocationId = host.LocationId
         };
 
-        _context.Hosts.Add(entity);
-        await _context.SaveChangesAsync();
+        _Dbcontext.Hosts.Add(entity);
+        await _Dbcontext.SaveChangesAsync();
     }
 
     public async Task AddStationAsync(StationDto station)
@@ -68,8 +68,8 @@ public class DadesObertesRepository : IDadesObertesRepository
             LocationId = station.LocationId
         };
 
-        _context.Stations.Add(entity);
-        await _context.SaveChangesAsync();
+        _Dbcontext.Stations.Add(entity);
+        await _Dbcontext.SaveChangesAsync();
     }
 
     public async Task AddPortAsync(PortDto port)
@@ -85,14 +85,14 @@ public class DadesObertesRepository : IDadesObertesRepository
             StationId = port.StationId
         };
 
-        _context.Ports.Add(entity);
-        await _context.SaveChangesAsync();
+        _Dbcontext.Ports.Add(entity);
+        await _Dbcontext.SaveChangesAsync();
     }
 
-    public List<StationDto> GetAllStations()
+    public async Task<List<StationDto>> GetAllStations()
     {
-        var entities = _context.Stations
-            .Select(s => new StationDto
+        var entities = await _Dbcontext.Stations
+            .Select(s => new StationEntity
             {
                 StationId = s.StationId,
                 StationLabel = s.StationLabel,
@@ -101,7 +101,7 @@ public class DadesObertesRepository : IDadesObertesRepository
                 Reservable = s.Reservable,
                 LocationId = s.LocationId
             })
-            .ToList();
+            .ToListAsync();
 
         return _mapper.Map<List<StationDto>>(entities);
     }

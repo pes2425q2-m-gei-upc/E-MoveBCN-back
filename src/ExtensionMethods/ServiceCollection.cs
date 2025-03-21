@@ -15,9 +15,10 @@ public static class ServiceCollection
         services.AddScoped<IAuthenticationHelper, AuthenticationHelper>();
         //Services
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IDadesObertesService, DadesObertesService>();
 
         //Repositories
         services.AddScoped<IUserRepository, UserRepository>();
-
+        services.AddScoped<IDadesObertesRepository, DadesObertesRepository>();
     }
 }

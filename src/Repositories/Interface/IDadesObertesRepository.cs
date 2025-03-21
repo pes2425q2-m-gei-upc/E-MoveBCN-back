@@ -6,7 +6,7 @@ namespace Repositories.Interface;
 
 public interface IDadesObertesRepository
 {
-    List<StationDto> GetAllStations();
+    Task<List<StationDto>> GetAllStations();
     Task AddLocationAsync(LocationDto location);
     Task AddHostAsync(HostDto host);
     Task AddStationAsync(StationDto station);

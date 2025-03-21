@@ -6,5 +6,5 @@ namespace Services.Interface;
 
 public interface IDadesObertesService
 {
-    Task<List<StationEntity>> GetAllStationsAsync();
+    Task<List<StationDto>> GetAllStationsAsync();
 }

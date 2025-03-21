@@ -10,9 +10,10 @@ using Entity;
 using Repositories.Interface;
 using Dto;
 using Repositories;
+using Services.Interface;
 namespace Services;
 
-public class DadesObertesService
+public class DadesObertesService : IDadesObertesService
 {
     private readonly IDadesObertesRepository _DadesObertesRepository;
     private readonly HttpClient _httpClient;
@@ -28,7 +29,7 @@ public class DadesObertesService
 
     public async Task<List<StationDto>> GetAllStationsAsync()
     {
-            return _DadesObertesRepository.GetAllStations();
+            return await _DadesObertesRepository.GetAllStations();
     }
 
     public async Task FetchAndStoreChargingStationsAsync()
