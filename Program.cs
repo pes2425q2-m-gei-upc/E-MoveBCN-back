@@ -14,12 +14,13 @@ using System.Threading.Tasks;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddHttpClient();
+
 // API Controllers
 builder.Services.AddControllers();
 
 // API Services Helpers and Repos
 builder.Services.AddServices();
-
 // Configura el acceso a la base de datos, solo pasamos los options al DbContext
 builder.Services.AddDbContext<ApiDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
