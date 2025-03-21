@@ -87,4 +87,28 @@ public class UserController : ControllerBase
         var users = _userService.GetAllUsers();
         return Ok(users);
     }
+    // POST: /api/user/modify
+    [HttpPost("modify")]
+    public async Task<IActionResult> ModifyUser([FromBody] UserDto user)
+    {
+        if (user == null)
+        {
+            return BadRequest("Invalid data");
+        }
+
+        try
+        {
+            var isModified = await _userService.ModifyUser(user);
+
+            if (isModified)
+            {
+                return Ok("User modified successfully");
+            }
+            return BadRequest("Incorrect credentials");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error en el servidor: {ex.Message}");
+        }
+    }
 }
