@@ -19,7 +19,6 @@ public class ApiDbContext : DbContext
     public DbSet<HostEntity> Hosts { get; set; }
     public DbSet<StationEntity> Stations { get; set; }
     public DbSet<PortEntity> Ports { get; set; }
-    public DbSet<AuthenticationEntity> Authentications { get; set; }
     public DbSet<BicingStationEntity> BicingStations { get; set; }
     public DbSet<StateBicingEntity> StateBicing { get; set; }
 
@@ -84,10 +83,6 @@ public class ApiDbContext : DbContext
         .HasColumnName("network_brand_name")
         .HasColumnType("text");
 
-      entity.Property(e => e.NetworkName)
-        .HasColumnName("network_name")
-        .HasColumnType("text");
-
       entity.Property(e => e.OperatorPhone)
         .HasColumnName("operator_phone")
         .HasColumnType("text");
@@ -112,57 +107,13 @@ public class ApiDbContext : DbContext
         .HasColumnName("locality")
         .HasColumnType("text");
 
-      entity.Property(e => e.AdminArea)
-        .HasColumnName("admin_area")
-        .HasColumnType("text");
-
       entity.Property(e => e.PostalCode)
         .HasColumnName("postal_code")
         .HasColumnType("text");
 
-      entity.Property(e => e.CountryCode)
-        .HasColumnName("country_code")
-        .HasColumnType("text");
-      
-      entity.Property(e => e.LanguageCode)
-        .HasColumnName("language_code")
-        .HasColumnType("text");
-
-      entity.Property(e => e.AccessRestriction)
-        .HasColumnName("access_restriction")
-        .HasColumnType("text");
-
-      entity.Property(e => e.OnstreetLocation)
-        .HasColumnName("onstreet_location")
-        .HasColumnType("boolean");
-
       entity.Property(e => e.LastUpdated)
         .HasColumnName("last_updated")
         .HasColumnType("timestamp");
-
-      entity.Property(e => e.WeekdayBegin)
-        .HasColumnName("weekday_begin")
-        .HasColumnType("integer");
-
-      entity.Property(e => e.WeekdayEnd)
-        .HasColumnName("weekday_end")
-        .HasColumnType("integer");  
-      
-      entity.Property(e => e.HourBegin)
-        .HasColumnName("hour_begin")
-        .HasColumnType("time");
-
-      entity.Property(e => e.HourEnd)
-        .HasColumnName("hour_end")
-        .HasColumnType("time");
-
-      entity.HasMany(e => e.Hosts)
-        .WithOne(e => e.Location)
-        .HasForeignKey(e => e.LocationId);
-
-      entity.HasMany(e => e.Stations)
-        .WithOne(e => e.Location)
-        .HasForeignKey(e => e.LocationId);
         
     });
 
@@ -191,14 +142,6 @@ public class ApiDbContext : DbContext
         .HasColumnName("host_postal_code")
         .HasColumnType("text");
 
-      entity.Property(e => e.CountryCode)
-        .HasColumnName("country_code")
-        .HasColumnType("text");
-
-      entity.Property(e => e.LanguageCode)
-        .HasColumnName("language_code")
-        .HasColumnType("text");
-
       entity.Property(e => e.OperatorPhone)
         .HasColumnName("operator_phone")
         .HasColumnType("text");
@@ -207,8 +150,14 @@ public class ApiDbContext : DbContext
         .HasColumnName("operator_website")
         .HasColumnType("text");
 
-      entity.HasOne(e => e.Location)
-        .WithMany(e => e.Hosts)
+      entity.Property(e => e.LocationId)
+        .HasColumnName("id_location")
+        .HasColumnType("text");
+
+      //Relations 
+
+      entity.HasOne(e => e.LocationIdNavigation)
+        .WithMany()
         .HasForeignKey(e => e.LocationId);
       
       
@@ -218,6 +167,8 @@ public class ApiDbContext : DbContext
     {
       entity.ToTable("stations");
       entity.HasKey(e => e.StationId);
+
+      //Columns
 
       entity.Property(e => e.StationId)
         .HasColumnName("station_id")
@@ -235,8 +186,18 @@ public class ApiDbContext : DbContext
         .HasColumnName("station_longitude")
         .HasColumnType("float");
 
-      entity.HasOne(e => e.Location)
-        .WithMany(e => e.Stations)
+      entity.Property(e => e.Reservable)
+        .HasColumnName("reservable")
+        .HasColumnType("boolean");
+
+      entity.Property(e => e.LocationId)
+        .HasColumnName("id_location")
+        .HasColumnType("text");
+
+      //Relations
+
+      entity.HasOne(e => e.LocationIdNavigation)
+        .WithMany()
         .HasForeignKey(e => e.LocationId);
       
       
@@ -271,41 +232,16 @@ public class ApiDbContext : DbContext
         .HasColumnName("last_updated")
         .HasColumnType("timestamp");
 
-      entity.Property(e => e.Notes)
-        .HasColumnName("notes")
+      entity.Property(e => e.StationId)
+        .HasColumnName("id_station")
         .HasColumnType("text");
+      
+      //Relations
 
-      entity.Property(e => e.Reservable)
-        .HasColumnName("reservable")
-        .HasColumnType("boolean");
+      entity.HasOne(e => e.StationIdNavigation)
+        .WithMany()
+        .HasForeignKey(e => e.StationId);
 
-      entity.HasMany(e => e.Authentications)
-        .WithOne(e => e.Port)
-        .HasForeignKey(e => e.PortId);
-    });
-
-    modelBuilder.Entity<AuthenticationEntity>(entity =>
-    {
-      entity.ToTable("authentications");
-      entity.HasKey(e => e.AuthenticationId);
-
-      entity.Property(e => e.AuthenticationId)
-        .HasColumnName("authentication_id")
-        .HasColumnType("text");
-
-      entity.Property(e => e.PortId)
-        .HasColumnName("port_id")
-        .HasColumnType("text");
-
-      entity.Property(e => e.PaymentRequired)
-        .HasColumnName("payment_required")
-        .HasColumnType("boolean");
-
-      entity.HasOne(e => e.Port)
-        .WithMany(e => e.Authentications)
-        .HasForeignKey(e => e.PortId);
-        
-        
     });
 
     modelBuilder.Entity<BicingStationEntity>(entity =>
@@ -353,25 +289,10 @@ public class ApiDbContext : DbContext
         .HasColumnName("is_charging_station")
         .HasColumnType("boolean");
 
-      entity.Property(e => e.ShortName)
-        .HasColumnName("short_name")
-        .HasColumnType("integer");
-
-      entity.Property(e => e.NearbyDistance)
-        .HasColumnName("nearby_distance")
-        .HasColumnType("real");
-
       entity.Property(e => e.LastUpdated)
         .HasColumnName("last_updated")
         .HasColumnType("date");
 
-      entity.Property(e => e.RideCodeSupport)
-        .HasColumnName("_ride_code_support")
-        .HasColumnType("boolean");
-
-      entity.HasOne(e => e.State)
-        .WithOne(e => e.BicingStation)
-        .HasForeignKey<StateBicingEntity>(e => e.BicingId);
     });
 
     modelBuilder.Entity<StateBicingEntity>(entity =>
@@ -407,17 +328,9 @@ public class ApiDbContext : DbContext
         .HasColumnName("status")
         .HasColumnType("char(50)");
 
-      entity.Property(e => e.IsInstalled)
-        .HasColumnName("is_installed")
-        .HasColumnType("integer");
-
-      entity.Property(e => e.IsRenting)
-        .HasColumnName("is_renting")
-        .HasColumnType("integer");
-
-      entity.HasOne(e => e.BicingStation)
-        .WithOne(e => e.State)
-        .HasForeignKey<StateBicingEntity>(e => e.BicingId);
+      entity.HasOne(e => e.BicingStationIdNavigation)
+        .WithMany()
+        .HasForeignKey(e => e.BicingId);
     });
   }
 }

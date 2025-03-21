@@ -2,11 +2,11 @@ using System.Collections.Generic;
 
 public class StationDto
 {
-    public string StationId { get; set; }
-    public string StationLabel { get; set; }
-    public float StationLatitude { get; set; }
-    public float StationLongitude { get; set; }
-    public string Notes { get; set; }
-    public bool Reservable { get; set; }
-    public List<AuthenticationDto> Authentications { get; set; }    
+    public required string StationId { get; set; }
+    public required string StationLabel { get; set; }
+    public required float StationLatitude { get; set; }
+    public required float StationLongitude { get; set; }
+    public required bool Reservable { get; set; }
+    public required string LocationId { get; set; }
+    public LocationDto? Location { get; set; }    
 }

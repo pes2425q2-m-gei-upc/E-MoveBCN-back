@@ -1,11 +1,11 @@
 public class StationEntity
 {
     
-    public string StationId { get; set; } 
-    public string StationLabel { get; set; }
-    public float StationLatitude { get; set; }
-    public float StationLongitude { get; set; }
-    
-    public string LocationId { get; set; }
-    public LocationEntity Location { get; set; } 
+    public required string StationId { get; set; } 
+    public required string StationLabel { get; set; }
+    public required float StationLatitude { get; set; }
+    public required float StationLongitude { get; set; }
+    public required bool Reservable { get; set; }
+    public required string LocationId { get; set; }
+    public LocationEntity? LocationIdNavigation { get; set; } 
 }

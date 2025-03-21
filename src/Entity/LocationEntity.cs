@@ -1,30 +1,15 @@
 using System;
-using System.Collections.Generic;
 
 public class LocationEntity
 {
-    public string LocationId { get; set; }
-    public string NetworkBrandName { get; set; }
-    public string NetworkName { get; set; }
-    public string OperatorPhone { get; set; }
-
-    public string OperatorWebsite { get; set; }
-    public float Latitude { get; set; }
-    public float Longitude { get; set; }
-    public string AddressString { get; set; }
-    public string Locality { get; set; }
-    public string AdminArea { get; set; }
-    public string PostalCode { get; set; }
-    public string CountryCode { get; set; }
-    public string LanguageCode { get; set; }
-    public string AccessRestriction { get; set; }
-    public bool OnstreetLocation { get; set; }
+    public required string LocationId { get; set; }
+    public required string NetworkBrandName { get; set; }
+    public required string OperatorPhone { get; set; }
+    public required string OperatorWebsite { get; set; }
+    public required float Latitude { get; set; }
+    public required float Longitude { get; set; }
+    public required string AddressString { get; set; }
+    public required string Locality { get; set; }
+    public required string PostalCode { get; set; }
     public DateTime LastUpdated { get; set; }
-    public int WeekdayBegin { get; set; }
-    public int WeekdayEnd { get; set; }
-    public TimeSpan HourBegin { get; set; }
-    public TimeSpan HourEnd { get; set; }
-    
-    public ICollection<HostEntity> Hosts { get; set; }
-    public ICollection<StationEntity> Stations { get; set; }
 }
