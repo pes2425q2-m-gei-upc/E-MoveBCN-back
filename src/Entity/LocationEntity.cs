@@ -11,5 +11,4 @@ public class LocationEntity
     public required string AddressString { get; set; }
     public required string Locality { get; set; }
     public required string PostalCode { get; set; }
-    public DateTime LastUpdated { get; set; }
 }

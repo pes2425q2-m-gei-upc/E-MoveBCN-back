@@ -28,7 +28,4 @@ public class LocationDto
     
     [JsonPropertyName("address.postal_code")]
     public required string PostalCode { get; set; }
-    
-    [JsonPropertyName("last_updated")]
-    public DateTime LastUpdated { get; set; }
 }

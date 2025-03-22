@@ -18,6 +18,8 @@ public class DadesObertesRepository : IDadesObertesRepository
             _mapper = mapper;
     }
 
+     
+
     public async Task AddLocationAsync(LocationDto location)
     {
         var entity = new LocationEntity
@@ -30,12 +32,23 @@ public class DadesObertesRepository : IDadesObertesRepository
             Longitude = (float)location.Longitude,
             AddressString = location.AddressString,
             Locality = location.Locality,
-            PostalCode = location.PostalCode,
-            LastUpdated = location.LastUpdated
+            PostalCode = location.PostalCode
         };
 
-        _Dbcontext.LocationEntity.Add(entity);
-        await _Dbcontext.SaveChangesAsync();
+        using (var transaction = await _Dbcontext.Database.BeginTransactionAsync())
+        {
+            try
+            {
+            _Dbcontext.Locations.Add(entity);
+            await _Dbcontext.SaveChangesAsync();
+            await transaction.CommitAsync(); 
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync(); 
+                throw;
+            }
+        }
     }
 
     public async Task AddHostAsync(HostDto host)
@@ -52,8 +65,20 @@ public class DadesObertesRepository : IDadesObertesRepository
             LocationId = host.LocationId
         };
 
-        _Dbcontext.Hosts.Add(entity);
-        await _Dbcontext.SaveChangesAsync();
+        using (var transaction = await _Dbcontext.Database.BeginTransactionAsync())
+        {
+            try
+            {
+            _Dbcontext.Hosts.Add(entity);
+            await _Dbcontext.SaveChangesAsync();
+            await transaction.CommitAsync(); 
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync(); 
+                throw;
+            }
+        }
     }
 
     public async Task AddStationAsync(StationDto station)
@@ -68,8 +93,20 @@ public class DadesObertesRepository : IDadesObertesRepository
             LocationId = station.LocationId
         };
 
-        _Dbcontext.Stations.Add(entity);
-        await _Dbcontext.SaveChangesAsync();
+        using (var transaction = await _Dbcontext.Database.BeginTransactionAsync())
+        {
+            try
+            {
+            _Dbcontext.Stations.Add(entity);
+            await _Dbcontext.SaveChangesAsync();
+            await transaction.CommitAsync(); 
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync(); 
+                throw;
+            }
+        }
     }
 
     public async Task AddPortAsync(PortDto port)
@@ -85,8 +122,20 @@ public class DadesObertesRepository : IDadesObertesRepository
             StationId = port.StationId
         };
 
-        _Dbcontext.Ports.Add(entity);
-        await _Dbcontext.SaveChangesAsync();
+        using (var transaction = await _Dbcontext.Database.BeginTransactionAsync())
+        {
+            try
+            {
+            _Dbcontext.Ports.Add(entity);
+            await _Dbcontext.SaveChangesAsync();
+            await transaction.CommitAsync(); 
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync(); 
+                throw;
+            }
+        }
     }
 
     public async Task<List<StationDto>> GetAllStations()

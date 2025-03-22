@@ -25,4 +25,11 @@ public class DadesObertesController : ControllerBase
         var stations = await _dadesObertesService.GetAllStationsAsync();
         return Ok(stations);
     }
+
+    [HttpPost("fetch-and-store")]
+    public async Task<IActionResult> FetchAndStoreChargingStations()
+    {
+        await _dadesObertesService.FetchAndStoreChargingStationsAsync();
+        return Ok("Charging stations fetched and stored successfully.");
+    }
 }

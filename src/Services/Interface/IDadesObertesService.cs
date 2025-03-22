@@ -7,4 +7,6 @@ namespace Services.Interface;
 public interface IDadesObertesService
 {
     Task<List<StationDto>> GetAllStationsAsync();
+
+    Task FetchAndStoreChargingStationsAsync();
 }

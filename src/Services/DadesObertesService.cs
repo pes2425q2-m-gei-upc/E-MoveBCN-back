@@ -58,8 +58,7 @@ public class DadesObertesService : IDadesObertesService
                     Longitude = locationElement.GetProperty("coordinates").GetProperty("longitude").GetDouble(),
                     AddressString = locationElement.GetProperty("address").GetProperty("address_string").GetString(),
                     Locality = locationElement.GetProperty("address").GetProperty("locality").GetString(),
-                    PostalCode = locationElement.GetProperty("address").GetProperty("postal_code").GetString(),
-                    LastUpdated = locationElement.GetProperty("LastUpdated").GetDateTime()
+                    PostalCode = locationElement.GetProperty("address").GetProperty("postal_code").GetString()
                 };
 
                 await _DadesObertesRepository.AddLocationAsync(Location);
