@@ -102,7 +102,7 @@ namespace Services
                         {
                             var stationId = stationElement.GetProperty("id").GetString();
                             
-                            string stationLabel = "Station " + stationId; 
+                            string stationLabel = null; 
                             if (stationElement.TryGetProperty("label", out var labelElement))
                             {
                                 stationLabel = labelElement.GetString();
