@@ -6,7 +6,7 @@ public class StationDto
     [JsonPropertyName("id")]
     public required string StationId { get; set; }
     [JsonPropertyName("label")]
-    public required string StationLabel { get; set; }
+    public string? StationLabel { get; set; }
     [JsonPropertyName("coordinates.latitude")]
     public required double StationLatitude { get; set; }
     [JsonPropertyName("coordinates.longitude")]
