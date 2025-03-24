@@ -13,10 +13,12 @@ public static class ServiceCollection
     public static void AddServices(this IServiceCollection services) {
         //Helper
         services.AddScoped<IAuthenticationHelper, AuthenticationHelper>();
+        
         //Services
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IDadesObertesService, DadesObertesService>();
-
+        services.AddHostedService<ChargingStationsBackgroundService>();
+        
         //Repositories
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IDadesObertesRepository, DadesObertesRepository>();

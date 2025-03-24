@@ -7,8 +7,10 @@ namespace Repositories.Interface;
 public interface IDadesObertesRepository
 {
     Task<List<StationDto>> GetAllStations();
-    Task AddLocationAsync(LocationDto location);
-    Task AddHostAsync(HostDto host);
-    Task AddStationAsync(StationDto station);
-    Task AddPortAsync(PortDto port);
+    Task BulkInsertAsync(
+        List<LocationEntity> locations,
+        List<HostEntity> hosts,
+        List<StationEntity> stations,
+        List<PortEntity> ports
+    );
 }

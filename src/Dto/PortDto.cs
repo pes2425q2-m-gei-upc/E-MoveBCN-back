@@ -18,6 +18,9 @@ public class PortDto
     
     [JsonPropertyName("port_status[0].status")]
     public required string PortStatus { get; set; }
+
+    [JsonPropertyName("reservable")]
+    public required bool Reservable { get; set; }
     
     [JsonPropertyName("last_updated")]
     public required DateTime LastUpdated { get; set; }

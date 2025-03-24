@@ -11,8 +11,6 @@ public class StationDto
     public required double StationLatitude { get; set; }
     [JsonPropertyName("coordinates.longitude")]
     public required double StationLongitude { get; set; }
-    [JsonPropertyName("reservable")]
-    public required bool Reservable { get; set; }
     public required string LocationId { get; set; }
     public LocationDto? Location { get; set; }    
 }

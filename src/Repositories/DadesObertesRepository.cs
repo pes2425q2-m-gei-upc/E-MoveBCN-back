@@ -6,153 +6,71 @@ using Microsoft.EntityFrameworkCore;
 using Repositories.Interface;
 using AutoMapper;
 using System.Linq;
-namespace Repositories;
 
-public class DadesObertesRepository : IDadesObertesRepository
+namespace Repositories
 {
-    private readonly ApiDbContext _Dbcontext;
-    private readonly IMapper _mapper;
-    public DadesObertesRepository(ApiDbContext Dbcontext, IMapper mapper)
+    public class DadesObertesRepository : IDadesObertesRepository
     {
-            _Dbcontext = Dbcontext;
+        private readonly ApiDbContext _dbContext;
+        private readonly IMapper _mapper;
+        
+        public DadesObertesRepository(ApiDbContext dbContext, IMapper mapper)
+        {
+            _dbContext = dbContext;
             _mapper = mapper;
-    }
+        }
 
-     
-
-    public async Task AddLocationAsync(LocationDto location)
-    {
-        var entity = new LocationEntity
+        public async Task BulkInsertAsync(
+            List<LocationEntity> locations,
+            List<HostEntity> hosts,
+            List<StationEntity> stations,
+            List<PortEntity> ports)
         {
-            LocationId = location.LocationId,
-            NetworkBrandName = location.NetworkBrandName,
-            OperatorPhone = location.OperatorPhone,
-            OperatorWebsite = location.OperatorWebsite,
-            Latitude = (float)location.Latitude,
-            Longitude = (float)location.Longitude,
-            AddressString = location.AddressString,
-            Locality = location.Locality,
-            PostalCode = location.PostalCode
-        };
+            using (var transaction = await _dbContext.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    await _dbContext.Database.ExecuteSqlRawAsync("TRUNCATE TABLE location CASCADE");
+                    await _dbContext.Database.ExecuteSqlRawAsync("TRUNCATE TABLE host CASCADE");
+                    await _dbContext.Database.ExecuteSqlRawAsync("TRUNCATE TABLE station CASCADE");
+                    await _dbContext.Database.ExecuteSqlRawAsync("TRUNCATE TABLE port CASCADE");
 
-        using (var transaction = await _Dbcontext.Database.BeginTransactionAsync())
-        {
-            try
-            {
-            _Dbcontext.Locations.Add(entity);
-            await _Dbcontext.SaveChangesAsync();
-            await transaction.CommitAsync(); 
-            }
-            catch (Exception)
-            {
-                await transaction.RollbackAsync(); 
-                throw;
+                    await _dbContext.Locations.AddRangeAsync(locations);
+                    await _dbContext.SaveChangesAsync(); 
+                
+                    await _dbContext.Hosts.AddRangeAsync(hosts);
+                    await _dbContext.SaveChangesAsync(); 
+                    
+                    await _dbContext.Stations.AddRangeAsync(stations);
+                    await _dbContext.SaveChangesAsync(); 
+                    
+                    await _dbContext.Ports.AddRangeAsync(ports);
+                    await _dbContext.SaveChangesAsync(); 
+
+                    await transaction.CommitAsync();
+                }
+                catch (Exception)
+                {
+                    await transaction.RollbackAsync();
+                    throw;
+                }
             }
         }
-    }
 
-    public async Task AddHostAsync(HostDto host)
-    {
-        var entity = new HostEntity
+        public async Task<List<StationDto>> GetAllStations()
         {
-            HostId = Guid.NewGuid(),
-            HostName = host.HostName,
-            HostAddress = host.HostAddress,
-            HostLocality = host.HostLocality,
-            HostPostalCode = host.HostPostalCode,
-            OperatorPhone = host.OperatorPhone,
-            OperatorWebsite = host.OperatorWebsite,
-            LocationId = host.LocationId
-        };
+            var entities = await _dbContext.Stations
+                .Select(s => new StationEntity
+                {
+                    StationId = s.StationId,
+                    StationLabel = s.StationLabel,
+                    StationLatitude = s.StationLatitude,
+                    StationLongitude = s.StationLongitude,
+                    LocationId = s.LocationId
+                })
+                .ToListAsync();
 
-        using (var transaction = await _Dbcontext.Database.BeginTransactionAsync())
-        {
-            try
-            {
-            _Dbcontext.Hosts.Add(entity);
-            await _Dbcontext.SaveChangesAsync();
-            await transaction.CommitAsync(); 
-            }
-            catch (Exception)
-            {
-                await transaction.RollbackAsync(); 
-                throw;
-            }
+            return _mapper.Map<List<StationDto>>(entities);
         }
     }
-
-    public async Task AddStationAsync(StationDto station)
-    {
-        var entity = new StationEntity
-        {
-            StationId = station.StationId,
-            StationLabel = station.StationLabel,
-            StationLatitude = station.StationLatitude,
-            StationLongitude = station.StationLongitude,
-            Reservable = station.Reservable,
-            LocationId = station.LocationId
-        };
-
-        using (var transaction = await _Dbcontext.Database.BeginTransactionAsync())
-        {
-            try
-            {
-            _Dbcontext.Stations.Add(entity);
-            await _Dbcontext.SaveChangesAsync();
-            await transaction.CommitAsync(); 
-            }
-            catch (Exception)
-            {
-                await transaction.RollbackAsync(); 
-                throw;
-            }
-        }
-    }
-
-    public async Task AddPortAsync(PortDto port)
-    {
-        var entity = new PortEntity
-        {
-            PortId = port.PortId,
-            ConnectorType = port.ConnectorType,
-            PowerKw = port.PowerKw,
-            ChargingMechanism = port.ChargingMechanism,
-            Status = port.PortStatus,
-            LastUpdated = port.LastUpdated,
-            StationId = port.StationId
-        };
-
-        using (var transaction = await _Dbcontext.Database.BeginTransactionAsync())
-        {
-            try
-            {
-            _Dbcontext.Ports.Add(entity);
-            await _Dbcontext.SaveChangesAsync();
-            await transaction.CommitAsync(); 
-            }
-            catch (Exception)
-            {
-                await transaction.RollbackAsync(); 
-                throw;
-            }
-        }
-    }
-
-    public async Task<List<StationDto>> GetAllStations()
-    {
-        var entities = await _Dbcontext.Stations
-            .Select(s => new StationEntity
-            {
-                StationId = s.StationId,
-                StationLabel = s.StationLabel,
-                StationLatitude = s.StationLatitude,
-                StationLongitude = s.StationLongitude,
-                Reservable = s.Reservable,
-                LocationId = s.LocationId
-            })
-            .ToListAsync();
-
-        return _mapper.Map<List<StationDto>>(entities);
-    }
-    
 }

@@ -182,10 +182,6 @@ public class ApiDbContext : DbContext
         .HasColumnName("station_longitude")
         .HasColumnType("float");
 
-      entity.Property(e => e.Reservable)
-        .HasColumnName("reservable")
-        .HasColumnType("boolean");
-
       entity.Property(e => e.LocationId)
         .HasColumnName("location_id")
         .HasColumnType("text");
@@ -223,6 +219,10 @@ public class ApiDbContext : DbContext
       entity.Property(e => e.Status)
         .HasColumnName("status")
         .HasColumnType("text");
+
+      entity.Property(e => e.Reservable)
+        .HasColumnName("reservable")
+        .HasColumnType("boolean");
 
       entity.Property(e => e.LastUpdated)
         .HasColumnName("last_updated")
@@ -284,10 +284,6 @@ public class ApiDbContext : DbContext
       entity.Property(e => e.IsChargingStation)
         .HasColumnName("is_charging_station")
         .HasColumnType("boolean");
-
-      entity.Property(e => e.LastUpdated)
-        .HasColumnName("last_updated")
-        .HasColumnType("date");
 
     });
 
