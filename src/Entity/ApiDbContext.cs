@@ -15,7 +15,7 @@ public class ApiDbContext : DbContext
     }
 
     public DbSet<UserEntity> Users { get; set; }
-    public DbSet<LocationEntity> LocationEntity { get; set; }
+    public DbSet<LocationEntity> Locations { get; set; }
     public DbSet<HostEntity> Hosts { get; set; }
     public DbSet<StationEntity> Stations { get; set; }
     public DbSet<PortEntity> Ports { get; set; }
@@ -72,7 +72,7 @@ public class ApiDbContext : DbContext
 
     modelBuilder.Entity<LocationEntity>(entity =>
     {
-      entity.ToTable("locations");
+      entity.ToTable("location");
       entity.HasKey(e => e.LocationId);
 
       entity.Property(e => e.LocationId)
@@ -93,11 +93,11 @@ public class ApiDbContext : DbContext
 
       entity.Property(e => e.Latitude)
         .HasColumnName("latitude")
-        .HasColumnType("float");
+        .HasColumnType("real");
 
       entity.Property(e => e.Longitude)
         .HasColumnName("longitude")
-        .HasColumnType("float");
+        .HasColumnType("real");
 
       entity.Property(e => e.AddressString)
         .HasColumnName("address_string")
@@ -110,21 +110,17 @@ public class ApiDbContext : DbContext
       entity.Property(e => e.PostalCode)
         .HasColumnName("postal_code")
         .HasColumnType("text");
-
-      entity.Property(e => e.LastUpdated)
-        .HasColumnName("last_updated")
-        .HasColumnType("timestamp");
         
     });
 
     modelBuilder.Entity<HostEntity>(entity =>
     {
-      entity.ToTable("hosts");
+      entity.ToTable("host");
       entity.HasKey(e => e.HostId);
 
       entity.Property(e => e.HostId)
         .HasColumnName("host_id")
-        .HasColumnType("text");
+        .HasColumnType("uuid");
 
       entity.Property(e => e.HostName)
         .HasColumnName("host_name")
@@ -151,7 +147,7 @@ public class ApiDbContext : DbContext
         .HasColumnType("text");
 
       entity.Property(e => e.LocationId)
-        .HasColumnName("id_location")
+        .HasColumnName("location_id")
         .HasColumnType("text");
 
       //Relations 
@@ -165,7 +161,7 @@ public class ApiDbContext : DbContext
 
     modelBuilder.Entity<StationEntity>(entity =>
     {
-      entity.ToTable("stations");
+      entity.ToTable("station");
       entity.HasKey(e => e.StationId);
 
       //Columns
@@ -186,12 +182,8 @@ public class ApiDbContext : DbContext
         .HasColumnName("station_longitude")
         .HasColumnType("float");
 
-      entity.Property(e => e.Reservable)
-        .HasColumnName("reservable")
-        .HasColumnType("boolean");
-
       entity.Property(e => e.LocationId)
-        .HasColumnName("id_location")
+        .HasColumnName("location_id")
         .HasColumnType("text");
 
       //Relations
@@ -205,8 +197,8 @@ public class ApiDbContext : DbContext
 
     modelBuilder.Entity<PortEntity>(entity =>
     {
-      entity.ToTable("ports");
-      entity.HasKey(e => e.PortId);
+      entity.ToTable("port");
+      entity.HasKey(e => new { e.StationId, e.PortId });
 
       entity.Property(e => e.PortId)
         .HasColumnName("port_id")
@@ -228,12 +220,16 @@ public class ApiDbContext : DbContext
         .HasColumnName("status")
         .HasColumnType("text");
 
+      entity.Property(e => e.Reservable)
+        .HasColumnName("reservable")
+        .HasColumnType("boolean");
+
       entity.Property(e => e.LastUpdated)
         .HasColumnName("last_updated")
         .HasColumnType("timestamp");
 
       entity.Property(e => e.StationId)
-        .HasColumnName("id_station")
+        .HasColumnName("station_id")
         .HasColumnType("text");
       
       //Relations
@@ -288,10 +284,6 @@ public class ApiDbContext : DbContext
       entity.Property(e => e.IsChargingStation)
         .HasColumnName("is_charging_station")
         .HasColumnType("boolean");
-
-      entity.Property(e => e.LastUpdated)
-        .HasColumnName("last_updated")
-        .HasColumnType("date");
 
     });
 
