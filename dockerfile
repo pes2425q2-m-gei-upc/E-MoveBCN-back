@@ -2,21 +2,23 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copia solo los archivos de solución y proyectos primero (para caché)
-COPY *.sln ./
-COPY */*.csproj ./
+# Copia el archivo .csproj a la imagen
+COPY plantilla.Web.csproj ./plantilla.Web.csproj
 
-# Asegura que se copien los archivos correctamente antes de restaurar
-RUN ls -l && dotnet nuget locals all --clear && dotnet restore
+# Verifica que el archivo .csproj se haya copiado correctamente
+RUN ls -l
 
-# Copia el resto de los archivos
+# Restaura dependencias usando el archivo .csproj
+RUN dotnet restore plantilla.Web.csproj
+
+# Copia el resto del código
 COPY . .
 
-# Compila el proyecto
+# Compila la aplicación
 RUN dotnet publish -c Release -o /app
 
-# Etapa de runtime (para hacer la imagen más ligera)
+# Etapa de runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 COPY --from=build /app .
-ENTRYPOINT ["dotnet", "E-MOVEBCN-BACK.dll"]
+ENTRYPOINT ["dotnet", "plantilla.Web.dll"]
