@@ -62,7 +62,9 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-app.Urls.Add($"http://0.0.0.0:{port}");
+app.Urls.Clear(); 
+app.Urls.Add($"http://*:{port}");
+Console.WriteLine($"Server running on port {port}");
 
 // Configurar la canalización de solicitudes HTTP.
 app.MapControllers();
