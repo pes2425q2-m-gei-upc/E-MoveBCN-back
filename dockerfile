@@ -1,6 +1,9 @@
 # Etapa de construcción
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0.100 AS build
 WORKDIR /src
+
+# Elimina global.json si existe (Evita conflictos de versión)
+RUN rm -f global.json
 
 # Copia el archivo .csproj a la imagen
 COPY plantilla.Web.csproj ./plantilla.Web.csproj
