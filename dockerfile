@@ -18,7 +18,7 @@ RUN dotnet restore plantilla.Web.csproj
 COPY . .
 
 # Compila la aplicación
-RUN dotnet publish -c Release -o /app
+RUN dotnet publish plantilla.Web.csproj -c Release -o /app
 
 # Etapa de runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
