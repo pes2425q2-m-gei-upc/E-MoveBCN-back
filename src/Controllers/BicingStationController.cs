@@ -1,45 +1,28 @@
 using Microsoft.AspNetCore.Mvc;
-using Services.Interface;
-using System;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Dto;
-
+using Services;
+using Entity;
+using Microsoft.AspNetCore.Authorization;
+using Services.Interface;
 namespace Controllers;
 
-[Route("api/[controller]")]
+
 [ApiController]
+[Route("api/[controller]")] // api/bicingstation
+//[Authorize]
 public class BicingStationController : ControllerBase
 {
     private readonly IBicingStationService _bicingStationService;
-    private readonly ILogger<BicingStationController> _logger;
 
-    public BicingStationController(IBicingStationService bicingStationService, ILogger<BicingStationController> logger)
+    public BicingStationController(IBicingStationService bicingStationService)
     {
         _bicingStationService = bicingStationService;
-        _logger = logger;
     }
-
-    // GET: api/BicingStation
-    [HttpGet]
-    public async Task<IActionResult> GetAll()
+   
+    [HttpGet("bicingstations")] // api/bicingstation/stations
+    public async Task<IActionResult> GetAllStations()
     {
-        try
-        {
-            var stations = await _bicingStationService.GetAllBicingStationsAsync();
-            return Ok(stations);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError($"Error getting all bicing stations: {ex.Message}");
-            return StatusCode(500, "Error interno del servidor al obtener las estaciones de bicing");
-        }
+        var stations = await _bicingStationService.GetAllBicingStationsAsync();
+        return Ok(stations);
     }
-
-    [HttpPost("fetch-and-store")]
-    public async Task<IActionResult> FetchAndStoreChargingStations()
-    {
-        await _bicingStationService.FetchAndStoreBicingStationsAsync();
-        return Ok("Charging stations fetched and stored successfully.");
-    }
-} 
+}

@@ -25,7 +25,6 @@ public class AuthenticationHelper: IAuthenticationHelper
             new Claim(ApiClaimTypes.Name, user.Name),
             new Claim(ApiClaimTypes.Email, user.Email),
             new Claim(ApiClaimTypes.UserId, user.UserId.ToString()),
-            new Claim(ApiClaimTypes.Idioma, user.Idioma)
         };
         var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var expirationDate = DateTimeOffset.UtcNow.AddDays(1);

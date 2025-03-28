@@ -31,7 +31,6 @@ public class UserRepository : IUserRepository
                 Name = u.Name,
                 Email = u.Email,
                 PasswordHash = u.PasswordHash,
-                Idioma = u.Idioma
             })
             .ToList();
         return _mapper.Map<List<UserDto>>(entities);
@@ -50,7 +49,6 @@ public class UserRepository : IUserRepository
                 Name = userDto.Name,
                 Email = userDto.Email,
                 PasswordHash = password,
-                Idioma = userDto.Idioma
             };
 
             _Dbcontext.Users.Add(user);
@@ -95,7 +93,6 @@ public class UserRepository : IUserRepository
         user.Name = userModify.Name;
         user.Email = userModify.Email;
         user.PasswordHash = password;
-        user.Idioma = userModify.Idioma;
 
         _Dbcontext.Users.Update(user);
         return await _Dbcontext.SaveChangesAsync() > 0;
