@@ -17,10 +17,13 @@ public static class ServiceCollection
         //Services
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IDadesObertesService, DadesObertesService>();
+        services.AddScoped<IBicingStationService, BicingStationService>();
         services.AddHostedService<ChargingStationsBackgroundService>();
+        services.AddHostedService<BicingStationBackgroundService>();
         
         //Repositories
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IDadesObertesRepository, DadesObertesRepository>();
+        services.AddScoped<IBicingStationRepository, BicingStationRepository>();
     }
 }

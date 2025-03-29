@@ -11,11 +11,11 @@ public class BicingStationDto
     [JsonPropertyName("name")]
     public required string BicingName { get; set; }
     [JsonPropertyName("lat")]
-    public required float Latitude { get; set; }
+    public required double Latitude { get; set; }
     [JsonPropertyName("lon")]
-    public required float Longitude { get; set; }
+    public required double Longitude { get; set; }
     [JsonPropertyName("altitude")]
-    public required float Altitude { get; set; }
+    public required double Altitude { get; set; }
     [JsonPropertyName("address")]
     public required string Address { get; set; }
     [JsonPropertyName("cross_street")]

@@ -8,4 +8,6 @@ public interface IBicingStationService
 {
     Task<List<BicingStationDto>> GetAllBicingStationsAsync();
     Task FetchAndStoreBicingStationsAsync();
+
+    
 }
