@@ -28,18 +28,6 @@ namespace Repositories
         public async Task BulkInsertAsync(
             List<BicingStationEntity> bicingstations)
         {
-            const int maxWaitTimeSeconds = 60;
-            const int checkIntervalMs = 1000;
-            int elapsedSeconds = 0;
-
-            // 1. Espera activa verificando conexiones activas
-            while (elapsedSeconds < maxWaitTimeSeconds)
-            {
-
-
-                await Task.Delay(checkIntervalMs);
-                elapsedSeconds++;
-            }
             using (var transaction = await _dbContext.Database.BeginTransactionAsync())
             {
                 try
