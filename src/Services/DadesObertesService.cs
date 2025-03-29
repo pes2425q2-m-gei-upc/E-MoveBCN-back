@@ -5,14 +5,11 @@ using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Entity;
-using System.Linq;
 using Repositories.Interface;
-using Dto;
 using Services.Interface;
 
-namespace Services
-{
+namespace Services;
+
     public class DadesObertesService : IDadesObertesService
     {
         private readonly IDadesObertesRepository _dadesObertesRepository;
@@ -220,4 +217,4 @@ namespace Services
             }
         }
     }
-}
+

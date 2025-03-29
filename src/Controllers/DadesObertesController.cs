@@ -9,7 +9,7 @@ namespace Controllers;
 
 [ApiController]
 [Route("api/[controller]")] // api/dadesobertes
-//[Authorize]
+[Authorize]
 public class DadesObertesController : ControllerBase
 {
     private readonly IDadesObertesService _dadesObertesService;
