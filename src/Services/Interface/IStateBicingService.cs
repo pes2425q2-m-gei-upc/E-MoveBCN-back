@@ -6,7 +6,7 @@ namespace Services.Interface;
 
 public interface IStateBicingService
 {
-    Task<List<BicingStationDto>> GetAllStateBicingStationsAsync();
+    Task<List<StateBicingDto>> GetAllStateBicingStationsAsync();
     Task FetchAndStoreStateBicingStationsAsync();
 
     

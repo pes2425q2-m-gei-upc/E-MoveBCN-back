@@ -27,6 +27,19 @@ namespace Services
             {
                 try
                 {
+                    const int maxWaitTimeSeconds = 15;
+                    const int checkIntervalMs = 1000;
+                    int elapsedSeconds = 0;
+
+                    // 1. Espera activa verificando conexiones activas
+                    while (elapsedSeconds < maxWaitTimeSeconds)
+                    {
+
+
+                        await Task.Delay(checkIntervalMs);
+                        elapsedSeconds++;
+                    }
+
                     _logger.LogInformation("Starting periodic update of bicing stations");
                     await _service.FetchAndStoreBicingStationsAsync();
                     _logger.LogInformation("Completed periodic update of bicing stations");

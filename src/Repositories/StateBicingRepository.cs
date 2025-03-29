@@ -9,7 +9,7 @@ using System.Linq;
 using Dto;
 namespace Repositories
 {
-    public class StateBicingRepository : IStateBicingStationRepository
+    public class StateBicingRepository : IStateBicingRepository
     {   
         private readonly ApiDbContext _dbContext;
         private readonly IMapper _mapper;
