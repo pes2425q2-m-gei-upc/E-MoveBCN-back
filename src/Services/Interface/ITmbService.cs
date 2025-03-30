@@ -7,4 +7,5 @@ namespace Services.Interface;
     public interface ITmbService
     {
         Task<List<MetroDto>> GetAllMetrosAsync();
+        Task<List<BusDto>> GetAllBusAsync();
     }

@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Dto;
 using Microsoft.Extensions.Configuration;
+using Microsoft.VisualBasic;
 using Newtonsoft.Json.Linq;
 using Services.Interface;
 
@@ -88,5 +89,55 @@ namespace Services;
             }
 
             return metroList;
+        }
+
+        public async Task<List<BusDto>> GetAllBusAsync()
+        {
+            var baseUrl = _configuration["TmbApi:BaseUrl"];
+            var busEndpoint = _configuration["TmbApi:Bus"];
+
+            var busResponse = await _httpClient.GetAsync(baseUrl + busEndpoint);
+
+            if (!busResponse.IsSuccessStatusCode)
+            {
+                return null;
+            }
+
+            var busContent = await busResponse.Content.ReadAsStringAsync();
+            var busStopsJson = JObject.Parse(busContent)["features"] as JArray;
+
+            List<BusDto> busList = new List<BusDto>();
+
+            foreach (var busStop in busStopsJson)
+            {
+                var properties = busStop["properties"];
+                var geometry = busStop["geometry"];
+
+                BusDto busStation = new BusDto
+                {
+                    ParadaId = (int)properties["ID_PARADA"],
+                    CodiParada = (int)properties["CODI_PARADA"],
+                    Name = (string)properties["NOM_PARADA"],
+                    Description = (int)properties["DESC_PARADA"],
+                    IntersectionId = (int)properties["CODI_INTERC"],
+                    IntersectionName = (int)properties["NOM_INTERC"],
+                    ParadaTypeName = (string)properties["NOM_TIPUS_PARADA"],
+                    ParadaTypeTipification = (string)properties["TIPIFICACIO_PARADA"],
+                    Adress = (string)properties["ADRECA"],
+                    LocationId = (string)properties["ID_POBLACIO"],
+                    LocationName = (string)properties["NOM_POBLACIO"],
+                    DistrictId = (string)properties["ID_DISTRICTE"],
+                    DistrictName = (string)properties["NOM_DISTRICTE"],
+                    Date = (string)properties["DATA"],
+                    StreetName = (string)properties["NOM_VIA"],
+                    ParadaPoints = (string)properties["PUNTS_PARADA"],
+                    Latitude = (double)geometry["coordinates"][1],
+                    Longitude = (double)geometry["coordinates"][0]
+                };
+
+                busList.Add(busStation);
+            }
+
+            return busList;
         }
     }

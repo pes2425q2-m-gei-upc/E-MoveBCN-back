@@ -18,11 +18,18 @@ public class TmbController : ControllerBase
         _tmbService = tmbService;
     }
 
-    // GET: /api/tmb/Metros
+    // GET: /api/tmb/metros
     [HttpGet("Metros")]
     public async Task<IActionResult> GetAllMetros()
     {
         var metros = await _tmbService.GetAllMetrosAsync();
         return Ok(metros);
+    }
+    // GET: /api/tmb/bus
+    [HttpGet("Bus")]
+    public async Task<IActionResult> GetAllBus()
+    {
+        var bus = await _tmbService.GetAllBusAsync();
+        return Ok(bus);
     }
 }
