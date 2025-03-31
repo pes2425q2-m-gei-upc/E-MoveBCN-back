@@ -4,7 +4,7 @@ using Entity;
 using Dto;
 namespace Repositories.Interface;
 
-public interface IStateBicingStationRepository
+public interface IStateBicingRepository
 {
     Task<List<StateBicingDto>> GetAllStateBicingStations();
     Task BulkInsertAsync(

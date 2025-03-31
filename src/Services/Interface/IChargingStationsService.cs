@@ -4,9 +4,9 @@ using Entity;
 
 namespace Services.Interface;
 
-public interface IDadesObertesService
+public interface IChargingStationsService
 {
-    Task<List<StationDto>> GetAllStationsAsync();
+    Task<List<ChargingStationDto>> GetAllChargingStationsAsync();
 
     Task FetchAndStoreChargingStationsAsync();
 }
