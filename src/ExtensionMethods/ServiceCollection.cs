@@ -20,6 +20,7 @@ public static class ServiceCollection
         services.AddScoped<IChargingStationsService, ChargingStationsService>();
         services.AddScoped<IStateBicingService, StateBicingService>();
         services.AddScoped<IBicingStationService, BicingStationService>();
+        services.AddScoped<ITmbService, TmbService>();
         services.AddHostedService<ChargingStationsBackgroundService>();
         services.AddHostedService<BicingStationBackgroundService>();
         services.AddHostedService<StateBicingBackgroundService>();
