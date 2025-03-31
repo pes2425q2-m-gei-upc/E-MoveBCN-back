@@ -78,9 +78,25 @@ namespace Services
 
                 MetroDto metroStation = new MetroDto
                 {
+                    IdEstacioLinia = properties?["ID_ESTACIO_LINIA"]?.Value<int>() ?? 0,
+                    CodiEstacioLinia = properties?["CODI_ESTACIO_LINIA"]?.Value<int>() ?? 0,
+                    IdGrupEstacio = properties?["ID_GRUP_ESTACIO"]?.Value<int>() ?? 0,
+                    CodiGrupEstacio = properties?["CODI_GRUP_ESTACIO"]?.Value<int>() ?? 0,
                     IdEstacio = properties?["ID_ESTACIO"]?.Value<int>() ?? 0,
                     CodiEstacio = properties?["CODI_ESTACIO"]?.Value<int>() ?? 0,
                     NomEstacio = properties?["NOM_ESTACIO"]?.Value<string>() ?? "Desconocido",
+                    OrdreEstacio = properties?["ORDRE_ESTACIO"]?.Value<int>() ?? 0,
+                    IdLinia = properties?["ID_LINIA"]?.Value<int>() ?? 0,
+                    CodiLinia = properties?["CODI_LINIA"]?.Value<int>() ?? 0,
+                    NomLinia = properties?["NOM_LINIA"]?.Value<string>() ?? "Desconocido",
+                    DescServei = properties?["DESC_SERVEI"]?.Value<string>() ?? "Desconocido",
+                    OrigenServei = properties?["ORIGEN_SERVEI"]?.Value<string>() ?? "Desconocido",
+                    DestiServei = properties?["DESTI_SERVEI"]?.Value<string>() ?? "Desconocido",
+                    ColorLinia = properties?["COLOR_LINIA"]?.Value<string>() ?? "Desconocido",
+                    Picto = properties?["PICTO"]?.Value<string>() ?? "Desconocido",
+                    PictoGrup = properties?["PICTO_GRUP"]?.Value<string>() ?? "Desconocido",
+                    DataInauguracio = properties?["DATA_INAUGURACIO"]?.Value<string>() ?? "Desconocido",
+                    Data = properties?["DATA"]?.Value<string>() ?? "Desconocido",
                     Latitude = geometry?["coordinates"]?[1]?.Value<double>() ?? 0.0,
                     Longitude = geometry?["coordinates"]?[0]?.Value<double>() ?? 0.0
                 };
@@ -125,6 +141,19 @@ namespace Services
                     ParadaId = properties?["ID_PARADA"]?.Value<int>() ?? 0,
                     CodiParada = properties?["CODI_PARADA"]?.Value<int>() ?? 0,
                     Name = properties?["NOM_PARADA"]?.Value<string>() ?? "Desconocido",
+                    Description = properties?["DESC_PARADA"]?.Value<string>() ?? "Desconocido",
+                    IntersectionId = properties?["CODI_INTERC"]?.Value<int>() ?? 0,
+                    IntersectionName = properties?["NOM_INTERC"]?.Value<string>() ?? "Desconocido",
+                    ParadaTypeName = properties?["NOM_TIPUS_PARADA"]?.Value<string>() ?? "Desconocido",
+                    ParadaTypeTipification = properties?["TIPIFICACIO_PARADA"]?.Value<string>() ?? "Desconocido",
+                    Adress = properties?["ADRECA"]?.Value<string>() ?? "Desconocida",
+                    LocationId = properties?["ID_POBLACIO"]?.Value<string>() ?? "Desconocido",
+                    LocationName = properties?["NOM_POBLACIO"]?.Value<string>() ?? "Desconocido",
+                    DistrictId = properties?["ID_DISTRICTE"]?.Value<string>() ?? "Desconocido",
+                    DistrictName = properties?["NOM_DISTRICTE"]?.Value<string>() ?? "Desconocido",
+                    Date = properties?["DATA"]?.Value<string>() ?? "Desconocida",
+                    StreetName = properties?["NOM_VIA"]?.Value<string>() ?? "Desconocida",
+                    ParadaPoints = properties?["PUNTS_PARADA"]?.Value<string>() ?? "Desconocido",
                     Latitude = geometry?["coordinates"]?[1]?.Value<double>() ?? 0.0,
                     Longitude = geometry?["coordinates"]?[0]?.Value<double>() ?? 0.0
                 };

@@ -5,9 +5,9 @@ public class BusDto
     public int ParadaId { get; set; }
     public int CodiParada { get; set; }
     public string Name { get; set; }
-    public int Description { get; set; }
+    public string Description { get; set; }
     public int IntersectionId { get; set; }
-    public int IntersectionName { get; set; }
+    public string IntersectionName { get; set; }
     public string ParadaTypeName { get; set; }
     public string ParadaTypeTipification { get; set; }
     public string Adress { get; set; }
