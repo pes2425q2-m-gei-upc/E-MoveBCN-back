@@ -17,7 +17,7 @@ public static class ServiceCollection
         
         //Services
         services.AddScoped<IUserService, UserService>();
-        services.AddScoped<IDadesObertesService, DadesObertesService>();
+        services.AddScoped<IChargingStationsService, ChargingStationsService>();
         services.AddScoped<IStateBicingService, StateBicingService>();
         services.AddScoped<IBicingStationService, BicingStationService>();
         services.AddHostedService<ChargingStationsBackgroundService>();
@@ -26,7 +26,7 @@ public static class ServiceCollection
         
         //Repositories
         services.AddScoped<IUserRepository, UserRepository>();
-        services.AddScoped<IDadesObertesRepository, DadesObertesRepository>();
+        services.AddScoped<IChargingStationsRepository, ChargingStationsRepository>();
          services.AddScoped<IBicingStationRepository, BicingStationRepository>();
         services.AddScoped<IStateBicingRepository, StateBicingRepository>();
     }

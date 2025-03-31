@@ -13,27 +13,27 @@ using Services.Interface;
 
 namespace Services
 {
-    public class DadesObertesService : IDadesObertesService
+    public class ChargingStationsService : IChargingStationsService
     {
-        private readonly IDadesObertesRepository _dadesObertesRepository;
+        private readonly IChargingStationsRepository _chargingStationsRepository;
         private readonly HttpClient _httpClient;
-        private readonly ILogger<DadesObertesService> _logger;
+        private readonly ILogger<ChargingStationsService> _logger;
         private readonly string _apiToken = "2185586da4efca30fd5d2d22aec924e5c7e7459cafa210c2df828d3743eef3f4";
 
         private JsonElement? _cachedJsonData;
         private DateTime _lastFetchTime = DateTime.MinValue;
         private readonly TimeSpan _cacheDuration = TimeSpan.FromMinutes(30);
 
-        public DadesObertesService(HttpClient httpClient, ILogger<DadesObertesService> logger, IDadesObertesRepository dadesObertesRepository)
+        public ChargingStationsService(HttpClient httpClient, ILogger<ChargingStationsService> logger, IChargingStationsRepository chargingStationsRepository)
         {
             _httpClient = httpClient;
             _logger = logger;
-            _dadesObertesRepository = dadesObertesRepository;
+            _chargingStationsRepository = chargingStationsRepository;
         }
 
-        public async Task<List<StationDto>> GetAllStationsAsync()
+        public async Task<List<ChargingStationDto>> GetAllChargingStationsAsync()
         {
-            return await _dadesObertesRepository.GetAllStations();
+            return await _chargingStationsRepository.GetAllChargingStations();
         }
 
         public async Task FetchAndStoreChargingStationsAsync()
@@ -209,7 +209,7 @@ namespace Services
                     }
                 }
                 
-                await _dadesObertesRepository.BulkInsertAsync(locationsToAdd, hostsToAdd, stationsToAdd, portsToAdd);
+                await _chargingStationsRepository.BulkInsertAsync(locationsToAdd, hostsToAdd, stationsToAdd, portsToAdd);
                 _logger.LogInformation("Datos insertados: {Locations} ubicaciones, {Hosts} hosts, {Stations} estaciones, {Ports} puertos",
                     locationsToAdd.Count, hostsToAdd.Count, stationsToAdd.Count, portsToAdd.Count);
             }

@@ -17,14 +17,14 @@ namespace Services
     {
         private readonly IStateBicingRepository _stateBicingRepository;
         private readonly HttpClient _httpClient;
-        private readonly ILogger<DadesObertesService> _logger;
+        private readonly ILogger<StateBicingService> _logger;
         private readonly string _apiToken = "2185586da4efca30fd5d2d22aec924e5c7e7459cafa210c2df828d3743eef3f4";
 
         private JsonElement? _cachedJsonData;
         private DateTime _lastFetchTime = DateTime.MinValue;
         private readonly TimeSpan _cacheDuration = TimeSpan.FromMinutes(30);
 
-        public StateBicingService(HttpClient httpClient, ILogger<DadesObertesService> logger, IStateBicingRepository dadesObertesRepository)
+        public StateBicingService(HttpClient httpClient, ILogger<StateBicingService> logger, IStateBicingRepository dadesObertesRepository)
         {
             _httpClient = httpClient;
             _logger = logger;
