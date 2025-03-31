@@ -9,12 +9,12 @@ namespace Services
 {
     public class ChargingStationsBackgroundService : BackgroundService
     {
-        private readonly IDadesObertesService _service;
+        private readonly IChargingStationsService _service;
         private readonly ILogger<ChargingStationsBackgroundService> _logger;
         private readonly TimeSpan _interval = TimeSpan.FromMinutes(30);
 
         public ChargingStationsBackgroundService(
-            IDadesObertesService service,
+            IChargingStationsService service,
             ILogger<ChargingStationsBackgroundService> logger)
         {
             _service = service;

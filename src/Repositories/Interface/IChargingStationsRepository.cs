@@ -4,9 +4,9 @@ using Entity;
 
 namespace Repositories.Interface;
 
-public interface IDadesObertesRepository
+public interface IChargingStationsRepository
 {
-    Task<List<StationDto>> GetAllStations();
+    Task<List<ChargingStationDto>> GetAllChargingStations();
     Task BulkInsertAsync(
         List<LocationEntity> locations,
         List<HostEntity> hosts,

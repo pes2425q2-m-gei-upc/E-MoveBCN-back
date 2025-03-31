@@ -2,6 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Services;
 using Entity;
+using Dto;
+using AutoMapper;
+using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Services.Interface;
 namespace Controllers;
@@ -13,16 +16,34 @@ namespace Controllers;
 public class BicingStationController : ControllerBase
 {
     private readonly IBicingStationService _bicingStationService;
+    private readonly IStateBicingService _stateBicingService;
 
-    public BicingStationController(IBicingStationService bicingStationService)
+    private readonly IMapper _mapper;
+
+    public BicingStationController(IBicingStationService bicingStationService, IStateBicingService stateBicingService, IMapper mapper)
     {
         _bicingStationService = bicingStationService;
+        _mapper = mapper;
+        _stateBicingService = stateBicingService;
     }
    
-    [HttpGet("bicingstations")] // api/bicingstation/stations
+    [HttpGet("bicingstations")] // api/BicingStation/bicingstations
     public async Task<IActionResult> GetAllStations()
     {
         var stations = await _bicingStationService.GetAllBicingStationsAsync();
-        return Ok(stations);
+        var states = await _stateBicingService.GetAllStateBicingStationsAsync();
+
+        var combinedData = stations.Join(
+            states,
+            station => station.BicingId,
+            state => state.BicingId,
+            (station, state) => new CombinedBicingDto
+            {
+                StationInfo = _mapper.Map<BicingStationDto>(station),
+                RealTimeStatus = _mapper.Map<StateBicingDto>(state)
+            }
+        ).ToList();
+
+        return Ok(combinedData);
     }
 }
