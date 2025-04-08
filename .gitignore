@@ -1,3 +1,4 @@
 # Ignorar las carpetas bin y obj de .NET
 /bin/
 /obj/
+E-MoveBCN-back.sln
