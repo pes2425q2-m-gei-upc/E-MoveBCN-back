@@ -12,7 +12,7 @@ namespace Controllers;
 
 [ApiController]
 [Route("api/[controller]")] // api/bicingstation
-//[Authorize]
+[Authorize]
 public class BicingStationController : ControllerBase
 {
     private readonly IBicingStationService _bicingStationService;

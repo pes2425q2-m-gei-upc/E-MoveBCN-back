@@ -9,7 +9,7 @@ namespace Controllers;
 
 [ApiController]
 [Route("api/[controller]")] // api/ChargingStations
-//[Authorize]
+[Authorize]
 public class ChargingStationsController : ControllerBase
 {
     private readonly IChargingStationsService _chargingStationService;

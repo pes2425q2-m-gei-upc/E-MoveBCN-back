@@ -8,7 +8,7 @@ namespace Controllers;
 
 [Route("api/[controller]")]  // Base route: api/tmb
 [ApiController]
-//[Authorize]
+[Authorize]
 public class TmbController : ControllerBase
 {
     private readonly ITmbService _tmbService;
