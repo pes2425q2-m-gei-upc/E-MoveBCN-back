@@ -17,7 +17,7 @@ public class RouteRepository : IRouteRepository
 
     public async Task GuardarRutaAsync(RouteEntity ruta)
     {
-        _dbContext.Routes.Add(ruta);
+        _dbContext.Routes.Add(ruta); // to-do: guardar en UserRoutes
         await _dbContext.SaveChangesAsync();
     }
 }
