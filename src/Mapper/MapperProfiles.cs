@@ -17,5 +17,7 @@ public class MapperProfiles : Profile
         CreateMap<StateBicingEntity, StateBicingDto>()
             .ForMember(dest => dest.BicingStation, opt => opt.MapFrom(src => src.BicingStationIdNavigation));
         CreateMap<BicingStationEntity, BicingStationDto>();
+
+        
     }
 }
