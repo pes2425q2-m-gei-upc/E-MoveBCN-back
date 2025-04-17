@@ -10,4 +10,7 @@ public interface IUserService {
     Task<bool> DeleteUser(UserCredentials userCredentials);
     Task<UserDto> Authenticate(UserCredentials userCredentials);
     Task<bool> ModifyUser(UserDto userModify);
+
+    Task<UserDto> LoginWithGoogleAsync(string name, string email);
+
 }

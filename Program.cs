@@ -14,6 +14,10 @@ using System.Threading.Tasks;
 using System;
 using Microsoft.OpenApi.Models;
 using System.Collections.Generic;
+using  Microsoft.AspNetCore.Authentication.Google;
+
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,7 +40,7 @@ builder.Services.AddAutoMapper(typeof(MapperProfiles));
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.Cookie.SameSite = SameSiteMode.Strict;
+        options.Cookie.SameSite = SameSiteMode.Lax;
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
         options.SlidingExpiration = true;
         options.Events = new CookieAuthenticationEvents
@@ -52,6 +56,12 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
                 return Task.CompletedTask;
             }
         };
+    })
+    .AddGoogle(options =>
+    {
+        options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+        options.CallbackPath = "/signin-google";
     });
 
 // CORS
@@ -62,6 +72,7 @@ builder.Services.AddCors(options =>
                         .AllowAnyMethod()
                         .AllowAnyHeader());
 });
+
 
 // Swagger configuration
 builder.Services.AddSwaggerGen(c =>
@@ -119,8 +130,9 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Mi API v1");
     c.RoutePrefix = string.Empty; // Permite acceder desde la raíz
 });
-
-
+app.UseCors("AllowAll");
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
