@@ -330,8 +330,7 @@ public class ApiDbContext : DbContext
 
             entity.Property(e => e.UbicationId)
                 .HasColumnName("ubication_id")
-                .HasColumnType("uuid")
-                .HasDefaultValueSql("uuid_generate_v4()");
+                .HasColumnType("uuid");
 
             entity.Property(e => e.UserId)
                 .HasColumnName("user_id")
@@ -339,8 +338,7 @@ public class ApiDbContext : DbContext
 
             entity.Property(e => e.StationType)
                 .HasColumnName("station_type")
-                .HasConversion<string>()
-                .HasMaxLength(20);
+                .HasColumnType("varchar(20)");
 
             // Configuración para estaciones de carga
             entity.Property(e => e.ChargingStationId)
