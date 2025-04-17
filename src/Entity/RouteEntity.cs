@@ -6,19 +6,18 @@ using System.Text.Json;
 
 public class RouteEntity
 {
-    [Key]
-    public Guid Id { get; set; }
+    public  required Guid Id { get; set; }
 
-    public double OriginLat { get; set; }
-    public double OriginLng {get; set;}
-    public double DestinationLat {get; set;}
-    public double DestinationLng { get; set; }
-    public string Mean { get; set; }
-    public string Preference { get; set; }
+    public required double OriginLat { get; set; }
+    public required double OriginLng {get; set;}
+    public required double DestinationLat {get; set;}
+    public required double DestinationLng { get; set; }
+    public required string Mean { get; set; }
+    public required string Preference { get; set; }
 
-    public float Distance { get; set; }
-    public float Duration { get; set; }
+    public required float Distance { get; set; }
+    public required float Duration { get; set; }
+    public required string GeometryJson { get; set; }
 
-     [Column(TypeName = "jsonb")]
-    public string GeometryJson { get; set; }
+    public required string InstructionsJson { get; set; }
 }

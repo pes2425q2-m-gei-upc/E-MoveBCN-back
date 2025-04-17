@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using System.Linq;
+using Microsoft.Identity.Client;
 
 public class RouteService : IRouteService
 {
@@ -18,6 +19,7 @@ public class RouteService : IRouteService
     {
         _config = config;
         _httpClient = httpClient;
+        _repo = repo;
     }
 
     public async Task<RouteResponseDto> CalcularRutaAsync(RouteRequestDto request, Guid usuarioId)
@@ -37,8 +39,11 @@ public class RouteService : IRouteService
             Preference = request.Preference,
             Distance = (float)response.Distance,
             Duration = (float)response.Duration,
-            GeometryJson = JsonSerializer.Serialize(response.Geometry)
+            GeometryJson = JsonSerializer.Serialize(response.Geometry),
+            InstructionsJson = JsonSerializer.Serialize(response.Instructions)
         };
+
+        await _repo.GuardarRutaAsync(route);
 
         return response;
     }
@@ -55,8 +60,7 @@ public class RouteService : IRouteService
             "electric-bike" => "cycling-electric",
             "walk" => "foot-walking",
             "hiking" => "foot-hiking",
-            "wheelchair" => "wheelchair",
-            "sustainable" => "cycling-regular", 
+            "sustainable" => "cycling-regular", // TODO: Cambiar sustainable por funcion
             _ => "cycling-regular"
         };
 
@@ -103,6 +107,31 @@ public class RouteService : IRouteService
         {
             throw new Exception("La respuesta de ORS no contiene la geometría de la ruta.");
         }
+        var instructions = new List<RouteInstructionDto>();
+        if (route.TryGetProperty("segments", out var segments))
+        {
+            foreach(var segment in segments.EnumerateArray())
+            {
+                if (segment.TryGetProperty("steps", out var steps))
+                {
+                    foreach (var step in steps.EnumerateArray())
+                    {
+                        var instruction = step.TryGetProperty("instruction", out var instr)
+                            ? instr.GetString() : "Paso sin descripción";
+                        var stepDistance = step.TryGetProperty("distance", out var dist)
+                            ? dist.GetDouble() : 0.0;
+                        var travelMode = profile.Split ('-')[0];
+
+                        instructions.Add(new RouteInstructionDto
+                        {
+                            Instruction = instruction,
+                            Distance = stepDistance,
+                            Mode = travelMode
+                        });
+                    }
+                }
+            }
+        }
         var polyline = geometry.GetString();
         var coords = DecodeGooglePolyline(polyline);
 
@@ -110,7 +139,8 @@ public class RouteService : IRouteService
         {
             Distance = summary.GetProperty("distance").GetDouble(),
             Duration = summary.GetProperty("duration").GetDouble(),
-            Geometry = coords
+            Geometry = coords,
+            Instructions = instructions
         };
     }
 
@@ -182,13 +212,35 @@ public class RouteService : IRouteService
         {
             throw new Exception("La polilínea de la ruta está vacía.");
         }
+        var instructions = new List<RouteInstructionDto>();
+        if (leg.TryGetProperty("steps", out var steps))
+        {
+            foreach (var step in steps.EnumerateArray())
+            {
+                var instruction = step.TryGetProperty("html_instructions", out var htmlInstructions)
+                    ? htmlInstructions.GetString() : "Paso sin descripción";
+                var  stepDistance = step.TryGetProperty("distance", out var dist)
+                    ? dist.GetProperty("value").GetDouble() : 0.0;
+                var travelMode = step.TryGetProperty("travel_mode", out var mode)
+                    ? mode.GetString().ToLower() : "unknown";
+                
+                instructions.Add(new RouteInstructionDto
+                {
+                    Instruction = System.Net.WebUtility.HtmlDecode(instruction),
+                    Distance = stepDistance,
+                    Mode = travelMode
+                });
+            }
+
+        }
         var coords = DecodeGooglePolyline(polyline);
 
         return new RouteResponseDto
         {
             Distance = distance.GetProperty("value").GetDouble(), 
             Duration = duration.GetProperty("value").GetDouble(), 
-            Geometry = coords
+            Geometry = coords,
+            Instructions = instructions
         };
     }
 
