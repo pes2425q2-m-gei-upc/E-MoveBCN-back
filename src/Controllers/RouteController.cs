@@ -11,6 +11,7 @@ using Services.Interface;
 
 [ApiController]
 [Route("api/[controller]")] // api/rutas
+[Authorize]
 public class RutasController : ControllerBase
 {
     private readonly IRouteService _service;
@@ -25,7 +26,7 @@ public class RutasController : ControllerBase
     [HttpPost("calcular")]
     public async Task<IActionResult> CalcularRuta([FromBody] RouteRequestDto dto)
     {
-        Guid usuarioId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+        Guid usuarioId = Guid.Parse("11111111-1111-1111-1111-111111111111"); // to-do: poner usuario autenticado
         var resultado = await _service.CalcularRutaAsync(dto, usuarioId);
         return Ok(resultado);
     }

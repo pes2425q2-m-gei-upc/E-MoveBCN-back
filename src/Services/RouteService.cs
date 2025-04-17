@@ -43,7 +43,7 @@ public class RouteService : IRouteService
             InstructionsJson = JsonSerializer.Serialize(response.Instructions)
         };
 
-        await _repo.GuardarRutaAsync(route);
+        // await _repo.GuardarRutaAsync(route);
 
         return response;
     }

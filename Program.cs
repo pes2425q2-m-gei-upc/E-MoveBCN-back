@@ -18,7 +18,6 @@ using  Microsoft.AspNetCore.Authentication.Google;
 
 
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHttpClient();
@@ -27,7 +26,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddControllers();
 
 // API Services Helpers and Repos
-builder.Services.AddServices();
+builder.Services.AddServices(builder.Configuration);
 
 // Configura el acceso a la base de datos
 builder.Services.AddDbContext<ApiDbContext>(options =>
@@ -67,6 +66,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.CorrelationCookie.SameSite = SameSiteMode.Lax; // Ensure correlation cookie is sent
         options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
     });
+
+
 
 // CORS
 builder.Services.AddCors(options =>
@@ -126,7 +127,6 @@ var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 app.Urls.Clear(); 
 app.Urls.Add($"http://*:{port}");
 Console.WriteLine($"Server running on port {port}");
-
 
 app.UseSwagger();
 app.UseSwaggerUI(c =>
