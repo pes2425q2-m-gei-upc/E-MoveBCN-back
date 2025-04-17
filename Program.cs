@@ -26,7 +26,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddControllers();
 
 // API Services Helpers and Repos
-builder.Services.AddServices(builder.Configuration);
+builder.Services.AddServices();
 
 // Configura el acceso a la base de datos
 builder.Services.AddDbContext<ApiDbContext>(options =>

@@ -5,17 +5,15 @@ using Repositories;
 using Repositories.Interface;
 using Services;
 using Services.Interface;
-using Microsoft.Extensions.Configuration;
 
 
 namespace ExtensionMethods;
 
 public static class ServiceCollection
 {
-    public static void AddServices(this IServiceCollection services, IConfiguration configuration) {
+    public static void AddServices(this IServiceCollection services) {
         //Helper
         services.AddScoped<IAuthenticationHelper, AuthenticationHelper>();
-        services.AddScoped<PasswordHasherHelper>();
         
         //Services
         services.AddScoped<IUserService, UserService>();
