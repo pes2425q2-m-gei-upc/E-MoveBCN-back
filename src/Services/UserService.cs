@@ -2,6 +2,7 @@ using Services.Interface;
 using Repositories.Interface;
 using System.Collections.Generic;
 using Dto;
+using System;
 using System.Threading.Tasks;
 using Helpers;
 using Microsoft.AspNetCore.Identity;
@@ -49,4 +50,23 @@ public class UserService : IUserService
     public async Task<bool> ModifyUser(UserDto userModify) {
         return await _userRepository.ModifyUser(userModify);
     }
+
+    public async Task<UserDto> LoginWithGoogleAsync(string name, string email)
+    {
+        var existingUser = await _userRepository.GetUserByEmailAsync(email);
+
+        if (existingUser == null)
+        {
+            var success = await _userRepository.CreateGoogleUserAsync(name, email);
+            if (!success)
+            {
+                throw new Exception("Error creating Google user.");
+            }
+
+            existingUser = await _userRepository.GetUserByEmailAsync(email);
+        }
+
+        return existingUser!;
+    }
+
 }

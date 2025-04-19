@@ -97,4 +97,31 @@ public class UserRepository : IUserRepository
         _Dbcontext.Users.Update(user);
         return await _Dbcontext.SaveChangesAsync() > 0;
     }
+
+    public async Task<UserDto?> GetUserByEmailAsync(string email)
+    {
+        var user = await _Dbcontext.Users.FirstOrDefaultAsync(u => u.Email == email);
+        return _mapper.Map<UserDto>(user);
+    }
+
+    public async Task<bool> CreateGoogleUserAsync(string name, string email)
+    {
+        try
+        {
+            var user = new UserEntity
+            {
+                UserId = Guid.NewGuid(),
+                Name = name,
+                Email = email,
+                PasswordHash = "", // No password para usuarios de Google
+            };
+
+            _Dbcontext.Users.Add(user);
+            return await _Dbcontext.SaveChangesAsync() > 0;
+        }
+        catch
+        {
+            return false;
+        }
+    }
 }
