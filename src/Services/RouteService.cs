@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using System.Linq;
 using Microsoft.Identity.Client;
-using Microsoft.Identity.Client;
 
 public class RouteService : IRouteService
 {
