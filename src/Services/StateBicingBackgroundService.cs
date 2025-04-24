@@ -27,7 +27,7 @@ namespace Services
             {
                 try
                 {
-                    const int maxWaitTimeSeconds = 25;
+                    const int maxWaitTimeSeconds = 50;
                     const int checkIntervalMs = 1000;
                     int elapsedSeconds = 0;
 
