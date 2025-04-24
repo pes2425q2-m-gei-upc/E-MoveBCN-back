@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Dto;
 using System.Text.Json.Serialization;
 
 public class SavedUbicationDto
