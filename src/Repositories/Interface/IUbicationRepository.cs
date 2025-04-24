@@ -5,5 +5,6 @@ namespace Repositories.Interface;
 
 public interface IUbicationRepository
 {
-    Task<List<SavedUbicationDto>> GetUbicationsByUserIdAsync(string userId);
+    Task<List<SavedUbicationDto>> GetUbicationsByUserIdAsync(string username);
+    Task<bool> SaveUbicationAsync(SavedUbicationDto savedUbication);
 }

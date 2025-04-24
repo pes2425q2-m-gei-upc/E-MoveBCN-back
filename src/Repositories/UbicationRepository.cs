@@ -20,11 +20,17 @@ public class UbicationRepository : IUbicationRepository
         _context = context;
     }
 
-    public async Task<List<SavedUbicationDto>> GetUbicationsByUserIdAsync(string userId)
+    public async Task<List<SavedUbicationDto>> GetUbicationsByUserIdAsync(string username)
     {
         var entities = await _context.SavedUbications
-            .Where(u => u.UserId == Guid.Parse(userId))
+            .Where(u => u.Username == username)
             .ToListAsync();
         return _mapper.Map<List<SavedUbicationDto>>(entities);
+    }
+    public async Task<bool> SaveUbicationAsync(SavedUbicationDto savedUbication)
+    {
+        var entity = _mapper.Map<SavedUbicationEntity>(savedUbication);
+        await _context.SavedUbications.AddAsync(entity);
+        return await _context.SaveChangesAsync() > 0;
     }
 }

@@ -8,8 +8,8 @@ public class SavedUbicationDto
     [JsonPropertyName("ubication_id")]
     public required Guid UbicationId { get; set; }
 
-    [JsonPropertyName("user_id")]
-    public required Guid UserId { get; set; }
+    [JsonPropertyName("username")]
+    public required string Username { get; set; }
 
     [JsonPropertyName("station_type")]
     public required string StationType { get; set; }

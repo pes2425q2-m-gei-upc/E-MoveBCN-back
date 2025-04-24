@@ -328,8 +328,12 @@ public class ApiDbContext : DbContext
                 .HasColumnType("uuid");
 
             entity.Property(e => e.Username)
-              .HasColumnName("user_name")
-              .HasColumnType("varchar(100)");
+                .HasColumnName("username")
+                .HasColumnType("uuid");
+
+            entity.Property(e => e.StationType)
+                .HasColumnName("station_type")
+                .HasColumnType("varchar(20)");
 
             entity.Property(e => e.Latitude)
                 .HasColumnName("latitude")
@@ -344,6 +348,7 @@ public class ApiDbContext : DbContext
                 .WithMany()
                 .HasForeignKey(e => e.Username);
         });
+    });
   }
 }
 

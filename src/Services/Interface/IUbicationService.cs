@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dto;
-namespace Services.Interface;
+namespace plantilla.Web.src.Services.Interface;
 
 public interface IUbicationService
 {
-    Task<List<SavedUbicationDto>> GetUbicationsByUserIdAsync(string userId);
+  Task<List<SavedUbicationDto>> GetUbicationsByUserIdAsync(string username);
+  Task<bool> SaveUbicationAsync(SavedUbicationDto savedUbication);
 }
