@@ -327,7 +327,7 @@ public class ApiDbContext : DbContext
 
 
       entity.Property(e => e.Username)
-        .HasColumnName("user_name")
+        .HasColumnName("username")
         .HasColumnType("varchar(100)");
 
       entity.Property(e => e.StationType)
