@@ -51,7 +51,7 @@ jobs:
       - name: Configurar .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0'
+          dotnet-version: '8.0.100'
 
       - name: Publicar la aplicación
         run: dotnet publish -c Release -o app_publish

@@ -3,21 +3,22 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Services.Interface;
 
 namespace Services
 {
     public class StateBicingBackgroundService : BackgroundService
     {
-        private readonly IStateBicingService _service;
+        private readonly IServiceProvider _serviceProvider;  // Usamos IServiceProvider
         private readonly ILogger<StateBicingBackgroundService> _logger;
         private readonly TimeSpan _interval = TimeSpan.FromMinutes(30);
 
         public StateBicingBackgroundService(
-            IStateBicingService service,
+            IServiceProvider serviceProvider,  // Inyectamos IServiceProvider
             ILogger<StateBicingBackgroundService> logger)
         {
-            _service = service;
+            _serviceProvider = serviceProvider;
             _logger = logger;
         }
 
@@ -37,8 +38,16 @@ namespace Services
                         await Task.Delay(checkIntervalMs);
                         elapsedSeconds++;
                     }
+
                     _logger.LogInformation("Starting periodic update of the state of bicing stations");
-                    await _service.FetchAndStoreStateBicingStationsAsync();
+
+                    // Crear un scope y obtener el servicio scoped dentro del scope
+                    using (var scope = _serviceProvider.CreateScope())
+                    {
+                        var stateBicingService = scope.ServiceProvider.GetRequiredService<IStateBicingService>();
+                        await stateBicingService.FetchAndStoreStateBicingStationsAsync();
+                    }
+
                     _logger.LogInformation("Completed periodic update of the state of bicing stations");
                 }
                 catch (Exception ex)

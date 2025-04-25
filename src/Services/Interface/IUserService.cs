@@ -11,6 +11,6 @@ public interface IUserService {
     Task<UserDto> Authenticate(UserCredentials userCredentials);
     Task<bool> ModifyUser(UserDto userModify);
 
-    Task<UserDto> LoginWithGoogleAsync(string name, string email);
+    Task<UserDto> LoginWithGoogleAsync(LoginGoogleDto dto);
 
 }

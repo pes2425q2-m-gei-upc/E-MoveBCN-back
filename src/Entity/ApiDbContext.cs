@@ -60,8 +60,6 @@ public class ApiDbContext : DbContext
         .HasColumnName("name")
         .HasColumnType("text");
 
-      entity.HasAlternateKey(e => e.Name);
-
       entity.Property(e => e.Email)
         .HasColumnName("email")
         .HasColumnType("text");
@@ -316,180 +314,56 @@ public class ApiDbContext : DbContext
         .HasForeignKey(e => e.BicingId);
     });
 
-    modelBuilder.Entity<SavedUbicationEntity>(entity =>
-    {
-      entity.ToTable("saved_ubications");
-      entity.HasKey(e => e.UbicationId);
+      modelBuilder.Entity<SavedUbicationEntity>(entity =>
+        {
+            entity.ToTable("saved_ubications");
+            //Primary Key
+            entity.HasKey(e => new {e.UbicationId, e.Username, e.StationType});
 
-      entity.Property(e => e.UbicationId)
-        .HasColumnName("ubication_id")
-        .HasColumnType("uuid");
+            //Columns
+            entity.Property(e => e.UbicationId)
+                .HasColumnName("ubication_id")
+                .HasColumnType("integer");
 
+            entity.Property(e => e.Username)
+                .HasColumnName("username")
+                .HasColumnType("text");
 
-      entity.Property(e => e.Username)
-        .HasColumnName("username")
-        .HasColumnType("varchar(100)");
+            entity.Property(e => e.StationType)
+                .HasColumnName("station_type")
+                .HasColumnType("text");
 
-      entity.Property(e => e.StationType)
-        .HasColumnName("station_type")
-        .HasColumnType("varchar(20)");
+            entity.Property(e => e.Latitude)
+                .HasColumnName("latitude")
+                .HasColumnType("real");
 
-      entity.Property(e => e.ChargingStationId)
-        .HasColumnName("charging_station_id")
-        .HasColumnType("varchar(50)");
+            entity.Property(e => e.Longitude)
+              .HasColumnName("longitude")
+              .HasColumnType("real");
+        });
 
-      entity.Property(e => e.BicingStationId)
-        .HasColumnName("bicing_station_id")
-        .HasColumnType("integer");
+      modelBuilder.Entity<RouteUserEntity>(entity =>
+        {
+          entity.ToTable("userRoutes");
+          entity.HasKey(e => new {e.UsuarioId, e.RutaId});
 
-      entity.Property(e => e.DisplayName)
-        .HasColumnName("display_name")
-        .HasColumnType("varchar(200)");
+          entity.Property(e => e.UsuarioId)
+            .HasColumnName("UserId")
+            .HasColumnType("uuid");
 
-      entity.Property(e => e.Latitude)
-        .HasColumnName("latitude")
-        .HasColumnType("real");
+          entity.Property(e => e.RutaId)
+            .HasColumnName("RouteId")
+            .HasColumnType("uuid");
 
-      entity.Property(e => e.Longitude)
-        .HasColumnName("longitude")
-        .HasColumnType("real");
+          entity.HasOne(e => e.Ruta)
+            .WithMany()
+            .HasForeignKey(e => e.RutaId);
 
-      entity.Property(e => e.BusStopId)
-        .HasColumnName("bus_stop_id")
-        .HasColumnType("integer");
-
-      entity.Property(e => e.BusStreetName)
-        .HasColumnName("bus_street_name")
-        .HasColumnType("varchar(200)");
-
-      entity.Property(e => e.BusDistrictName)
-        .HasColumnName("bus_district_name")
-        .HasColumnType("varchar(100)");
-
-      entity.Property(e => e.MetroStationId)
-        .HasColumnName("metro_station_id")
-        .HasColumnType("integer");
-
-      entity.Property(e => e.MetroLineId)
-        .HasColumnName("metro_line_id")
-        .HasColumnType("integer");
-
-      entity.Property(e => e.MetroLineName)
-        .HasColumnName("metro_line_name")
-        .HasColumnType("varchar(50)");
-
-      entity.Property(e => e.MetroLineColor)
-        .HasColumnName("metro_line_color")
-        .HasColumnType("varchar(20)");
-
-      entity.Property(e => e.IsFavorite)
-        .HasColumnName("is_favorite")
-        .HasColumnType("boolean");
-      
-      entity.Property(e => e.RatingValue)
-        .HasColumnName("rating_value")
-        .HasColumnType("integer");
-      
-      entity.Property(e => e.RatingComment)
-        .HasColumnName("rating_comment")
-        .HasColumnType("text");
-
-      entity.Property(e => e.CreatedAt)
-        .HasColumnName("created_at")
-        .HasColumnType("timestamp");
-
-      entity.Property(e => e.UpdatedAt)
-        .HasColumnName("updated_at")
-        .HasColumnType("timestamp");
-
-      entity.HasOne(e => e.User)
-        .WithMany(u => u.SavedUbications)
-        .HasForeignKey(e => e.Username)
-        .HasPrincipalKey(u => u.Name);
-
-      entity.HasOne(e => e.ChargingStation)
-        .WithMany()
-        .HasForeignKey(e => e.ChargingStationId);
-
-      entity.HasOne(e => e.BicingStation)
-        .WithMany()
-        .HasForeignKey(e => e.BicingStationId);
-        
-    });
-
-    modelBuilder.Entity<RouteEntity>(entity=>
-    {
-      entity.ToTable("route");
-      entity.HasKey(e => e.Id);
-
-      entity.Property(e => e.Id)
-        .HasColumnName("route_id")
-        .HasColumnType("uuid");
-
-      entity.Property(e => e.OriginLat)
-        .HasColumnName("originlat")
-        .HasColumnType("double precision");
-
-      entity.Property(e => e.OriginLng)
-        .HasColumnName("originlng")
-        .HasColumnType("double precision");
-
-      entity.Property(e => e.DestinationLat)
-        .HasColumnName("destinationlat")
-        .HasColumnType("double precision");
-
-      entity.Property(e => e.DestinationLng)
-        .HasColumnName("destinationlng")
-        .HasColumnType("double precision");
-
-      entity.Property(e => e.Mean)
-        .HasColumnName("mean")
-        .HasColumnType("varchar(50)");
-
-      entity.Property(e => e.Preference)
-        .HasColumnName("preference")
-        .HasColumnType("varchar(50)");
-
-      entity.Property(e => e.Distance)
-        .HasColumnName("distance")
-        .HasColumnType("float");
-
-      entity.Property(e => e.Duration)
-        .HasColumnName("duration")
-        .HasColumnType("float");
-
-      entity.Property(e => e.GeometryJson)
-        .HasColumnName("geometryjson")
-        .HasColumnType("jsonb");
-
-      entity.Property(e => e.InstructionsJson)
-        .HasColumnName("instructionsjson")
-        .HasColumnType("jsonb");
-
-    });
-
-    modelBuilder.Entity<RouteUserEntity>(entity =>
-    {
-      entity.ToTable("userRoutes");
-      entity.HasKey(e => new {e.UsuarioId, e.RutaId});
-
-      entity.Property(e => e.UsuarioId)
-        .HasColumnName("UserId")
-        .HasColumnType("uuid");
-
-      entity.Property(e => e.RutaId)
-        .HasColumnName("RouteId")
-        .HasColumnType("uuid");
-
-      entity.HasOne(e => e.Ruta)
-        .WithMany()
-        .HasForeignKey(e => e.RutaId);
-
-      entity.HasOne(e => e.Usuario) 
-        .WithMany()
-        .HasForeignKey(e => e.UsuarioId);
-        
-    });
+          entity.HasOne(e => e.Usuario) 
+            .WithMany()
+            .HasForeignKey(e => e.UsuarioId);
+            
+        });
   }
 }
 
