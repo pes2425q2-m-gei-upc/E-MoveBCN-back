@@ -21,6 +21,7 @@ public static class ServiceCollection
         services.AddScoped<IStateBicingService, StateBicingService>();
         services.AddScoped<IBicingStationService, BicingStationService>();
         services.AddScoped<ITmbService, TmbService>();
+        services.AddScoped<IRouteService, RouteService>();
         services.AddHostedService<ChargingStationsBackgroundService>();
         services.AddHostedService<BicingStationBackgroundService>();
         services.AddHostedService<StateBicingBackgroundService>();
@@ -30,5 +31,6 @@ public static class ServiceCollection
         services.AddScoped<IChargingStationsRepository, ChargingStationsRepository>();
          services.AddScoped<IBicingStationRepository, BicingStationRepository>();
         services.AddScoped<IStateBicingRepository, StateBicingRepository>();
+        services.AddScoped<IRouteRepository, RouteRepository>();
     }
 }
