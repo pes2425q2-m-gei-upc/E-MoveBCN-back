@@ -60,8 +60,6 @@ public class ApiDbContext : DbContext
         .HasColumnName("name")
         .HasColumnType("text");
 
-      entity.HasAlternateKey(e => e.Name);
-
       entity.Property(e => e.Email)
         .HasColumnName("email")
         .HasColumnType("text");
@@ -342,6 +340,29 @@ public class ApiDbContext : DbContext
             entity.Property(e => e.Longitude)
               .HasColumnName("longitude")
               .HasColumnType("real");
+        });
+
+      modelBuilder.Entity<RouteUserEntity>(entity =>
+        {
+          entity.ToTable("userRoutes");
+          entity.HasKey(e => new {e.UsuarioId, e.RutaId});
+
+          entity.Property(e => e.UsuarioId)
+            .HasColumnName("UserId")
+            .HasColumnType("uuid");
+
+          entity.Property(e => e.RutaId)
+            .HasColumnName("RouteId")
+            .HasColumnType("uuid");
+
+          entity.HasOne(e => e.Ruta)
+            .WithMany()
+            .HasForeignKey(e => e.RutaId);
+
+          entity.HasOne(e => e.Usuario) 
+            .WithMany()
+            .HasForeignKey(e => e.UsuarioId);
+            
         });
   }
 }
