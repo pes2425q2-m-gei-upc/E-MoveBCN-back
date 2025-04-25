@@ -325,6 +325,7 @@ public class ApiDbContext : DbContext
         .HasColumnName("ubication_id")
         .HasColumnType("uuid");
 
+
       entity.Property(e => e.Username)
         .HasColumnName("user_name")
         .HasColumnType("varchar(100)");

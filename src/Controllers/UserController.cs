@@ -34,6 +34,7 @@ public class UserController : ControllerBase
 
     //POST: /api/user/createuser
     [HttpPost("createuser")]
+    [AllowAnonymous] 
     public IActionResult CreateUser([FromBody] UserCreate user)
     {
         if (user == null)
