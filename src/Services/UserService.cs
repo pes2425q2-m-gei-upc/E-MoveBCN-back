@@ -51,22 +51,28 @@ public class UserService : IUserService
         return await _userRepository.ModifyUser(userModify);
     }
 
-    public async Task<UserDto> LoginWithGoogleAsync(string name, string email)
-    {
-        var existingUser = await _userRepository.GetUserByEmailAsync(email);
-
-        if (existingUser == null)
+    public async Task<UserDto> LoginWithGoogleAsync(LoginGoogleDto dto)
+    {   
+        var existingUser = await _userRepository.GetUserByEmailAsync(dto.Email);
+        if (existingUser != null)
         {
-            var success = await _userRepository.CreateGoogleUserAsync(name, email);
-            if (!success)
-            {
-                throw new Exception("Error creating Google user.");
-            }
-
-            existingUser = await _userRepository.GetUserByEmailAsync(email);
+            return existingUser;
+        }
+        var created = await _userRepository.CreateGoogleUserAsync(dto.Username, dto.Email);
+    
+        if (!created)
+        {
+            throw new Exception("Error al crear usuario con Google");
         }
 
-        return existingUser!;
+        
+        var newUser = await _userRepository.GetUserByEmailAsync(dto.Email);
+        if (newUser == null)
+        {
+            throw new Exception("Usuario creado pero no se puede obtener");
+        }
+
+        return newUser;
     }
 
 }
