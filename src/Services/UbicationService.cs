@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Dto;
 using plantilla.Web.src.Services.Interface;
 using Repositories.Interface;
 
@@ -32,4 +33,14 @@ public class UbicationService : IUbicationService
         return result;
     }
     
+    public async Task<bool> DeleteUbication(UbicationDeleteDto ubicationDelete)
+    {
+        var user = await _userRepository.GetUserByUsername(ubicationDelete.Username);
+        if (user == null)
+        {
+            return false;
+        }
+        var result = await _ubicationRepository.DeleteUbication(ubicationDelete);
+        return result;
+    }
 }

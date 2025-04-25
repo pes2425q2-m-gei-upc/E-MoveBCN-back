@@ -1,9 +1,8 @@
-using System.Linq;
 using System.Threading.Tasks;
+using Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using plantilla.Web.src.Services.Interface;
-using Services.Interface;
 
 namespace plantilla.Web.src.Controllers;
 
@@ -44,5 +43,21 @@ public class UbicationController(IUbicationService ubicationService) : Controlle
       return BadRequest("Failed to save ubication.");
     }
     return Ok("Saved ubication successfully.");
+  }
+
+  [HttpDelete("deleteubication")] // api/ubication/deleteubication
+  public async Task<IActionResult> DeleteUbication([FromBody] UbicationDeleteDto ubicationDeleteDto)
+  {
+    if (ubicationDeleteDto == null)
+    {
+      return BadRequest("Ubication data is required.");
+    }
+    var done = await _ubicationService.DeleteUbication(ubicationDeleteDto);
+    if (done == false)
+    {
+      return BadRequest("Failed to delete ubication.");
+    }
+    return Ok("Ubication deleted successfully.");
+  
   }
 }
