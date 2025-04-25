@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Dto;
 using Entity;
 using Microsoft.EntityFrameworkCore;
 using Repositories.Interface;
@@ -38,6 +39,17 @@ public class UbicationRepository : IUbicationRepository
             StationType = savedUbication.StationType,
         };
         await _context.SavedUbications.AddAsync(savedUbicationEntity);
+        return await _context.SaveChangesAsync() > 0;
+    }
+    public async Task<bool> DeleteUbication(UbicationDeleteDto ubicationDelete)
+    {
+        var savedUbication = await _context.SavedUbications
+            .FirstOrDefaultAsync(u => u.Username == ubicationDelete.Username && u.UbicationId == ubicationDelete.UbicationId && u.StationType == ubicationDelete.StationType);
+        if (savedUbication == null)
+        {
+            return false;
+        }
+        _context.SavedUbications.Remove(savedUbication);
         return await _context.SaveChangesAsync() > 0;
     }
 }

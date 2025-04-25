@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Dto;
 using System.Text.Json.Serialization;
-
+namespace Dto;
 public class SavedUbicationDto
 {
     [JsonPropertyName("ubication_id")]
