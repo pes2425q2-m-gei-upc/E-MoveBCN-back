@@ -3,21 +3,22 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Services.Interface;
 
 namespace Services
 {
     public class ChargingStationsBackgroundService : BackgroundService
     {
-        private readonly IChargingStationsService _service;
+        private readonly IServiceProvider _serviceProvider;  // Cambiado para usar IServiceProvider
         private readonly ILogger<ChargingStationsBackgroundService> _logger;
         private readonly TimeSpan _interval = TimeSpan.FromMinutes(30);
 
         public ChargingStationsBackgroundService(
-            IChargingStationsService service,
+            IServiceProvider serviceProvider,  // Inyectamos IServiceProvider
             ILogger<ChargingStationsBackgroundService> logger)
         {
-            _service = service;
+            _serviceProvider = serviceProvider;
             _logger = logger;
         }
 
@@ -28,7 +29,15 @@ namespace Services
                 try
                 {
                     _logger.LogInformation("Starting periodic update of charging stations");
-                    await _service.FetchAndStoreChargingStationsAsync();
+
+                    // Crear un scope para obtener el servicio scoped
+                    using (var scope = _serviceProvider.CreateScope())
+                    {
+                        var chargingService = scope.ServiceProvider.GetRequiredService<IChargingStationsService>();
+
+                        await chargingService.FetchAndStoreChargingStationsAsync();
+                    }
+
                     _logger.LogInformation("Completed periodic update of charging stations");
                 }
                 catch (Exception ex)
