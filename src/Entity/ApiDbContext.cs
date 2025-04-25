@@ -343,7 +343,6 @@ public class ApiDbContext : DbContext
               .HasColumnName("longitude")
               .HasColumnType("real");
         });
-    });
   }
 }
 
