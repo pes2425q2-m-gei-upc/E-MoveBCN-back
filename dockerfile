@@ -23,5 +23,8 @@ RUN dotnet publish plantilla.Web.csproj -c Release -o /app
 # Etapa de runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
+
+EXPOSE 8080
+
 COPY --from=build /app .
 ENTRYPOINT ["dotnet", "plantilla.Web.dll"]
