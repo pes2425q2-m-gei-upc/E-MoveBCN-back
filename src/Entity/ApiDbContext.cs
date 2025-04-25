@@ -320,20 +320,20 @@ public class ApiDbContext : DbContext
         {
             entity.ToTable("saved_ubications");
             //Primary Key
-            entity.HasKey(e => e.UbicationId);
+            entity.HasKey(e => new {e.UbicationId, e.Username, e.StationType});
 
             //Columns
             entity.Property(e => e.UbicationId)
                 .HasColumnName("ubication_id")
-                .HasColumnType("uuid");
+                .HasColumnType("integer");
 
             entity.Property(e => e.Username)
                 .HasColumnName("username")
-                .HasColumnType("uuid");
+                .HasColumnType("text");
 
             entity.Property(e => e.StationType)
                 .HasColumnName("station_type")
-                .HasColumnType("varchar(20)");
+                .HasColumnType("text");
 
             entity.Property(e => e.Latitude)
                 .HasColumnName("latitude")
@@ -342,11 +342,6 @@ public class ApiDbContext : DbContext
             entity.Property(e => e.Longitude)
               .HasColumnName("longitude")
               .HasColumnType("real");
-
-            //Relations
-            entity.HasOne(e => e.UserIdNavigation)
-                .WithMany()
-                .HasForeignKey(e => e.Username);
         });
     });
   }

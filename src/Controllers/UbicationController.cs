@@ -43,6 +43,6 @@ public class UbicationController(IUbicationService ubicationService) : Controlle
     {
       return BadRequest("Failed to save ubication.");
     }
-    return Ok(result);
+    return Ok("Saved ubication successfully.");
   }
 }

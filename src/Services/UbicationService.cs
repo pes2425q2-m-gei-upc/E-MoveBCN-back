@@ -23,7 +23,7 @@ public class UbicationService : IUbicationService
     }
     public async Task<bool> SaveUbicationAsync(SavedUbicationDto savedUbication)
     {
-        var user = _userRepository.GetUserByUsername(savedUbication.Username);
+        var user = await _userRepository.GetUserByUsername(savedUbication.Username);
         if (user == null)
         {
             return false;

@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 public class SavedUbicationDto
 {
     [JsonPropertyName("ubication_id")]
-    public required Guid UbicationId { get; set; }
+    public required int UbicationId { get; set; }
 
     [JsonPropertyName("username")]
     public required string Username { get; set; }
@@ -19,5 +19,4 @@ public class SavedUbicationDto
 
     [JsonPropertyName("longitude")]
     public required double Longitude { get; set; }
-    public UserDto User { get; set; }
 }

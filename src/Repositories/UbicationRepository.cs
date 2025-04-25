@@ -29,8 +29,15 @@ public class UbicationRepository : IUbicationRepository
     }
     public async Task<bool> SaveUbicationAsync(SavedUbicationDto savedUbication)
     {
-        var entity = _mapper.Map<SavedUbicationEntity>(savedUbication);
-        await _context.SavedUbications.AddAsync(entity);
+        var savedUbicationEntity = new SavedUbicationEntity
+        {
+            Username = savedUbication.Username,
+            UbicationId = savedUbication.UbicationId,
+            Latitude = savedUbication.Latitude,
+            Longitude = savedUbication.Longitude,
+            StationType = savedUbication.StationType,
+        };
+        await _context.SavedUbications.AddAsync(savedUbicationEntity);
         return await _context.SaveChangesAsync() > 0;
     }
 }
