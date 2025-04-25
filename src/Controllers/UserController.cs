@@ -112,4 +112,21 @@ public class UserController : ControllerBase
             return StatusCode(500, $"Error en el servidor: {ex.Message}");
         }
     }
+    // POST: /api/user/googlelogin
+    [HttpPost("googlelogin")]
+    public async Task<IActionResult> GoogleLogin([FromBody] LoginGoogleDto dto)
+    {
+        if (string.IsNullOrEmpty(dto.Email) || string.IsNullOrEmpty(dto.Username))
+            return BadRequest("Invalid Data");
+
+        try
+        {
+            var usuario = await _userService.LoginWithGoogleAsync(dto);
+            return Ok(usuario); 
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error en el servidor: {ex.Message}");
+        }
+    }
 }

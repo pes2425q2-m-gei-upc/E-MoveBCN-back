@@ -57,14 +57,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
                 return Task.CompletedTask;
             }
         };
-    })
-    .AddGoogle(options =>
-    {
-        options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
-        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
-        options.CallbackPath = "/signin-google";
-        options.CorrelationCookie.SameSite = SameSiteMode.Lax; // Ensure correlation cookie is sent
-        options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
     });
 
 
