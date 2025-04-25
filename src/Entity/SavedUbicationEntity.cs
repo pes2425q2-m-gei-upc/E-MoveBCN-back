@@ -9,7 +9,10 @@ namespace Entity
     public class SavedUbicationEntity
     {
         public required Guid UbicationId { get; set; } 
-        public required Guid UserId { get; set; }
+
+
+        public required string Username { get; set; }
+
 
         public required virtual UserEntity User { get; set; }
         public required StationType StationType { get; set; }

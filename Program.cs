@@ -18,7 +18,6 @@ using  Microsoft.AspNetCore.Authentication.Google;
 
 
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHttpClient();
@@ -43,6 +42,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Cookie.SameSite = SameSiteMode.Lax;
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
         options.SlidingExpiration = true;
+        options.Cookie.HttpOnly = true;
+        options.Cookie.IsEssential = true;
         options.Events = new CookieAuthenticationEvents
         {
             OnRedirectToLogin = context =>
@@ -62,7 +63,11 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
         options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
         options.CallbackPath = "/signin-google";
+        options.CorrelationCookie.SameSite = SameSiteMode.Lax; // Ensure correlation cookie is sent
+        options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
     });
+
+
 
 // CORS
 builder.Services.AddCors(options =>
@@ -122,7 +127,6 @@ var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 app.Urls.Clear(); 
 app.Urls.Add($"http://*:{port}");
 Console.WriteLine($"Server running on port {port}");
-
 
 app.UseSwagger();
 app.UseSwaggerUI(c =>

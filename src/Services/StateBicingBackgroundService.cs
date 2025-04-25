@@ -27,15 +27,13 @@ namespace Services
             {
                 try
                 {
-                    const int maxWaitTimeSeconds = 25;
+                    const int maxWaitTimeSeconds = 60;
                     const int checkIntervalMs = 1000;
                     int elapsedSeconds = 0;
 
                     // 1. Espera activa verificando conexiones activas
                     while (elapsedSeconds < maxWaitTimeSeconds)
                     {
-
-
                         await Task.Delay(checkIntervalMs);
                         elapsedSeconds++;
                     }
