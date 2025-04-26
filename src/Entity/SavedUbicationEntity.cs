@@ -11,6 +11,8 @@ namespace Entity
         public required string StationType { get; set; }
         public required double Latitude { get; set; }
         public required double Longitude { get; set; }
+        public int? Valoration { get; set; }
+        public string? Comment { get; set; }
 
     }
 }

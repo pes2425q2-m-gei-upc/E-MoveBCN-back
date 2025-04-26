@@ -19,4 +19,6 @@ public class SavedUbicationDto
 
     [JsonPropertyName("longitude")]
     public required double Longitude { get; set; }
+    public int? Valoration { get; set; }
+    public string? Comment { get; set; }
 }

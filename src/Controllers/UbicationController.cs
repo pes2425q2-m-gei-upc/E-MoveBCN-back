@@ -36,7 +36,10 @@ public class UbicationController(IUbicationService ubicationService) : Controlle
     {
       return BadRequest("Saved ubication data is required.");
     }
-
+    if(savedUbication.Valoration != null && (savedUbication.Valoration < 1 || savedUbication.Valoration > 5))
+    {
+      return BadRequest("Valoration must be between 1 and 5.");
+    }
     var result = await _ubicationService.SaveUbicationAsync(savedUbication);
     if (result == false)
     {
@@ -46,7 +49,7 @@ public class UbicationController(IUbicationService ubicationService) : Controlle
   }
 
   [HttpDelete("deleteubication")] // api/ubication/deleteubication
-  public async Task<IActionResult> DeleteUbication([FromBody] UbicationDeleteDto ubicationDeleteDto)
+  public async Task<IActionResult> DeleteUbication([FromBody] UbicationInfoDto ubicationDeleteDto)
   {
     if (ubicationDeleteDto == null)
     {
@@ -59,5 +62,27 @@ public class UbicationController(IUbicationService ubicationService) : Controlle
     }
     return Ok("Ubication deleted successfully.");
   
+  }
+  [HttpPost("valorate")] // api/ubication/valorate
+  public async Task<IActionResult> Valorate([FromBody] UbicationInfoDto ubicationInfoDto)
+  {
+    if (ubicationInfoDto == null)
+    {
+      return BadRequest("Ubication data is required.");
+    }
+    if(ubicationInfoDto.Valoration == null)
+    {
+      return BadRequest("Valoration is required.");
+    }
+    if(ubicationInfoDto.Valoration < 1 || ubicationInfoDto.Valoration > 5)
+    {
+      return BadRequest("Valoration must be between 1 and 5.");
+    }
+    var result = await _ubicationService.UpdateUbication(ubicationInfoDto);
+    if (result == false)
+    {
+      return BadRequest("Failed to valorate ubication.");
+    }
+    return Ok("Ubication valorated successfully.");
   }
 }
