@@ -1,4 +1,6 @@
+using System;
 using System.Threading.Tasks;
+using Constants;
 using Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -84,5 +86,19 @@ public class UbicationController(IUbicationService ubicationService) : Controlle
       return BadRequest("Failed to valorate ubication.");
     }
     return Ok("Ubication valorated successfully.");
+  }
+  [HttpGet("details")] // api/ubication/details
+  public async Task<IActionResult> GetUbicationDetails([FromBody] UbicationInfoRequestDto ubication)
+  {
+    if (ubication == null)
+    {
+      return BadRequest("Ubication data is required.");
+    }
+    var result = await _ubicationService.GetUbicationDetails(ubication.UbicationId, ubication.StationType);
+    if (result == null)
+    {
+      return NotFound("Ubication not found.");
+    }
+    return Ok(result);
   }
 }

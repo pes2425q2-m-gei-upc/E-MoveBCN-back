@@ -13,4 +13,5 @@ public interface IChargingStationsRepository
         List<StationEntity> stations,
         List<PortEntity> ports
     );
+    Task<ChargingStationDto> GetChargingStationDetails(int ubicationId);
 }
