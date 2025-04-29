@@ -105,5 +105,53 @@ namespace Repositories
 
             return await query.ToListAsync();
         }
+        public async Task<ChargingStationDto> GetChargingStationDetails(int ubicationId)
+        {
+            var query = 
+                from station in _dbContext.Stations
+                join location in _dbContext.Locations 
+                    on station.LocationId equals location.LocationId
+                join host in _dbContext.Hosts 
+                    on location.LocationId equals host.LocationId 
+                join port in _dbContext.Ports 
+                    on station.StationId equals port.StationId into portsGroup
+                where station.StationId == ubicationId.ToString()
+                select new ChargingStationDto
+                {
+                    // Station
+                    StationId = station.StationId,
+                    StationLabel = station.StationLabel,
+                    StationLatitude = station.StationLatitude,
+                    StationLongitude = station.StationLongitude,
+
+                    // Location
+                    AddressString = location.AddressString,
+                    Locality = location.Locality,
+                    PostalCode = location.PostalCode,
+                    LocationLatitude = location.Latitude,
+                    LocationLongitude = location.Longitude,
+
+                    // Host
+                    HostId = host.HostId.ToString(),
+                    HostName = host.HostName,
+                    HostPhone = host.OperatorPhone,
+                    HostWebsite = host.OperatorWebsite,
+
+                    // Ports
+                    Ports = portsGroup.Select(p => new PortDto
+                    {
+                        PortId = p.PortId,
+                        StationId = p.StationId,
+                        ConnectorType = p.ConnectorType,
+                        PowerKw = p.PowerKw,
+                        PortStatus = p.Status,
+                        Reservable = p.Reservable,
+                        ChargingMechanism = p.ChargingMechanism,
+                        LastUpdated = p.LastUpdated
+                    }).ToList()
+                };
+
+            return _mapper.Map<ChargingStationDto>(await query.FirstOrDefaultAsync());
+        }
     }
 }
