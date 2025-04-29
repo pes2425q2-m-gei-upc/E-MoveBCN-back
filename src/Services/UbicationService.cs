@@ -33,7 +33,7 @@ public class UbicationService : IUbicationService
         return result;
     }
     
-    public async Task<bool> DeleteUbication(UbicationDeleteDto ubicationDelete)
+    public async Task<bool> DeleteUbication(UbicationInfoDto ubicationDelete)
     {
         var user = await _userRepository.GetUserByUsername(ubicationDelete.Username);
         if (user == null)
@@ -41,6 +41,16 @@ public class UbicationService : IUbicationService
             return false;
         }
         var result = await _ubicationRepository.DeleteUbication(ubicationDelete);
+        return result;
+    }
+    public async Task<bool> UpdateUbication(UbicationInfoDto savedUbication)
+    {
+        var user = await _userRepository.GetUserByUsername(savedUbication.Username);
+        if (user == null)
+        {
+            return false;
+        }
+        var result = await _ubicationRepository.UpdateUbication(savedUbication);
         return result;
     }
 }

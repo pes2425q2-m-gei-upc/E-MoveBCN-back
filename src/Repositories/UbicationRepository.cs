@@ -41,7 +41,7 @@ public class UbicationRepository : IUbicationRepository
         await _context.SavedUbications.AddAsync(savedUbicationEntity);
         return await _context.SaveChangesAsync() > 0;
     }
-    public async Task<bool> DeleteUbication(UbicationDeleteDto ubicationDelete)
+    public async Task<bool> DeleteUbication(UbicationInfoDto ubicationDelete)
     {
         var savedUbication = await _context.SavedUbications
             .FirstOrDefaultAsync(u => u.Username == ubicationDelete.Username && u.UbicationId == ubicationDelete.UbicationId && u.StationType == ubicationDelete.StationType);
@@ -50,6 +50,18 @@ public class UbicationRepository : IUbicationRepository
             return false;
         }
         _context.SavedUbications.Remove(savedUbication);
+        return await _context.SaveChangesAsync() > 0;
+    }
+    public async Task<bool> UpdateUbication(UbicationInfoDto savedUbication)
+    {
+        var savedUbicationEntity = await _context.SavedUbications
+            .FirstOrDefaultAsync(u => u.Username == savedUbication.Username && u.UbicationId == savedUbication.UbicationId);
+        if (savedUbicationEntity == null)
+        {
+            return false;
+        }
+        savedUbicationEntity.Valoration = savedUbication.Valoration;
+        savedUbicationEntity.Comment = savedUbication.Comment;
         return await _context.SaveChangesAsync() > 0;
     }
 }
