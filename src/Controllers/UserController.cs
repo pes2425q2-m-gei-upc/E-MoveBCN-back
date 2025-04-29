@@ -114,6 +114,7 @@ public class UserController : ControllerBase
     }
     // POST: /api/user/googlelogin
     [HttpPost("googlelogin")]
+    [AllowAnonymous] 
     public async Task<IActionResult> GoogleLogin([FromBody] LoginGoogleDto dto)
     {
         if (string.IsNullOrEmpty(dto.Email) || string.IsNullOrEmpty(dto.Username))
