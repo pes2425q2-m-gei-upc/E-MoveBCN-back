@@ -8,4 +8,6 @@ namespace Services.Interface;
     {
         Task<List<MetroDto>> GetAllMetrosAsync();
         Task<List<BusDto>> GetAllBusAsync();
+        Task<MetroDto?> GetMetroByIdAsync(int id);
+        Task<BusDto?> GetBusByIdAsync(int id);
     }

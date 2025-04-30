@@ -58,13 +58,6 @@ jobs:
 
       - name: Desplegar en el servidor
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SERVER_IP: ${{ secrets.SERVER_IP }}
-          SERVER_USER: ${{ secrets.SERVER_USER }}
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
         run: |
-          mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "rm -rf /var/www/app && mkdir -p /var/www/app"
-          scp -r app_publish/* $SERVER_USER@$SERVER_IP:/var/www/app/
-          ssh $SERVER_USER@$SERVER_IP "sudo systemctl restart mi-app.service"
+          curl -X POST $RENDER_DEPLOY_HOOK

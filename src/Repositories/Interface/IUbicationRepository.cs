@@ -8,5 +8,6 @@ public interface IUbicationRepository
 {
     Task<List<SavedUbicationDto>> GetUbicationsByUserIdAsync(string username);
     Task<bool> SaveUbicationAsync(SavedUbicationDto savedUbication);
-    Task<bool> DeleteUbication(UbicationDeleteDto ubicationDelete);
+    Task<bool> DeleteUbication(UbicationInfoDto ubicationDelete);
+    Task<bool> UpdateUbication(UbicationInfoDto savedUbication);
 }

@@ -340,6 +340,14 @@ public class ApiDbContext : DbContext
             entity.Property(e => e.Longitude)
               .HasColumnName("longitude")
               .HasColumnType("real");
+
+            entity.Property(e => e.Valoration)
+                .HasColumnName("valoration")
+                .HasColumnType("integer");
+
+            entity.Property(e => e.Comment)
+                .HasColumnName("comment")
+                .HasColumnType("text");
         });
 
       modelBuilder.Entity<RouteUserEntity>(entity =>
