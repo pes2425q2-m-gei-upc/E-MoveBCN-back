@@ -38,10 +38,6 @@ public class UbicationController(IUbicationService ubicationService) : Controlle
     {
       return BadRequest("Saved ubication data is required.");
     }
-    if(savedUbication.Valoration != null && (savedUbication.Valoration < 1 || savedUbication.Valoration > 5))
-    {
-      return BadRequest("Valoration must be between 1 and 5.");
-    }
     var result = await _ubicationService.SaveUbicationAsync(savedUbication);
     if (result == false)
     {
