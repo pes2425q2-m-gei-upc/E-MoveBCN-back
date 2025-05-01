@@ -47,4 +47,23 @@ public class AuthorizationController : ControllerBase
             return StatusCode(500, $"Error en el servidor: {ex.Message}");
         }
     }
+
+    // POST: /api/user/googlelogin
+    [HttpPost("googlelogin")]
+    public async Task<IActionResult> GoogleLogin([FromBody] LoginGoogleDto dto)
+    {
+        if (string.IsNullOrEmpty(dto.Email) || string.IsNullOrEmpty(dto.Username))
+            return BadRequest("Invalid Data");
+
+        try
+        {
+            var user = await _userService.LoginWithGoogleAsync(dto);
+            var userAuhtenticated = await _userService.Authenticate(new UserCredentials { Username = user.Name, Password = user.PasswordHash });
+            return Ok(userAuhtenticated); 
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Server error: {ex.Message}");
+        }
+    }
 }
