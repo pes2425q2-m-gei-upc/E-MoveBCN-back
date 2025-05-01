@@ -17,20 +17,24 @@ public class UbicationController(IUbicationService ubicationService) : Controlle
 
   private readonly IUbicationService _ubicationService = ubicationService;
 
-  [HttpGet("getsavedubications")] // api/ubication/getsavedubications
-  public async Task<IActionResult> GetAllSavedUbications([FromBody] string username)
+  [HttpGet("getsavedubications")]
+  public async Task<IActionResult> GetAllSavedUbications([FromQuery] string username)
   {
-    if (string.IsNullOrEmpty(username))
-    {
-      return BadRequest("User ID is required.");
-    }
-    var savedUbications = await _ubicationService.GetUbicationsByUserIdAsync(username);
-    if (savedUbications == null || savedUbications.Count == 0)
-    {
-      return NotFound("No saved ubications found for this user.");
-    }
-    return Ok(savedUbications);
+      if (string.IsNullOrEmpty(username))
+      {
+          return BadRequest("Username is required.");
+      }
+
+      var savedUbications = await _ubicationService.GetUbicationsByUserIdAsync(username);
+      
+      if (savedUbications == null || savedUbications.Count == 0)
+      {
+          return NotFound("No saved ubications found for this user.");
+      }
+
+      return Ok(savedUbications);
   }
+
   [HttpPost("saveubication")] // api/ubication/saveubication
   public async Task<IActionResult> SaveUbication([FromBody] SavedUbicationDto savedUbication)
   {
@@ -83,18 +87,16 @@ public class UbicationController(IUbicationService ubicationService) : Controlle
     }
     return Ok("Ubication valorated successfully.");
   }
-  [HttpGet("details")] // api/ubication/details
-  public async Task<IActionResult> GetUbicationDetails([FromBody] UbicationInfoRequestDto ubication)
+  [HttpGet("details")]
+  public async Task<IActionResult> GetUbicationDetails(
+      [FromQuery] int ubicationId,
+      [FromQuery] string stationType)
   {
-    if (ubication == null)
-    {
-      return BadRequest("Ubication data is required.");
-    }
-    var result = await _ubicationService.GetUbicationDetails(ubication.UbicationId, ubication.StationType);
-    if (result == null)
-    {
-      return NotFound("Ubication not found.");
-    }
-    return Ok(result);
+      var result = await _ubicationService.GetUbicationDetails(ubicationId, stationType);
+      if (result == null)
+      {
+          return NotFound("Ubication not found or invalid type.");
+      }
+      return Ok(result);
   }
 }

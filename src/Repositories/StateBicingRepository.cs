@@ -60,5 +60,19 @@ namespace Repositories
 
             return _mapper.Map<List<StateBicingDto>>(entities);
         }
+
+        public async Task<StateBicingDto> GetStateBicingById(int id)
+        {
+            var entity = await _dbContext.StateBicing
+                .FirstOrDefaultAsync(s => s.BicingId == id);
+
+            if (entity == null)
+            {
+                return null;
+            }
+
+            return _mapper.Map<StateBicingDto>(entity);
+        }
+
     }
 }
