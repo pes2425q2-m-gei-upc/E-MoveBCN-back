@@ -72,6 +72,17 @@ public class UserRepository : IUserRepository
         if (!Guid.TryParse(userId, out Guid parsedUserId))
             return false; 
 
+        var user = await _Dbcontext.Users
+            .FirstOrDefaultAsync(u => u.UserId == parsedUserId);
+        if (user == null)
+        {
+            return false;
+        }
+
+        await _Dbcontext.SavedUbications
+            .Where(u => u.Username == user.Name)
+            .ExecuteDeleteAsync();
+
         int deletedRows = await _Dbcontext.Users
             .Where(u => u.UserId == parsedUserId)
             .ExecuteDeleteAsync();
