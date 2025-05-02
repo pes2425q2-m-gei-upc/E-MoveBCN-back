@@ -86,13 +86,14 @@ public class UserRepository : IUserRepository
         {
             return false;
         }
+        if(userModify.PasswordHash != null && userModify.PasswordHash != "")
+        {
+            var passwordHasher = new PasswordHasherHelper();
+            var password = passwordHasher.HashPassword(userModify.PasswordHash);
+            user.PasswordHash = password;
+        }
 
-        var passwordHasher = new PasswordHasherHelper();
-        var password = passwordHasher.HashPassword(userModify.PasswordHash);
-
-        user.Name = userModify.Name;
         user.Email = userModify.Email;
-        user.PasswordHash = password;
 
         _Dbcontext.Users.Update(user);
         return await _Dbcontext.SaveChangesAsync() > 0;
