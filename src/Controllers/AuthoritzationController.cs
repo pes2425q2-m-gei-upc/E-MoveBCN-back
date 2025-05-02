@@ -58,8 +58,9 @@ public class AuthorizationController : ControllerBase
         try
         {
             var user = await _userService.LoginWithGoogleAsync(dto);
-            var userAuhtenticated = await _userService.Authenticate(new UserCredentials { Username = user.Name, Password = user.PasswordHash });
-            return Ok(userAuhtenticated); 
+            var (claimsIdentity, authenticationProperties) = _authenticationHelper.AuthenticationClaims(user);
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authenticationProperties);
+            return Ok(user); 
         }
         catch (Exception ex)
         {
