@@ -87,8 +87,8 @@ public class UbicationService : IUbicationService
 
         return new
         {
-            Info = info,
-            Status = status
+            stationInfo = info,
+            realTimeStatus = status
         };
     }
 
