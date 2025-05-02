@@ -113,7 +113,7 @@ public class UserRepository : IUserRepository
                 UserId = Guid.NewGuid(),
                 Name = name,
                 Email = email,
-                PasswordHash = "", // No password para usuarios de Google
+                PasswordHash = "", // No password for google users
             };
 
             _Dbcontext.Users.Add(user);
