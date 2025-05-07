@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Constants;
 using Dto;
@@ -20,19 +20,19 @@ public class UbicationController(IUbicationService ubicationService) : Controlle
   [HttpGet("getsavedubications")]
   public async Task<IActionResult> GetAllSavedUbications([FromQuery] string username)
   {
-      if (string.IsNullOrEmpty(username))
-      {
-          return BadRequest("Username is required.");
-      }
+    if (string.IsNullOrEmpty(username))
+    {
+      return BadRequest("Username is required.");
+    }
 
-      var savedUbications = await _ubicationService.GetUbicationsByUserIdAsync(username);
-      
-      if (savedUbications == null || savedUbications.Count == 0)
-      {
-          return NotFound("No saved ubications found for this user.");
-      }
+    var savedUbications = await _ubicationService.GetUbicationsByUserIdAsync(username).ConfigureAwait(false);
 
-      return Ok(savedUbications);
+    if (savedUbications == null || savedUbications.Count == 0)
+    {
+      return NotFound("No saved ubications found for this user.");
+    }
+
+    return Ok(savedUbications);
   }
 
   [HttpPost("saveubication")] // api/ubication/saveubication
@@ -42,7 +42,7 @@ public class UbicationController(IUbicationService ubicationService) : Controlle
     {
       return BadRequest("Saved ubication data is required.");
     }
-    var result = await _ubicationService.SaveUbicationAsync(savedUbication);
+    var result = await _ubicationService.SaveUbicationAsync(savedUbication).ConfigureAwait(false);
     if (result == false)
     {
       return BadRequest("Failed to save ubication.");
@@ -57,13 +57,13 @@ public class UbicationController(IUbicationService ubicationService) : Controlle
     {
       return BadRequest("Ubication data is required.");
     }
-    var done = await _ubicationService.DeleteUbication(ubicationDeleteDto);
+    var done = await _ubicationService.DeleteUbication(ubicationDeleteDto).ConfigureAwait(false);
     if (done == false)
     {
       return BadRequest("Failed to delete ubication.");
     }
     return Ok("Ubication deleted successfully.");
-  
+
   }
   [HttpPost("valorate")] // api/ubication/valorate
   public async Task<IActionResult> Valorate([FromBody] UbicationInfoDto ubicationInfoDto)
@@ -72,15 +72,15 @@ public class UbicationController(IUbicationService ubicationService) : Controlle
     {
       return BadRequest("Ubication data is required.");
     }
-    if(ubicationInfoDto.Valoration == null)
+    if (ubicationInfoDto.Valoration == null)
     {
       return BadRequest("Valoration is required.");
     }
-    if(ubicationInfoDto.Valoration < 1 || ubicationInfoDto.Valoration > 5)
+    if (ubicationInfoDto.Valoration < 1 || ubicationInfoDto.Valoration > 5)
     {
       return BadRequest("Valoration must be between 1 and 5.");
     }
-    var result = await _ubicationService.UpdateUbication(ubicationInfoDto);
+    var result = await _ubicationService.UpdateUbication(ubicationInfoDto).ConfigureAwait(false);
     if (result == false)
     {
       return BadRequest("Failed to valorate ubication.");
@@ -92,11 +92,11 @@ public class UbicationController(IUbicationService ubicationService) : Controlle
       [FromQuery] int ubicationId,
       [FromQuery] string stationType)
   {
-      var result = await _ubicationService.GetUbicationDetails(ubicationId, stationType);
-      if (result == null)
-      {
-          return NotFound("Ubication not found or invalid type.");
-      }
-      return Ok(result);
+    var result = await _ubicationService.GetUbicationDetails(ubicationId, stationType).ConfigureAwait(false);
+    if (result == null)
+    {
+      return NotFound("Ubication not found or invalid type.");
+    }
+    return Ok(result);
   }
 }

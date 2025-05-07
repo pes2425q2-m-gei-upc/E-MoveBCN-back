@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dto;
 
@@ -6,8 +6,8 @@ namespace Repositories.Interface;
 
 public interface IUbicationRepository
 {
-    Task<List<SavedUbicationDto>> GetUbicationsByUserIdAsync(string username);
-    Task<bool> SaveUbicationAsync(SavedUbicationDto savedUbication);
-    Task<bool> DeleteUbication(UbicationInfoDto ubicationDelete);
-    Task<bool> UpdateUbication(UbicationInfoDto savedUbication);
+  Task<List<SavedUbicationDto>> GetUbicationsByUserIdAsync(string username);
+  Task<bool> SaveUbicationAsync(SavedUbicationDto savedUbication);
+  Task<bool> DeleteUbication(UbicationInfoDto ubicationDelete);
+  Task<bool> UpdateUbication(UbicationInfoDto savedUbication);
 }

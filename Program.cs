@@ -1,20 +1,20 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using AutoMapper;
+using Entity;
+using ExtensionMethods;
+using Mapper;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using ExtensionMethods;
-using Entity;
-using Mapper;
-using Microsoft.Extensions.Configuration;
-using Microsoft.EntityFrameworkCore;
-using AutoMapper;
-using Services;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Http;
-using System.Threading.Tasks;
-using System;
 using Microsoft.OpenApi.Models;
-using System.Collections.Generic;
-using  Microsoft.AspNetCore.Authentication.Google;
+using Services;
 
 
 
@@ -39,24 +39,24 @@ builder.Services.AddAutoMapper(typeof(MapperProfiles));
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.Cookie.SameSite = SameSiteMode.Lax;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        options.SlidingExpiration = true;
-        options.Cookie.HttpOnly = true;
-        options.Cookie.IsEssential = true;
-        options.Events = new CookieAuthenticationEvents
+      options.Cookie.SameSite = SameSiteMode.Lax;
+      options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+      options.SlidingExpiration = true;
+      options.Cookie.HttpOnly = true;
+      options.Cookie.IsEssential = true;
+      options.Events = new CookieAuthenticationEvents
+      {
+        OnRedirectToLogin = context =>
         {
-            OnRedirectToLogin = context =>
-            {
-                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                return Task.CompletedTask;
-            },
-            OnRedirectToAccessDenied = context =>
-            {
-                context.Response.StatusCode = StatusCodes.Status403Forbidden;
-                return Task.CompletedTask;
-            }
-        };
+          context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+          return Task.CompletedTask;
+        },
+        OnRedirectToAccessDenied = context =>
+        {
+          context.Response.StatusCode = StatusCodes.Status403Forbidden;
+          return Task.CompletedTask;
+        }
+      };
     });
 
 
@@ -64,41 +64,41 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 // CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll",
-        policy => policy.AllowAnyOrigin()
-                        .AllowAnyMethod()
-                        .AllowAnyHeader());
+  options.AddPolicy("AllowAll",
+      policy => policy.AllowAnyOrigin()
+                      .AllowAnyMethod()
+                      .AllowAnyHeader());
 });
 
 
 // Swagger configuration
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo
+  c.SwaggerDoc("v1", new OpenApiInfo
+  {
+    Title = "Mi API",
+    Version = "v1",
+    Description = "Documentación de la API usando Swagger",
+    Contact = new OpenApiContact
     {
-        Title = "Mi API",
-        Version = "v1",
-        Description = "Documentación de la API usando Swagger",
-        Contact = new OpenApiContact
-        {
-            Name = "Tu Nombre",
-            Email = "tuemail@example.com",
-            Url = new Uri("https://tuweb.com")
-        }
-    });
+      Name = "Tu Nombre",
+      Email = "tuemail@example.com",
+      Url = new Uri("https://tuweb.com")
+    }
+  });
 
-    // Add Swagger authentication
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        Scheme = "Bearer",
-        BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Description = "Introduce el token JWT con el prefijo 'Bearer'. Ejemplo: Bearer <token>"
-    });
+  // Add Swagger authentication
+  c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+  {
+    Name = "Authorization",
+    Type = SecuritySchemeType.Http,
+    Scheme = "Bearer",
+    BearerFormat = "JWT",
+    In = ParameterLocation.Header,
+    Description = "Introduce el token JWT con el prefijo 'Bearer'. Ejemplo: Bearer <token>"
+  });
 
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+  c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
             new OpenApiSecurityScheme
@@ -116,15 +116,15 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-app.Urls.Clear(); 
+app.Urls.Clear();
 app.Urls.Add($"http://*:{port}");
 Console.WriteLine($"Server running on port {port}");
 
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Mi API v1");
-    c.RoutePrefix = string.Empty; // Permite acceder desde la raíz
+  c.SwaggerEndpoint("/swagger/v1/swagger.json", "Mi API v1");
+  c.RoutePrefix = string.Empty; // Permite acceder desde la raíz
 });
 app.UseCors("AllowAll");
 app.UseAuthentication();
