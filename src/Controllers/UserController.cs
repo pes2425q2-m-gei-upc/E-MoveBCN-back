@@ -1,9 +1,9 @@
+﻿using System;
+using System.Threading.Tasks;
+using Dto;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Interface;
-using Dto;
-using System;
-using Microsoft.AspNetCore.Authorization;
-using System.Threading.Tasks;
 
 
 namespace Controllers;
@@ -13,103 +13,103 @@ namespace Controllers;
 [Authorize]
 public class UserController : ControllerBase
 {
-    private readonly IUserService _userService;
+  private readonly IUserService _userService;
 
-    public UserController(IUserService userService)
-    {
-        _userService = userService;
-    }
+  public UserController(IUserService userService)
+  {
+    _userService = userService;
+  }
 
-    // GET: /api/user/getuserstest
-    [HttpGet("getuserstest")]
-    public IActionResult GetUserstest()
-    {
-        var users = new[] {
+  // GET: /api/user/getuserstest
+  [HttpGet("getuserstest")]
+  public IActionResult GetUserstest()
+  {
+    var users = new[] {
             new { Id = 1, Name = "Juan", Email = "juan@example.com", PasswordHash = "password123", Idioma = "es" },
             new { Id = 2, Name = "Ana", Email = "ana@example.com", PasswordHash = "password456", Idioma = "en" }
         };
 
-        return Ok(users);
-    }
+    return Ok(users);
+  }
 
-    //POST: /api/user/createuser
-    [HttpPost("createuser")]
-    [AllowAnonymous] 
-    public IActionResult CreateUser([FromBody] UserCreate user)
+  //POST: /api/user/createuser
+  [HttpPost("createuser")]
+  [AllowAnonymous]
+  public IActionResult CreateUser([FromBody] UserCreate user)
+  {
+    if (user == null)
     {
-        if (user == null)
-        {
-            return BadRequest("Invalid data");
-        }
-
-        try
-        {
-            var isCreated = _userService.CreateUser(user);
-
-            if (isCreated)
-            {
-                return Ok("User created successfully");
-            }
-            return BadRequest("Error");
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"Error en el servidor: {ex.Message}");
-        }
+      return BadRequest("Invalid data");
     }
-    //DELETE /api/user/deleteuser
-    [HttpDelete("deleteuser")]
-    public async Task<IActionResult> DeleteUser([FromBody] UserCredentials user)
+
+    try
     {
-        if (user == null)
-        {
-            return BadRequest("Invalid data");
-        }
+      var isCreated = _userService.CreateUser(user);
 
-        try
-        {
-            var isDeleted = await _userService.DeleteUser(user);
-
-            if (isDeleted)
-            {
-                return Ok("User deleted successfully");
-            }
-            return BadRequest("Incorrect credentials");
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"Error en el servidor: {ex.Message}");
-        }
+      if (isCreated)
+      {
+        return Ok("User created successfully");
+      }
+      return BadRequest("Error");
     }
-    // GET: /api/user/getusers
-    [HttpGet("getusers")]
-    public IActionResult GetUsers()
+    catch (Exception ex)
     {
-        var users = _userService.GetAllUsers();
-        return Ok(users);
+      return StatusCode(500, $"Error en el servidor: {ex.Message}");
     }
-    // POST: /api/user/modify
-    [HttpPost("modify")]
-    public async Task<IActionResult> ModifyUser([FromBody] UserDto user)
+  }
+  //DELETE /api/user/deleteuser
+  [HttpDelete("deleteuser")]
+  public async Task<IActionResult> DeleteUser([FromBody] UserCredentials user)
+  {
+    if (user == null)
     {
-        if (user == null)
-        {
-            return BadRequest("Invalid data");
-        }
-
-        try
-        {
-            var isModified = await _userService.ModifyUser(user);
-
-            if (isModified)
-            {
-                return Ok("User modified successfully");
-            }
-            return BadRequest("Incorrect credentials");
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"Error en el servidor: {ex.Message}");
-        }
+      return BadRequest("Invalid data");
     }
+
+    try
+    {
+      var isDeleted = await _userService.DeleteUser(user).ConfigureAwait(false);
+
+      if (isDeleted)
+      {
+        return Ok("User deleted successfully");
+      }
+      return BadRequest("Incorrect credentials");
+    }
+    catch (Exception ex)
+    {
+      return StatusCode(500, $"Error en el servidor: {ex.Message}");
+    }
+  }
+  // GET: /api/user/getusers
+  [HttpGet("getusers")]
+  public IActionResult GetUsers()
+  {
+    var users = _userService.GetAllUsers();
+    return Ok(users);
+  }
+  // POST: /api/user/modify
+  [HttpPost("modify")]
+  public async Task<IActionResult> ModifyUser([FromBody] UserDto user)
+  {
+    if (user == null)
+    {
+      return BadRequest("Invalid data");
+    }
+
+    try
+    {
+      var isModified = await _userService.ModifyUser(user).ConfigureAwait(false);
+
+      if (isModified)
+      {
+        return Ok("User modified successfully");
+      }
+      return BadRequest("Incorrect credentials");
+    }
+    catch (Exception ex)
+    {
+      return StatusCode(500, $"Error en el servidor: {ex.Message}");
+    }
+  }
 }

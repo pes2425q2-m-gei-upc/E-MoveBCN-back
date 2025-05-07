@@ -1,11 +1,11 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using System.Linq;
 using System.Threading.Tasks;
-using Services;
-using Entity;
-using Dto;
 using AutoMapper;
-using System.Linq;
+using Dto;
+using Entity;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Services;
 using Services.Interface;
 namespace Controllers;
 
@@ -15,35 +15,35 @@ namespace Controllers;
 [Authorize]
 public class BicingStationController : ControllerBase
 {
-    private readonly IBicingStationService _bicingStationService;
-    private readonly IStateBicingService _stateBicingService;
+  private readonly IBicingStationService _bicingStationService;
+  private readonly IStateBicingService _stateBicingService;
 
-    private readonly IMapper _mapper;
+  private readonly IMapper _mapper;
 
-    public BicingStationController(IBicingStationService bicingStationService, IStateBicingService stateBicingService, IMapper mapper)
-    {
-        _bicingStationService = bicingStationService;
-        _mapper = mapper;
-        _stateBicingService = stateBicingService;
-    }
-   
-    [HttpGet("bicingstations")] // api/BicingStation/bicingstations
-    public async Task<IActionResult> GetAllStations()
-    {
-        var stations = await _bicingStationService.GetAllBicingStationsAsync();
-        var states = await _stateBicingService.GetAllStateBicingStationsAsync();
+  public BicingStationController(IBicingStationService bicingStationService, IStateBicingService stateBicingService, IMapper mapper)
+  {
+    _bicingStationService = bicingStationService;
+    _mapper = mapper;
+    _stateBicingService = stateBicingService;
+  }
 
-        var combinedData = stations.Join(
-            states,
-            station => station.BicingId,
-            state => state.BicingId,
-            (station, state) => new CombinedBicingDto
-            {
-                StationInfo = _mapper.Map<BicingStationDto>(station),
-                RealTimeStatus = _mapper.Map<StateBicingDto>(state)
-            }
-        ).ToList();
+  [HttpGet("bicingstations")] // api/BicingStation/bicingstations
+  public async Task<IActionResult> GetAllStations()
+  {
+    var stations = await _bicingStationService.GetAllBicingStationsAsync().ConfigureAwait(false);
+    var states = await _stateBicingService.GetAllStateBicingStationsAsync().ConfigureAwait(false);
 
-        return Ok(combinedData);
-    }
+    var combinedData = stations.Join(
+        states,
+        station => station.BicingId,
+        state => state.BicingId,
+        (station, state) => new CombinedBicingDto
+        {
+          StationInfo = _mapper.Map<BicingStationDto>(station),
+          RealTimeStatus = _mapper.Map<StateBicingDto>(state)
+        }
+    ).ToList();
+
+    return Ok(combinedData);
+  }
 }
