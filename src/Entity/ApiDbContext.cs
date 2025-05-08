@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -7,41 +7,41 @@ namespace Entity;
 
 public class ApiDbContext : DbContext
 {
-    private readonly IConfiguration _configuration;
+  private readonly IConfiguration _configuration;
 
-    public ApiDbContext(DbContextOptions<ApiDbContext> options, IConfiguration configuration) : base(options)
+  public ApiDbContext(DbContextOptions<ApiDbContext> options, IConfiguration configuration) : base(options)
+  {
+    _configuration = configuration;
+  }
+
+  public DbSet<UserEntity> Users { get; set; }
+  public DbSet<LocationEntity> Locations { get; set; }
+  public DbSet<HostEntity> Hosts { get; set; }
+  public DbSet<StationEntity> Stations { get; set; }
+  public DbSet<PortEntity> Ports { get; set; }
+  public DbSet<BicingStationEntity> BicingStations { get; set; }
+  public DbSet<StateBicingEntity> StateBicing { get; set; }
+  public DbSet<SavedUbicationEntity> SavedUbications { get; set; }
+  public DbSet<RouteEntity> Routes { get; set; }
+  public DbSet<RouteUserEntity> RoutesUser { get; set; }
+
+
+
+  protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+  {
+    if (!optionsBuilder.IsConfigured)
     {
-        _configuration = configuration;
+      var connectionString = _configuration.GetConnectionString("DefaultConnection");
+      optionsBuilder.UseNpgsql(connectionString, options =>
+      {
+        options.UseNetTopologySuite();
+        options.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(5),
+                errorCodesToAdd: new List<string>());
+      });
     }
-
-    public DbSet<UserEntity> Users { get; set; }
-    public DbSet<LocationEntity> Locations { get; set; }
-    public DbSet<HostEntity> Hosts { get; set; }
-    public DbSet<StationEntity> Stations { get; set; }
-    public DbSet<PortEntity> Ports { get; set; }
-    public DbSet<BicingStationEntity> BicingStations { get; set; }
-    public DbSet<StateBicingEntity> StateBicing { get; set; }
-    public DbSet<SavedUbicationEntity> SavedUbications { get; set; }
-    public DbSet<RouteEntity> Routes {get; set;}
-    public DbSet<RouteUserEntity> RoutesUser { get; set; }
-
-
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        if (!optionsBuilder.IsConfigured)
-        {
-            var connectionString = _configuration.GetConnectionString("DefaultConnection");
-            optionsBuilder.UseNpgsql(connectionString, options =>
-            {
-                options.UseNetTopologySuite();
-                options.EnableRetryOnFailure(
-                  maxRetryCount: 5,
-                  maxRetryDelay: TimeSpan.FromSeconds(5),
-                  errorCodesToAdd: new List<string>());
-            });
-        }
-    }
+  }
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
@@ -51,7 +51,7 @@ public class ApiDbContext : DbContext
     {
       entity.ToTable("users");
       entity.HasKey(e => e.UserId);
-      
+
       entity.Property(e => e.UserId)
         .HasColumnName("id_user")
         .HasColumnType("uuid");
@@ -109,7 +109,7 @@ public class ApiDbContext : DbContext
       entity.Property(e => e.PostalCode)
         .HasColumnName("postal_code")
         .HasColumnType("text");
-        
+
     });
 
     modelBuilder.Entity<HostEntity>(entity =>
@@ -152,7 +152,7 @@ public class ApiDbContext : DbContext
       entity.HasOne(e => e.LocationIdNavigation)
         .WithMany()
         .HasForeignKey(e => e.LocationId);
-      
+
     });
 
     modelBuilder.Entity<StationEntity>(entity =>
@@ -183,7 +183,7 @@ public class ApiDbContext : DbContext
       entity.HasOne(e => e.LocationIdNavigation)
         .WithMany()
         .HasForeignKey(e => e.LocationId);
-      
+
     });
 
     modelBuilder.Entity<PortEntity>(entity =>
@@ -194,7 +194,7 @@ public class ApiDbContext : DbContext
       entity.Property(e => e.PortId)
         .HasColumnName("port_id")
         .HasColumnType("text");
-        
+
       entity.Property(e => e.ConnectorType)
         .HasColumnName("connector_type")
         .HasColumnType("text");
@@ -308,70 +308,70 @@ public class ApiDbContext : DbContext
       entity.Property(e => e.Status)
         .HasColumnName("status")
         .HasColumnType("char(50)");
-    
+
       entity.HasOne(e => e.BicingStationIdNavigation)
         .WithMany()
         .HasForeignKey(e => e.BicingId);
     });
 
-      modelBuilder.Entity<SavedUbicationEntity>(entity =>
-        {
-            entity.ToTable("saved_ubications");
-            //Primary Key
-            entity.HasKey(e => new {e.UbicationId, e.Username, e.StationType});
+    modelBuilder.Entity<SavedUbicationEntity>(entity =>
+      {
+        entity.ToTable("saved_ubications");
+        //Primary Key
+        entity.HasKey(e => new { e.UbicationId, e.Username, e.StationType });
 
-            //Columns
-            entity.Property(e => e.UbicationId)
-                .HasColumnName("ubication_id")
-                .HasColumnType("integer");
+        //Columns
+        entity.Property(e => e.UbicationId)
+              .HasColumnName("ubication_id")
+              .HasColumnType("integer");
 
-            entity.Property(e => e.Username)
-                .HasColumnName("username")
-                .HasColumnType("text");
+        entity.Property(e => e.Username)
+              .HasColumnName("username")
+              .HasColumnType("text");
 
-            entity.Property(e => e.StationType)
-                .HasColumnName("station_type")
-                .HasColumnType("text");
+        entity.Property(e => e.StationType)
+              .HasColumnName("station_type")
+              .HasColumnType("text");
 
-            entity.Property(e => e.Latitude)
-                .HasColumnName("latitude")
-                .HasColumnType("real");
-
-            entity.Property(e => e.Longitude)
-              .HasColumnName("longitude")
+        entity.Property(e => e.Latitude)
+              .HasColumnName("latitude")
               .HasColumnType("real");
 
-            entity.Property(e => e.Valoration)
-                .HasColumnName("valoration")
-                .HasColumnType("integer");
+        entity.Property(e => e.Longitude)
+            .HasColumnName("longitude")
+            .HasColumnType("real");
 
-            entity.Property(e => e.Comment)
-                .HasColumnName("comment")
-                .HasColumnType("text");
-        });
+        entity.Property(e => e.Valoration)
+              .HasColumnName("valoration")
+              .HasColumnType("integer");
 
-      modelBuilder.Entity<RouteUserEntity>(entity =>
-        {
-          entity.ToTable("userRoutes");
-          entity.HasKey(e => new {e.UsuarioId, e.RutaId});
+        entity.Property(e => e.Comment)
+              .HasColumnName("comment")
+              .HasColumnType("text");
+      });
 
-          entity.Property(e => e.UsuarioId)
-            .HasColumnName("UserId")
-            .HasColumnType("uuid");
+    modelBuilder.Entity<RouteUserEntity>(entity =>
+      {
+        entity.ToTable("userRoutes");
+        entity.HasKey(e => new { e.UsuarioId, e.RutaId });
 
-          entity.Property(e => e.RutaId)
-            .HasColumnName("RouteId")
-            .HasColumnType("uuid");
+        entity.Property(e => e.UsuarioId)
+          .HasColumnName("UserId")
+          .HasColumnType("uuid");
 
-          entity.HasOne(e => e.Ruta)
-            .WithMany()
-            .HasForeignKey(e => e.RutaId);
+        entity.Property(e => e.RutaId)
+          .HasColumnName("RouteId")
+          .HasColumnType("uuid");
 
-          entity.HasOne(e => e.Usuario) 
-            .WithMany()
-            .HasForeignKey(e => e.UsuarioId);
-            
-        });
+        entity.HasOne(e => e.Ruta)
+          .WithMany()
+          .HasForeignKey(e => e.RutaId);
+
+        entity.HasOne(e => e.Usuario)
+          .WithMany()
+          .HasForeignKey(e => e.UsuarioId);
+
+      });
   }
 }
 
