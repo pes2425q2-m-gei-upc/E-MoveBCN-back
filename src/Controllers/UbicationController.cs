@@ -18,14 +18,14 @@ public class UbicationController(IUbicationService ubicationService) : Controlle
   private readonly IUbicationService _ubicationService = ubicationService;
 
   [HttpGet("getsavedubications")]
-  public async Task<IActionResult> GetAllSavedUbications([FromQuery] string username)
+  public async Task<IActionResult> GetAllSavedUbications([FromQuery] string userEmail)
   {
-    if (string.IsNullOrEmpty(username))
+    if (string.IsNullOrEmpty(userEmail))
     {
       return BadRequest("Username is required.");
     }
 
-    var savedUbications = await _ubicationService.GetUbicationsByUserIdAsync(username).ConfigureAwait(false);
+    var savedUbications = await _ubicationService.GetUbicationsByUserIdAsync(userEmail).ConfigureAwait(false);
 
     if (savedUbications == null || savedUbications.Count == 0)
     {

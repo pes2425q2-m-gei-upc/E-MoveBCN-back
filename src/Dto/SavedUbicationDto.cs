@@ -9,7 +9,7 @@ public class SavedUbicationDto
   public required int UbicationId { get; set; }
 
   [JsonPropertyName("username")]
-  public required string Username { get; set; }
+  public required string UserEmail { get; set; }
 
   [JsonPropertyName("station_type")]
   public required string StationType { get; set; }
