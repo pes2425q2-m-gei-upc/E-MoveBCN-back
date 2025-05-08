@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Services.Interface;
 
 
-namespace Controllers;
+namespace src.Controllers;
 
 [Route("api/[controller]")]  // Base route: api/user
 [ApiController]

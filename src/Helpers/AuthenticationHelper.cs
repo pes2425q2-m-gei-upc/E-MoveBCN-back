@@ -22,7 +22,7 @@ public class AuthenticationHelper : IAuthenticationHelper
   {
     var claims = new List<Claim>
         {
-            new Claim(ApiClaimTypes.Name, user.Name),
+            new Claim(ApiClaimTypes.Name, user.Username),
             new Claim(ApiClaimTypes.Email, user.Email),
             new Claim(ApiClaimTypes.UserId, user.UserId.ToString())
         };

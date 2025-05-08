@@ -28,7 +28,7 @@ public class UserRepository : IUserRepository
         .Select(u => new UserDto
         {
           UserId = u.UserId.ToString(),
-          Name = u.Name,
+          Username = u.Username,
           Email = u.Email,
           PasswordHash = u.PasswordHash,
         })
@@ -46,7 +46,7 @@ public class UserRepository : IUserRepository
       var user = new UserEntity
       {
         UserId = Guid.NewGuid(),
-        Name = userDto.Name,
+        Username = userDto.Username,
         Email = userDto.Email,
         PasswordHash = password,
       };
@@ -62,7 +62,7 @@ public class UserRepository : IUserRepository
   public async Task<UserDto> GetUserByUsername(string username)
   {
     var user = await _Dbcontext.Users
-        .FirstOrDefaultAsync(u => u.Name == username).ConfigureAwait(false);
+        .FirstOrDefaultAsync(u => u.Username == username).ConfigureAwait(false);
 
     return _mapper.Map<UserDto>(user);
   }
@@ -80,7 +80,7 @@ public class UserRepository : IUserRepository
     }
 
     await _Dbcontext.SavedUbications
-        .Where(u => u.Username == user.Name)
+        .Where(u => u.UserEmail == user.Email)
         .ExecuteDeleteAsync().ConfigureAwait(false);
 
     int deletedRows = await _Dbcontext.Users
@@ -104,7 +104,7 @@ public class UserRepository : IUserRepository
       user.PasswordHash = password;
     }
 
-    user.Email = userModify.Email;
+    user.Username = userModify.Username;
 
     _Dbcontext.Users.Update(user);
     return await _Dbcontext.SaveChangesAsync().ConfigureAwait(false) > 0;
@@ -123,7 +123,7 @@ public class UserRepository : IUserRepository
       var user = new UserEntity
       {
         UserId = Guid.NewGuid(),
-        Name = name,
+        Username = name,
         Email = email,
         PasswordHash = "", // No password for google users
       };
