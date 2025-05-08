@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,56 +12,56 @@ namespace Repositories;
 
 public class UbicationRepository : IUbicationRepository
 {
-    private readonly ApiDbContext _context;
-    private readonly IMapper _mapper;
+  private readonly ApiDbContext _context;
+  private readonly IMapper _mapper;
 
-    public UbicationRepository(ApiDbContext context, IMapper mapper)
-    {
-        _mapper = mapper;
-        _context = context;
-    }
+  public UbicationRepository(ApiDbContext context, IMapper mapper)
+  {
+    _mapper = mapper;
+    _context = context;
+  }
 
-    public async Task<List<SavedUbicationDto>> GetUbicationsByUserIdAsync(string username)
+  public async Task<List<SavedUbicationDto>> GetUbicationsByUserIdAsync(string userEmail)
+  {
+    var entities = await _context.SavedUbications
+        .Where(u => u.UserEmail == userEmail)
+        .ToListAsync().ConfigureAwait(false);
+    return _mapper.Map<List<SavedUbicationDto>>(entities);
+  }
+  public async Task<bool> SaveUbicationAsync(SavedUbicationDto savedUbication)
+  {
+    var savedUbicationEntity = new SavedUbicationEntity
     {
-        var entities = await _context.SavedUbications
-            .Where(u => u.Username == username)
-            .ToListAsync();
-        return _mapper.Map<List<SavedUbicationDto>>(entities);
-    }
-    public async Task<bool> SaveUbicationAsync(SavedUbicationDto savedUbication)
+      UserEmail = savedUbication.UserEmail,
+      UbicationId = savedUbication.UbicationId,
+      Latitude = savedUbication.Latitude,
+      Longitude = savedUbication.Longitude,
+      StationType = savedUbication.StationType,
+    };
+    await _context.SavedUbications.AddAsync(savedUbicationEntity).ConfigureAwait(false);
+    return await _context.SaveChangesAsync().ConfigureAwait(false) > 0;
+  }
+  public async Task<bool> DeleteUbication(UbicationInfoDto ubicationDelete)
+  {
+    var savedUbication = await _context.SavedUbications
+        .FirstOrDefaultAsync(u => u.UserEmail == ubicationDelete.Username && u.UbicationId == ubicationDelete.UbicationId && u.StationType == ubicationDelete.StationType).ConfigureAwait(false);
+    if (savedUbication == null)
     {
-        var savedUbicationEntity = new SavedUbicationEntity
-        {
-            Username = savedUbication.Username,
-            UbicationId = savedUbication.UbicationId,
-            Latitude = savedUbication.Latitude,
-            Longitude = savedUbication.Longitude,
-            StationType = savedUbication.StationType,
-        };
-        await _context.SavedUbications.AddAsync(savedUbicationEntity);
-        return await _context.SaveChangesAsync() > 0;
+      return false;
     }
-    public async Task<bool> DeleteUbication(UbicationInfoDto ubicationDelete)
+    _context.SavedUbications.Remove(savedUbication);
+    return await _context.SaveChangesAsync().ConfigureAwait(false) > 0;
+  }
+  public async Task<bool> UpdateUbication(UbicationInfoDto savedUbication)
+  {
+    var savedUbicationEntity = await _context.SavedUbications
+        .FirstOrDefaultAsync(u => u.UserEmail == savedUbication.Username && u.UbicationId == savedUbication.UbicationId).ConfigureAwait(false);
+    if (savedUbicationEntity == null)
     {
-        var savedUbication = await _context.SavedUbications
-            .FirstOrDefaultAsync(u => u.Username == ubicationDelete.Username && u.UbicationId == ubicationDelete.UbicationId && u.StationType == ubicationDelete.StationType);
-        if (savedUbication == null)
-        {
-            return false;
-        }
-        _context.SavedUbications.Remove(savedUbication);
-        return await _context.SaveChangesAsync() > 0;
+      return false;
     }
-    public async Task<bool> UpdateUbication(UbicationInfoDto savedUbication)
-    {
-        var savedUbicationEntity = await _context.SavedUbications
-            .FirstOrDefaultAsync(u => u.Username == savedUbication.Username && u.UbicationId == savedUbication.UbicationId);
-        if (savedUbicationEntity == null)
-        {
-            return false;
-        }
-        savedUbicationEntity.Valoration = savedUbication.Valoration;
-        savedUbicationEntity.Comment = savedUbication.Comment;
-        return await _context.SaveChangesAsync() > 0;
-    }
+    savedUbicationEntity.Valoration = savedUbication.Valoration;
+    savedUbicationEntity.Comment = savedUbication.Comment;
+    return await _context.SaveChangesAsync().ConfigureAwait(false) > 0;
+  }
 }

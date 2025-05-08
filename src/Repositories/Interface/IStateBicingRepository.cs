@@ -1,17 +1,17 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Entity;   
 using Dto;
+using Entity;
 namespace Repositories.Interface;
 
 public interface IStateBicingRepository
 {
-    Task<List<StateBicingDto>> GetAllStateBicingStations();
+  Task<List<StateBicingDto>> GetAllStateBicingStations();
 
-    Task<StateBicingDto> GetStateBicingById(int stationId);
-    Task BulkInsertAsync(
-        List<StateBicingEntity> statebicing
-    );
+  Task<StateBicingDto> GetStateBicingById(int stationId);
+  Task BulkInsertAsync(
+      List<StateBicingEntity> statebicing
+  );
 
-    
+
 }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -11,28 +11,28 @@ using Repositories.Interface;
 
 namespace Helpers;
 
-public class AuthenticationHelper: IAuthenticationHelper
+public class AuthenticationHelper : IAuthenticationHelper
 {
-    public AuthenticationHelper()
-    {
+  public AuthenticationHelper()
+  {
 
-    }
+  }
 
-    public (ClaimsIdentity ClaimsIdentity, AuthenticationProperties AuthenticationProperties) AuthenticationClaims(UserDto user)
-    {
-        var claims = new List<Claim>
+  public (ClaimsIdentity ClaimsIdentity, AuthenticationProperties AuthenticationProperties) AuthenticationClaims(UserDto user)
+  {
+    var claims = new List<Claim>
         {
-            new Claim(ApiClaimTypes.Name, user.Name),
+            new Claim(ApiClaimTypes.Name, user.Username),
             new Claim(ApiClaimTypes.Email, user.Email),
             new Claim(ApiClaimTypes.UserId, user.UserId.ToString())
         };
-        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-        var expirationDate = DateTimeOffset.UtcNow.AddDays(1);
-        var authenticationProperties = new AuthenticationProperties
-        {
-            IsPersistent = true,
-            ExpiresUtc = expirationDate
-        };
-        return (claimsIdentity, authenticationProperties);
-    }
+    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+    var expirationDate = DateTimeOffset.UtcNow.AddDays(1);
+    var authenticationProperties = new AuthenticationProperties
+    {
+      IsPersistent = true,
+      ExpiresUtc = expirationDate
+    };
+    return (claimsIdentity, authenticationProperties);
+  }
 }
