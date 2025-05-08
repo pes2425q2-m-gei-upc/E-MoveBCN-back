@@ -6,7 +6,7 @@ using Helpers;
 using Microsoft.AspNetCore.Identity;
 using Repositories.Interface;
 using Services.Interface;
-namespace Services;
+namespace src.Services;
 
 public class UserService : IUserService
 {
@@ -25,9 +25,9 @@ public class UserService : IUserService
   {
     return _userRepository.CreateUser(user);
   }
-  public async Task<UserDto?> Authenticate(UserCredentials userCredentials)
+  public async Task<UserDto> Authenticate(UserCredentials userCredentials)
   {
-    var user = await _userRepository.GetUserByUsername(userCredentials.Username).ConfigureAwait(false);
+    var user = await _userRepository.GetUserByEmailAsync(userCredentials.UserEmail).ConfigureAwait(false);
     if (user == null)
     {
       return null;
@@ -43,7 +43,7 @@ public class UserService : IUserService
 
   public async Task<bool> DeleteUser(UserCredentials userCredentials)
   {
-    var user = await _userRepository.GetUserByUsername(userCredentials.Username).ConfigureAwait(false);
+    var user = await _userRepository.GetUserByEmailAsync(userCredentials.UserEmail).ConfigureAwait(false);
     if (user == null)
     {
       return false;

@@ -56,8 +56,8 @@ public class ApiDbContext : DbContext
         .HasColumnName("id_user")
         .HasColumnType("uuid");
 
-      entity.Property(e => e.Name)
-        .HasColumnName("name")
+      entity.Property(e => e.Username)
+        .HasColumnName("username")
         .HasColumnType("text");
 
       entity.Property(e => e.Email)
@@ -318,15 +318,15 @@ public class ApiDbContext : DbContext
       {
         entity.ToTable("saved_ubications");
         //Primary Key
-        entity.HasKey(e => new { e.UbicationId, e.Username, e.StationType });
+        entity.HasKey(e => new { e.UbicationId, e.UserEmail, e.StationType });
 
         //Columns
         entity.Property(e => e.UbicationId)
               .HasColumnName("ubication_id")
               .HasColumnType("integer");
 
-        entity.Property(e => e.Username)
-              .HasColumnName("username")
+        entity.Property(e => e.UserEmail)
+              .HasColumnName("email")
               .HasColumnType("text");
 
         entity.Property(e => e.StationType)
