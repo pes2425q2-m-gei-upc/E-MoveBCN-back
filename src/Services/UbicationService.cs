@@ -32,14 +32,14 @@ public class UbicationService : IUbicationService
     _tmbService = tmbService;
   }
 
-  public async Task<List<SavedUbicationDto>> GetUbicationsByUserIdAsync(string username)
+  public async Task<List<SavedUbicationDto>> GetUbicationsByUserIdAsync(string userEmail)
   {
-    var savedUbications = await _ubicationRepository.GetUbicationsByUserIdAsync(username).ConfigureAwait(false);
+    var savedUbications = await _ubicationRepository.GetUbicationsByUserIdAsync(userEmail).ConfigureAwait(false);
     return savedUbications;
   }
   public async Task<bool> SaveUbicationAsync(SavedUbicationDto savedUbication)
   {
-    var user = await _userRepository.GetUserByUsername(savedUbication.Username).ConfigureAwait(false);
+    var user = await _userRepository.GetUserByUsername(savedUbication.UserEmail).ConfigureAwait(false);
     if (user == null)
     {
       return false;

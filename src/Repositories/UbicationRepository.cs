@@ -21,10 +21,10 @@ public class UbicationRepository : IUbicationRepository
     _context = context;
   }
 
-  public async Task<List<SavedUbicationDto>> GetUbicationsByUserIdAsync(string username)
+  public async Task<List<SavedUbicationDto>> GetUbicationsByUserIdAsync(string userEmail)
   {
     var entities = await _context.SavedUbications
-        .Where(u => u.Username == username)
+        .Where(u => u.UserEmail == userEmail)
         .ToListAsync().ConfigureAwait(false);
     return _mapper.Map<List<SavedUbicationDto>>(entities);
   }
@@ -32,7 +32,7 @@ public class UbicationRepository : IUbicationRepository
   {
     var savedUbicationEntity = new SavedUbicationEntity
     {
-      Username = savedUbication.Username,
+      UserEmail = savedUbication.UserEmail,
       UbicationId = savedUbication.UbicationId,
       Latitude = savedUbication.Latitude,
       Longitude = savedUbication.Longitude,
@@ -44,7 +44,7 @@ public class UbicationRepository : IUbicationRepository
   public async Task<bool> DeleteUbication(UbicationInfoDto ubicationDelete)
   {
     var savedUbication = await _context.SavedUbications
-        .FirstOrDefaultAsync(u => u.Username == ubicationDelete.Username && u.UbicationId == ubicationDelete.UbicationId && u.StationType == ubicationDelete.StationType).ConfigureAwait(false);
+        .FirstOrDefaultAsync(u => u.UserEmail == ubicationDelete.Username && u.UbicationId == ubicationDelete.UbicationId && u.StationType == ubicationDelete.StationType).ConfigureAwait(false);
     if (savedUbication == null)
     {
       return false;
@@ -55,7 +55,7 @@ public class UbicationRepository : IUbicationRepository
   public async Task<bool> UpdateUbication(UbicationInfoDto savedUbication)
   {
     var savedUbicationEntity = await _context.SavedUbications
-        .FirstOrDefaultAsync(u => u.Username == savedUbication.Username && u.UbicationId == savedUbication.UbicationId).ConfigureAwait(false);
+        .FirstOrDefaultAsync(u => u.UserEmail == savedUbication.Username && u.UbicationId == savedUbication.UbicationId).ConfigureAwait(false);
     if (savedUbicationEntity == null)
     {
       return false;
