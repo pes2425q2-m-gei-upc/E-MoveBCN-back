@@ -6,19 +6,19 @@ WORKDIR /src
 RUN rm -f global.json
 
 # Copia el archivo .csproj a la imagen
-COPY plantilla.Web.csproj ./plantilla.Web.csproj
+COPY E-MoveBCN-back.csproj ./E-MoveBCN-back.csproj
 
 # Verifica que el archivo .csproj se haya copiado correctamente
 RUN ls -l
 
 # Restaura dependencias usando el archivo .csproj
-RUN dotnet restore plantilla.Web.csproj
+RUN dotnet restore E-MoveBCN-back.csproj
 
 # Copia el resto del código
 COPY . .
 
 # Compila la aplicación
-RUN dotnet publish plantilla.Web.csproj -c Release -o /app
+RUN dotnet publish E-MoveBCN-back.csproj -c Release -o /app
 
 # Etapa de runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
@@ -27,4 +27,5 @@ WORKDIR /app
 EXPOSE 8080
 
 COPY --from=build /app .
-ENTRYPOINT ["dotnet", "plantilla.Web.dll"]
+ENTRYPOINT ["dotnet", "E-MoveBCN-back.dll"]
+
