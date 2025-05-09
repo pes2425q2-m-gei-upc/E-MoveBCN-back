@@ -1,0 +1,6 @@
+projectKey=e-movebcn
+serverUrl=http://localhost:9000
+serverVersion=25.5.0.107428
+dashboardUrl=http://localhost:9000/dashboard?id=e-movebcn
+ceTaskId=f8a1fde6-476b-49ba-8084-54e6639836ae
+ceTaskUrl=http://localhost:9000/api/ce/task?id=f8a1fde6-476b-49ba-8084-54e6639836ae
