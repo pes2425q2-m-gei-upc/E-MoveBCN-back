@@ -9,6 +9,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Identity.Client;
+using Repositories.Interface;
 using src.Dto.Route;
 using src.Entity.Route;
 
@@ -17,12 +18,14 @@ public class RouteService : IRouteService
   private readonly IConfiguration _config;
   private readonly HttpClient _httpClient;
   private readonly IRouteRepository _routeRepository;
+  private readonly IUserRepository _userRepository;
 
-  public RouteService(IConfiguration config, HttpClient httpClient, IRouteRepository routeRepository)
+  public RouteService(IConfiguration config, HttpClient httpClient, IRouteRepository routeRepository, IUserRepository userRepository)
   {
     _config = config;
     _httpClient = httpClient;
     _routeRepository = routeRepository;
+    _userRepository = userRepository;
   }
 
   public async Task<RouteResponseDto> CalcularRutaAsync(RouteRequestDto request, Guid usuarioId)
@@ -126,6 +129,7 @@ public class RouteService : IRouteService
 
     return new RouteResponseDto
     {
+      RouteId = Guid.NewGuid().ToString(),
       Distance = summary.GetProperty("distance").GetDouble(),
       Duration = summary.GetProperty("duration").GetDouble(),
       Geometry = coords,
@@ -226,6 +230,7 @@ public class RouteService : IRouteService
 
     return new RouteResponseDto
     {
+      RouteId = Guid.NewGuid().ToString(),
       Distance = distance.GetProperty("value").GetDouble(),
       Duration = duration.GetProperty("value").GetDouble(),
       Geometry = coords,
@@ -294,6 +299,11 @@ public class RouteService : IRouteService
   }
   public async Task<bool> SaveRoute(RouteDto route)
   {
+    var user = await _userRepository.GetUserById(route.UserId).ConfigureAwait(false);
+    if (user == null)
+    {
+      throw new Exception("Usuario no encontrado");
+    }
     var routeEntity = new RouteEntity
     {
       RouteId = Guid.Parse(route.RouteId),
@@ -309,8 +319,12 @@ public class RouteService : IRouteService
       InstructionsJson = JsonSerializer.Serialize(route.Instructions),
       OriginStreetName = route.OriginStreetName,
       DestinationStreetName = route.DestinationStreetName,
-      UserId = Guid.Parse(route.UserId)
+      UserId = Guid.Parse(user.UserId)
     };
     return await _routeRepository.GuardarRutaAsync(routeEntity).ConfigureAwait(false);
+  }
+  public async Task<bool> DeleteRoute(string routeId)
+  {
+    return await _routeRepository.DeleteRoute(routeId).ConfigureAwait(false);
   }
 }

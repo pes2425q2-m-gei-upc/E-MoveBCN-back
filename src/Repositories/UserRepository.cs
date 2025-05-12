@@ -107,6 +107,11 @@ public class UserRepository : IUserRepository
     var user = await _Dbcontext.Users.FirstOrDefaultAsync(u => u.Email == email).ConfigureAwait(false);
     return _mapper.Map<UserDto>(user);
   }
+  public async Task<UserDto?> GetUserById(string userId)
+  {
+    var user = await _Dbcontext.Users.FirstOrDefaultAsync(u => u.UserId == Guid.Parse(userId)).ConfigureAwait(false);
+    return _mapper.Map<UserDto>(user);
+  }
 
   public async Task<bool> CreateGoogleUserAsync(string name, string email)
   {
