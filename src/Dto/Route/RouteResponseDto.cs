@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-
+namespace src.Dto.Route;
 public class RouteResponseDto
 {
   public double Distance { get; set; }

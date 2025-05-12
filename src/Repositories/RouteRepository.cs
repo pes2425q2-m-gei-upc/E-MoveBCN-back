@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using src.Dto.Route;
 using System.Threading.Tasks;
 using Entity;
-using Repositories.Interface;
+using src.Entity.Route;
 
 
 
@@ -15,9 +14,9 @@ public class RouteRepository : IRouteRepository
     _dbContext = dbContext;
   }
 
-  public async Task GuardarRutaAsync(RouteEntity ruta)
+  public async Task<bool> GuardarRutaAsync(RouteEntity ruta)
   {
     _dbContext.Routes.Add(ruta); // to-do: guardar en UserRoutes
-    await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+    return await _dbContext.SaveChangesAsync().ConfigureAwait(false) > 0;
   }
 }

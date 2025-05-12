@@ -9,18 +9,20 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Identity.Client;
+using src.Dto.Route;
+using src.Entity.Route;
 
 public class RouteService : IRouteService
 {
   private readonly IConfiguration _config;
   private readonly HttpClient _httpClient;
-  private readonly IRouteRepository _repo;
+  private readonly IRouteRepository _routeRepository;
 
-  public RouteService(IConfiguration config, HttpClient httpClient, IRouteRepository repo)
+  public RouteService(IConfiguration config, HttpClient httpClient, IRouteRepository routeRepository)
   {
     _config = config;
     _httpClient = httpClient;
-    _repo = repo;
+    _routeRepository = routeRepository;
   }
 
   public async Task<RouteResponseDto> CalcularRutaAsync(RouteRequestDto request, Guid usuarioId)
@@ -32,23 +34,6 @@ public class RouteService : IRouteService
         : await CalcularConORSAsync(request).ConfigureAwait(false);
     response.OriginStreetName = streetNameOrigin;
     response.DestinationStreetName = streetNameDestination;
-    var route = new RouteEntity
-    {
-      Id = Guid.NewGuid(),
-      OriginLat = request.OriginLat,
-      OriginLng = request.OriginLng,
-      DestinationLat = request.DestinationLat,
-      DestinationLng = request.DestinationLng,
-      Mean = request.Mode,
-      Preference = request.Preference,
-      Distance = (float)response.Distance,
-      Duration = (float)response.Duration,
-      GeometryJson = JsonSerializer.Serialize(response.Geometry),
-      InstructionsJson = JsonSerializer.Serialize(response.Instructions)
-    };
-
-    // await _repo.GuardarRutaAsync(route);
-
     return response;
   }
 
@@ -306,5 +291,26 @@ public class RouteService : IRouteService
       }
 
       return results[0].GetProperty("formatted_address").GetString();
+  }
+  public async Task<bool> SaveRoute(RouteDto route)
+  {
+    var routeEntity = new RouteEntity
+    {
+      RouteId = Guid.Parse(route.RouteId),
+      OriginLat = route.OriginLat,
+      OriginLng = route.OriginLng,
+      DestinationLat = route.DestinationLat,
+      DestinationLng = route.DestionationLng,
+      Mean = route.mean,
+      Preference = route.Preference,
+      Distance = (float)route.Distance,
+      Duration = (float)route.Duration,
+      GeometryJson = JsonSerializer.Serialize(route.Geometry),
+      InstructionsJson = JsonSerializer.Serialize(route.Instructions),
+      OriginStreetName = route.OriginStreetName,
+      DestinationStreetName = route.DestinationStreetName,
+      UserId = Guid.Parse(route.UserId)
+    };
+    return await _routeRepository.GuardarRutaAsync(routeEntity).ConfigureAwait(false);
   }
 }

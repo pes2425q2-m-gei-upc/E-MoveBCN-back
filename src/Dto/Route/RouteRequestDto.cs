@@ -1,4 +1,5 @@
-﻿public class RouteRequestDto
+﻿namespace src.Dto.Route;
+public class RouteRequestDto
 {
   public double OriginLat { get; set; }
   public double OriginLng { get; set; }
