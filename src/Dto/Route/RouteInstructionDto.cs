@@ -1,4 +1,5 @@
-﻿public class RouteInstructionDto
+﻿namespace src.Dto.Route;
+public class RouteInstructionDto
 {
   public string Instruction { get; set; }
   public double Distance { get; set; }

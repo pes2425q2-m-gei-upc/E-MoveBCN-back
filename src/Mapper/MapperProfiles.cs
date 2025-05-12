@@ -1,6 +1,10 @@
-﻿using AutoMapper;
+﻿using System.Collections.Generic;
+using System.Text.Json;
+using AutoMapper;
 using Dto;
 using Entity;
+using src.Dto.Route;
+using src.Entity.Route;
 namespace Mapper;
 public class MapperProfiles : Profile
 {
@@ -18,8 +22,19 @@ public class MapperProfiles : Profile
         .ForMember(dest => dest.BicingStation, opt => opt.MapFrom(src => src.BicingStationIdNavigation));
     CreateMap<BicingStationEntity, BicingStationDto>();
     CreateMap<SavedUbicationEntity, SavedUbicationDto>();
+    CreateMap<RouteEntity, RouteDto>()
+    .ForMember(dest => dest.User, opt => opt.MapFrom(src => src.UserIdNavigation))
+    .ForMember(dest => dest.Geometry, opt => opt.MapFrom(src => DeserializeGeometry(src.GeometryJson)))
+    .ForMember(dest => dest.Instructions, opt => opt.MapFrom(src => DeserializeInstructions(src.InstructionsJson)));
+  }
 
+  private static List<double[]> DeserializeGeometry(string json)
+  {
+      return JsonSerializer.Deserialize<List<double[]>>(json) ?? new List<double[]>();
+  }
 
-
+  private static List<RouteInstructionDto> DeserializeInstructions(string json)
+  {
+      return JsonSerializer.Deserialize<List<RouteInstructionDto>>(json) ?? new List<RouteInstructionDto>();
   }
 }
