@@ -4,6 +4,7 @@ using Dto;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Services.Interface;
+using src.Dto.Route;
 
 [ApiController]
 [Route("api/public")]
