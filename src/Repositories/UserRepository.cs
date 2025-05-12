@@ -59,14 +59,6 @@ public class UserRepository : IUserRepository
       return false;
     }
   }
-  public async Task<UserDto> GetUserByUsername(string username)
-  {
-    var user = await _Dbcontext.Users
-        .FirstOrDefaultAsync(u => u.Username == username).ConfigureAwait(false);
-
-    return _mapper.Map<UserDto>(user);
-  }
-
   public async Task<bool> DeleteUser(string userId)
   {
     if (!Guid.TryParse(userId, out Guid parsedUserId))

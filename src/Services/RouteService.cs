@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -24,10 +25,13 @@ public class RouteService : IRouteService
 
   public async Task<RouteResponseDto> CalcularRutaAsync(RouteRequestDto request, Guid usuarioId)
   {
+    var streetNameOrigin = await GetStreetNameAsync(request.OriginLat, request.OriginLng).ConfigureAwait(false);
+    var streetNameDestination = await GetStreetNameAsync(request.DestinationLat, request.DestinationLng).ConfigureAwait(false);
     var response = request.Mode == "transit"
         ? await CalcularConGoogleMapsAsync(request).ConfigureAwait(false)
         : await CalcularConORSAsync(request).ConfigureAwait(false);
-
+    response.OriginStreetName = streetNameOrigin;
+    response.DestinationStreetName = streetNameDestination;
     var route = new RouteEntity
     {
       Id = Guid.NewGuid(),
@@ -48,7 +52,7 @@ public class RouteService : IRouteService
     return response;
   }
 
-  public async Task<RouteResponseDto> CalcularConORSAsync(RouteRequestDto request)
+  private async Task<RouteResponseDto> CalcularConORSAsync(RouteRequestDto request)
   {
     string profile = request.Mode switch
     {
@@ -144,7 +148,7 @@ public class RouteService : IRouteService
     };
   }
 
-  public async Task<RouteResponseDto> CalcularConGoogleMapsAsync(RouteRequestDto request)
+  private async Task<RouteResponseDto> CalcularConGoogleMapsAsync(RouteRequestDto request)
   {
     var apiKey = _config["APIKeys:GoogleMaps:ApiKey"];
     string origin = $"{request.OriginLat.ToString(System.Globalization.CultureInfo.InvariantCulture)},{request.OriginLng.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
@@ -277,5 +281,30 @@ public class RouteService : IRouteService
     }
 
     return coords;
+  }
+  private async Task<string> GetStreetNameAsync(double lat, double lng)
+  {
+      var apiKey = _config["APIKeys:GoogleMaps:ApiKey"];
+      var url = $"https://maps.googleapis.com/maps/api/geocode/json?latlng={lat.ToString(CultureInfo.InvariantCulture)},{lng.ToString(CultureInfo.InvariantCulture)}&key={apiKey}";
+
+      var res = await _httpClient.GetAsync(url);
+      if (!res.IsSuccessStatusCode) return "Unknown";
+
+      var json = await res.Content.ReadAsStringAsync();
+      using var doc = JsonDocument.Parse(json);
+
+      var results = doc.RootElement.GetProperty("results");
+      if (results.GetArrayLength() == 0) return "Unknown";
+
+      var addressComponents = results[0].GetProperty("address_components");
+      foreach (var component in addressComponents.EnumerateArray())
+      {
+          if (component.GetProperty("types").EnumerateArray().Any(t => t.GetString() == "route"))
+          {
+              return component.GetProperty("long_name").GetString();
+          }
+      }
+
+      return results[0].GetProperty("formatted_address").GetString();
   }
 }
