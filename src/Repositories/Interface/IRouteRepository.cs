@@ -6,4 +6,5 @@ using src.Entity.Route;
 public interface IRouteRepository
 {
   Task<bool> GuardarRutaAsync(RouteEntity ruta);
+  Task<bool> DeleteRoute(string rutaId);
 }

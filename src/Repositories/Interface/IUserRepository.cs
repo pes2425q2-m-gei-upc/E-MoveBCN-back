@@ -10,7 +10,7 @@ public interface IUserRepository
   public bool CreateUser(UserCreate user);
   public Task<bool> DeleteUser(string userId);
   public Task<bool> ModifyUser(UserDto userModify);
-
+  public Task<UserDto?> GetUserById(string userId);
   Task<UserDto?> GetUserByEmailAsync(string email);
   Task<bool> CreateGoogleUserAsync(string name, string email);
 }

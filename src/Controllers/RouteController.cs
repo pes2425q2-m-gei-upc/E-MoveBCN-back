@@ -40,4 +40,14 @@ public class RutasController : ControllerBase
     }
     return Ok("Route saved successfully");
   }
+  [HttpDelete("delete")] // api/rutas/delete
+  public async Task<IActionResult> DeleteRoute([FromBody] string routeId)
+  {
+    var result = await _routeService.DeleteRoute(routeId).ConfigureAwait(false);
+    if (result == false)
+    {
+      return BadRequest("Error deleting route");
+    }
+    return Ok("Route deleted successfully");
+  }
 }
