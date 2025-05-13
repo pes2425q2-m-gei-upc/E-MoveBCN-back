@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using src.Entity.Route;
 
 namespace Entity;
 
@@ -23,7 +24,7 @@ public class ApiDbContext : DbContext
   public DbSet<StateBicingEntity> StateBicing { get; set; }
   public DbSet<SavedUbicationEntity> SavedUbications { get; set; }
   public DbSet<RouteEntity> Routes { get; set; }
-  public DbSet<RouteUserEntity> RoutesUser { get; set; }
+  public DbSet<PublishedRouteEntity> PublishedRoutes { get; set; }
 
 
 
@@ -350,27 +351,91 @@ public class ApiDbContext : DbContext
               .HasColumnType("text");
       });
 
-    modelBuilder.Entity<RouteUserEntity>(entity =>
+    modelBuilder.Entity<RouteEntity>(entity =>
       {
-        entity.ToTable("userRoutes");
-        entity.HasKey(e => new { e.UsuarioId, e.RutaId });
+        entity.ToTable("route");
+        entity.HasKey(e => e.RouteId);
 
-        entity.Property(e => e.UsuarioId)
-          .HasColumnName("UserId")
+        entity.Property(e => e.RouteId)
+          .HasColumnName("route_id")
           .HasColumnType("uuid");
 
-        entity.Property(e => e.RutaId)
-          .HasColumnName("RouteId")
+        entity.Property(e => e.OriginLat)
+          .HasColumnName("originlat")
+          .HasColumnType("real");
+
+        entity.Property(e => e.OriginLng)
+          .HasColumnName("originlng")
+          .HasColumnType("real");
+
+        entity.Property(e => e.DestinationLat)
+          .HasColumnName("destinationlat")
+          .HasColumnType("real");
+
+        entity.Property(e => e.DestinationLng)
+          .HasColumnName("destinationlng")
+          .HasColumnType("real");
+
+        entity.Property(e => e.Mean)
+          .HasColumnName("mean")
+          .HasColumnType("text");
+
+        entity.Property(e => e.Preference)
+          .HasColumnName("preference")
+          .HasColumnType("text");
+
+        entity.Property(e => e.Distance)
+          .HasColumnName("distance")
+          .HasColumnType("real");
+
+        entity.Property(e => e.Duration)
+          .HasColumnName("duration")
+          .HasColumnType("real");
+
+        entity.Property(e => e.GeometryJson)
+          .HasColumnName("geometryjson")
+          .HasColumnType("jsonb");
+
+        entity.Property(e => e.InstructionsJson)
+          .HasColumnName("instructionsjson")
+          .HasColumnType("jsonb");
+
+        entity.Property(e => e.OriginStreetName)
+          .HasColumnName("origin_street_name")
+          .HasColumnType("text");
+
+        entity.Property(e => e.DestinationStreetName)
+          .HasColumnName("destination_street_name")
+          .HasColumnType("text");
+
+        entity.Property(e => e.UserId)
+            .HasColumnName("id_user")
+            .HasColumnType("uuid");
+
+        entity.HasOne(e => e.UserIdNavigation)
+          .WithMany()
+          .HasForeignKey(e => e.UserId);
+      });
+    modelBuilder.Entity<PublishedRouteEntity>(entity =>
+      {
+        entity.ToTable("published_route");
+        entity.HasKey(e => e.RouteId);
+
+        entity.Property(e => e.RouteId)
+          .HasColumnName("route_id")
           .HasColumnType("uuid");
 
-        entity.HasOne(e => e.Ruta)
-          .WithMany()
-          .HasForeignKey(e => e.RutaId);
+        entity.Property(e => e.Date)
+          .HasColumnName("date")
+          .HasColumnType("timestamp");
 
-        entity.HasOne(e => e.Usuario)
+        entity.Property(e => e.AvailableSeats)
+          .HasColumnName("available_seats")
+          .HasColumnType("integer");
+        //Relations
+        entity.HasOne(e => e.RouteIdNavigation)
           .WithMany()
-          .HasForeignKey(e => e.UsuarioId);
-
+          .HasForeignKey(e => e.RouteId);
       });
   }
 }

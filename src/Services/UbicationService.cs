@@ -34,12 +34,12 @@ public class UbicationService : IUbicationService
 
   public async Task<List<SavedUbicationDto>> GetUbicationsByUserIdAsync(string userEmail)
   {
-    var savedUbications = await _ubicationRepository.GetUbicationsByUserIdAsync(userEmail).ConfigureAwait(false);
+    var savedUbications = await _ubicationRepository.GetUbicationsByEmailAsync(userEmail).ConfigureAwait(false);
     return savedUbications;
   }
   public async Task<bool> SaveUbicationAsync(SavedUbicationDto savedUbication)
   {
-    var user = await _userRepository.GetUserByUsername(savedUbication.UserEmail).ConfigureAwait(false);
+    var user = await _userRepository.GetUserByEmailAsync(savedUbication.UserEmail).ConfigureAwait(false);
     if (user == null)
     {
       return false;
@@ -50,7 +50,7 @@ public class UbicationService : IUbicationService
 
   public async Task<bool> DeleteUbication(UbicationInfoDto ubicationDelete)
   {
-    var user = await _userRepository.GetUserByUsername(ubicationDelete.Username).ConfigureAwait(false);
+    var user = await _userRepository.GetUserByEmailAsync(ubicationDelete.UserEmail).ConfigureAwait(false);
     if (user == null)
     {
       return false;
@@ -71,7 +71,7 @@ public class UbicationService : IUbicationService
   }
   public async Task<bool> UpdateUbication(UbicationInfoDto savedUbication)
   {
-    var user = await _userRepository.GetUserByUsername(savedUbication.Username).ConfigureAwait(false);
+    var user = await _userRepository.GetUserByEmailAsync(savedUbication.UserEmail).ConfigureAwait(false);
     if (user == null)
     {
       return false;

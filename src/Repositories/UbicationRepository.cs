@@ -21,7 +21,7 @@ public class UbicationRepository : IUbicationRepository
     _context = context;
   }
 
-  public async Task<List<SavedUbicationDto>> GetUbicationsByUserIdAsync(string userEmail)
+  public async Task<List<SavedUbicationDto>> GetUbicationsByEmailAsync(string userEmail)
   {
     var entities = await _context.SavedUbications
         .Where(u => u.UserEmail == userEmail)
@@ -44,7 +44,7 @@ public class UbicationRepository : IUbicationRepository
   public async Task<bool> DeleteUbication(UbicationInfoDto ubicationDelete)
   {
     var savedUbication = await _context.SavedUbications
-        .FirstOrDefaultAsync(u => u.UserEmail == ubicationDelete.Username && u.UbicationId == ubicationDelete.UbicationId && u.StationType == ubicationDelete.StationType).ConfigureAwait(false);
+        .FirstOrDefaultAsync(u => u.UserEmail == ubicationDelete.UserEmail && u.UbicationId == ubicationDelete.UbicationId && u.StationType == ubicationDelete.StationType).ConfigureAwait(false);
     if (savedUbication == null)
     {
       return false;
@@ -55,7 +55,7 @@ public class UbicationRepository : IUbicationRepository
   public async Task<bool> UpdateUbication(UbicationInfoDto savedUbication)
   {
     var savedUbicationEntity = await _context.SavedUbications
-        .FirstOrDefaultAsync(u => u.UserEmail == savedUbication.Username && u.UbicationId == savedUbication.UbicationId).ConfigureAwait(false);
+        .FirstOrDefaultAsync(u => u.UserEmail == savedUbication.UserEmail && u.UbicationId == savedUbication.UbicationId).ConfigureAwait(false);
     if (savedUbicationEntity == null)
     {
       return false;

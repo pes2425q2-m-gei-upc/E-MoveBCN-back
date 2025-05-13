@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using src.Dto.Route;
 using System.Threading.Tasks;
 using Entity;
-using Repositories.Interface;
+using src.Entity.Route;
+using System;
 
 
 
@@ -15,9 +15,44 @@ public class RouteRepository : IRouteRepository
     _dbContext = dbContext;
   }
 
-  public async Task GuardarRutaAsync(RouteEntity ruta)
+  public async Task<bool> GuardarRutaAsync(RouteEntity ruta)
   {
     _dbContext.Routes.Add(ruta); // to-do: guardar en UserRoutes
-    await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+    return await _dbContext.SaveChangesAsync().ConfigureAwait(false) > 0;
+  }
+  public async Task<bool> DeleteRoute(string rutaId)
+  {
+    var ruta = await _dbContext.Routes.FindAsync(Guid.Parse(rutaId)).ConfigureAwait(false);
+    if (ruta == null)
+    {
+      return false;
+    }
+    _dbContext.Routes.Remove(ruta);
+    return await _dbContext.SaveChangesAsync().ConfigureAwait(false) > 0;
+  }
+  public async Task<bool> PublishRoute(PublishedRouteDto publishedRouteDto)
+  {
+    var ruta = await _dbContext.Routes.FindAsync(Guid.Parse(publishedRouteDto.RouteId)).ConfigureAwait(false);
+    if (ruta == null)
+    {
+      return false;
+    }
+    await _dbContext.PublishedRoutes.AddAsync(new PublishedRouteEntity
+    {
+      RouteId = Guid.Parse(publishedRouteDto.RouteId),
+      Date = publishedRouteDto.Date,
+      AvailableSeats = publishedRouteDto.AvailableSeats,
+    }).ConfigureAwait(false);
+    return await _dbContext.SaveChangesAsync().ConfigureAwait(false) > 0;
+  }
+  public async Task<bool> DeletePublishedRoute(string routeId)
+  {
+    var publishedRoute = await _dbContext.PublishedRoutes.FindAsync(Guid.Parse(routeId)).ConfigureAwait(false);
+    if (publishedRoute == null)
+    {
+      return false;
+    }
+    _dbContext.PublishedRoutes.Remove(publishedRoute);
+    return await _dbContext.SaveChangesAsync().ConfigureAwait(false) > 0;
   }
 }
