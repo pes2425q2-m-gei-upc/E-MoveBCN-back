@@ -68,4 +68,14 @@ public class RutasController : ControllerBase
     }
     return Ok("Published route deleted successfully");
   }
+  [HttpGet("getroutesnear")] // api/rutas/getroutesnear
+  public async Task<IActionResult> GetRoutesNear([FromQuery] double lat, [FromQuery] double lon, [FromQuery] double radiusInMeters)
+  {
+    var result = await _routeService.GetRoutesNearAsync(lat, lon, radiusInMeters).ConfigureAwait(false);
+    if (result == null)
+    {
+      return NotFound("No routes found");
+    }
+    return Ok(result);
+  }
 }

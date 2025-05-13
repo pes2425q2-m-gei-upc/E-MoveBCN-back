@@ -335,4 +335,8 @@ public class RouteService : IRouteService
   {
     return await _routeRepository.DeletePublishedRoute(routeId).ConfigureAwait(false);
   }
+  public async Task<List<PublishedRouteDto>> GetRoutesNearAsync(double lat, double lon, double radiusInMeters)
+  {
+    return await _routeRepository.GetRoutesNearAsync(lat, lon, radiusInMeters).ConfigureAwait(false);
+  }
 }
