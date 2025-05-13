@@ -12,4 +12,5 @@ public interface IRouteService
   public Task<bool> DeleteRoute(string routeId);
   public Task<bool> PublishRoute(PublishedRouteDto publishedRouteDto);
   public Task<bool> DeletePublishedRoute(string routeId);
+  public Task<List<PublishedRouteDto>> GetRoutesNearAsync(double lat, double lon, double radiusInMeters);
 }
