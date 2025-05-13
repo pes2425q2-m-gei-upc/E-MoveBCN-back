@@ -9,4 +9,5 @@ public interface IRouteRepository
   Task<bool> GuardarRutaAsync(RouteEntity ruta);
   Task<bool> DeleteRoute(string rutaId);
   Task<bool> PublishRoute(PublishedRouteDto publishedRouteDto);
+  Task<bool> DeletePublishedRoute(string routeId);
 }

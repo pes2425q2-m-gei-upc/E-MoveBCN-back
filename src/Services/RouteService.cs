@@ -331,4 +331,8 @@ public class RouteService : IRouteService
   {
     return await _routeRepository.PublishRoute(publishedRouteDto).ConfigureAwait(false);
   }
+  public async Task<bool> DeletePublishedRoute(string routeId)
+  {
+    return await _routeRepository.DeletePublishedRoute(routeId).ConfigureAwait(false);
+  }
 }

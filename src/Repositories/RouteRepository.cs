@@ -45,4 +45,14 @@ public class RouteRepository : IRouteRepository
     }).ConfigureAwait(false);
     return await _dbContext.SaveChangesAsync().ConfigureAwait(false) > 0;
   }
+  public async Task<bool> DeletePublishedRoute(string routeId)
+  {
+    var publishedRoute = await _dbContext.PublishedRoutes.FindAsync(Guid.Parse(routeId)).ConfigureAwait(false);
+    if (publishedRoute == null)
+    {
+      return false;
+    }
+    _dbContext.PublishedRoutes.Remove(publishedRoute);
+    return await _dbContext.SaveChangesAsync().ConfigureAwait(false) > 0;
+  }
 }
