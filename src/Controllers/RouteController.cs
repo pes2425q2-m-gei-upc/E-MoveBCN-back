@@ -15,12 +15,10 @@ using src.Dto.Route;
 public class RutasController : ControllerBase
 {
   private readonly IRouteService _routeService;
-  private readonly IRouteRepository _routeRepository;
 
-  public RutasController(IRouteService routeService, IRouteRepository routeRepository)
+  public RutasController(IRouteService routeService)
   {
     _routeService = routeService;
-    _routeRepository = routeRepository;
   }
 
   [HttpPost("calcular")] // api/rutas/calcular
@@ -59,5 +57,15 @@ public class RutasController : ControllerBase
       return BadRequest("Error publishing route");
     }
     return Ok("Route published successfully");
+  }
+  [HttpDelete("deletepublished")] // api/rutas/deletepublished
+  public async Task<IActionResult> DeletePublishedRoute([FromBody] string routeId)
+  {
+    var result = await _routeService.DeletePublishedRoute(routeId).ConfigureAwait(false);
+    if (result == false)
+    {
+      return BadRequest("Error deleting published route");
+    }
+    return Ok("Published route deleted successfully");
   }
 }
