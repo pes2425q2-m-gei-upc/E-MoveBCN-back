@@ -26,6 +26,9 @@ public class MapperProfiles : Profile
     .ForMember(dest => dest.User, opt => opt.MapFrom(src => src.UserIdNavigation))
     .ForMember(dest => dest.Geometry, opt => opt.MapFrom(src => DeserializeGeometry(src.GeometryJson)))
     .ForMember(dest => dest.Instructions, opt => opt.MapFrom(src => DeserializeInstructions(src.InstructionsJson)));
+    CreateMap<PublishedRouteEntity, PublishedRouteDto>()
+        .ForMember(dest => dest.Route, opt => opt.MapFrom(src => src.RouteIdNavigation));
+        
   }
 
   private static List<double[]> DeserializeGeometry(string json)
