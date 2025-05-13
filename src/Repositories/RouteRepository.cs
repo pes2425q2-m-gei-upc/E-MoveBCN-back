@@ -30,4 +30,19 @@ public class RouteRepository : IRouteRepository
     _dbContext.Routes.Remove(ruta);
     return await _dbContext.SaveChangesAsync().ConfigureAwait(false) > 0;
   }
+  public async Task<bool> PublishRoute(PublishedRouteDto publishedRouteDto)
+  {
+    var ruta = await _dbContext.Routes.FindAsync(Guid.Parse(publishedRouteDto.RouteId)).ConfigureAwait(false);
+    if (ruta == null)
+    {
+      return false;
+    }
+    await _dbContext.PublishedRoutes.AddAsync(new PublishedRouteEntity
+    {
+      RouteId = Guid.Parse(publishedRouteDto.RouteId),
+      Date = publishedRouteDto.Date,
+      AvailableSeats = publishedRouteDto.AvailableSeats,
+    }).ConfigureAwait(false);
+    return await _dbContext.SaveChangesAsync().ConfigureAwait(false) > 0;
+  }
 }

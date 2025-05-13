@@ -50,4 +50,14 @@ public class RutasController : ControllerBase
     }
     return Ok("Route deleted successfully");
   }
+  [HttpPost("publish")] // api/rutas/publish
+  public async Task<IActionResult> PublishRoute([FromBody] PublishedRouteDto publishedRouteDto)
+  {
+    var result = await _routeService.PublishRoute(publishedRouteDto).ConfigureAwait(false);
+    if (result == false)
+    {
+      return BadRequest("Error publishing route");
+    }
+    return Ok("Route published successfully");
+  }
 }
