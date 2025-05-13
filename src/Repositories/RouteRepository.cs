@@ -3,15 +3,21 @@ using System.Threading.Tasks;
 using Entity;
 using src.Entity.Route;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 
 
 
 public class RouteRepository : IRouteRepository
 {
   private readonly ApiDbContext _dbContext;
+  private readonly IMapper _mapper;
 
-  public RouteRepository(ApiDbContext dbContext)
+  public RouteRepository(ApiDbContext dbContext, IMapper mapper)
   {
+    _mapper = mapper;
     _dbContext = dbContext;
   }
 
@@ -55,4 +61,32 @@ public class RouteRepository : IRouteRepository
     _dbContext.PublishedRoutes.Remove(publishedRoute);
     return await _dbContext.SaveChangesAsync().ConfigureAwait(false) > 0;
   }
+  public async Task<List<PublishedRouteDto>> GetRoutesNearAsync(double lat, double lon, double radiusInMeters)
+{
+    const double EarthRadius = 6371000;
+
+    // Traer todas las rutas publicadas y sus rutas base
+    var publishedRoutes = await _dbContext.PublishedRoutes
+        .Include(p => p.RouteIdNavigation)
+        .ToListAsync().ConfigureAwait(false);
+
+    // Calcular distancia en memoria
+    var result = publishedRoutes
+        .Where(p =>
+        {
+            var originLat = p.RouteIdNavigation.OriginLat;
+            var originLng = p.RouteIdNavigation.OriginLng;
+
+            double distance = EarthRadius * Math.Acos(
+                Math.Cos(DegToRad(lat)) * Math.Cos(DegToRad(originLat)) *
+                Math.Cos(DegToRad(originLng - lon)) +
+                Math.Sin(DegToRad(lat)) * Math.Sin(DegToRad(originLat))
+            );
+
+            return distance < radiusInMeters;
+        })
+        .ToList();
+    return _mapper.Map<List<PublishedRouteDto>>(result);
+}
+  private static double DegToRad(double deg) => deg * (Math.PI / 180);
 }
