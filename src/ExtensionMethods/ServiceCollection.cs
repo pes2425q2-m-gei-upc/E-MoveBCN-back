@@ -6,6 +6,8 @@ using Repositories;
 using Repositories.Interface;
 using Services;
 using Services.Interface;
+using src.Helpers;
+using src.Helpers.Interface;
 using src.Services;
 
 
@@ -17,6 +19,7 @@ public static class ServiceCollection
   {
     //Helper
     services.AddScoped<IAuthenticationHelper, AuthenticationHelper>();
+    services.AddScoped<IAireLliureHelper, AireLliureHelper>();
 
     //Services
     services.AddScoped<IUserService, UserService>();

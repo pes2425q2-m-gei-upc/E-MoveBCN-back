@@ -5,6 +5,9 @@ using Dto;
 using plantilla.Web.src.Services.Interface;
 using Repositories.Interface;
 using Services.Interface;
+using src.Dto;
+using src.Dto.Air;
+using src.Helpers.Interface;
 
 namespace Services;
 
@@ -14,13 +17,14 @@ public class UbicationService : IUbicationService
   private readonly IUserRepository _userRepository;
   private readonly IBicingStationRepository _bicingStationRepository;
   private readonly IChargingStationsRepository _chargingStationsRepository;
-
+  private readonly IAireLliureHelper _aireLliureHelper;
   private readonly IStateBicingRepository _stateBicingRepository;
   private readonly ITmbService _tmbService;
 
   public UbicationService(IUserRepository userRepository, IUbicationRepository ubicationRepository,
                           IBicingStationRepository bicingStationRepository,
                           IChargingStationsRepository chargingStationsRepository,
+                          IAireLliureHelper aireLliureHelper,
                           IStateBicingRepository stateBicingRepository,
                           ITmbService tmbService)
   {
@@ -29,6 +33,7 @@ public class UbicationService : IUbicationService
     _ubicationRepository = ubicationRepository;
     _stateBicingRepository = stateBicingRepository;
     _chargingStationsRepository = chargingStationsRepository;
+    _aireLliureHelper = aireLliureHelper;
     _tmbService = tmbService;
   }
 
@@ -58,16 +63,36 @@ public class UbicationService : IUbicationService
     var result = await _ubicationRepository.DeleteUbication(ubicationDelete).ConfigureAwait(false);
     return result;
   }
-  public async Task<object> GetUbicationDetails(int ubicationId, string stationType)
+  public async Task<(object,double?)> GetUbicationDetails(int ubicationId, string stationType)
   {
-    return stationType switch
+    var result = stationType switch
     {
-      UbicationTypeConstants.BICING => await GetBicingStationWithStatus(ubicationId).ConfigureAwait(false),
-      UbicationTypeConstants.BUS => await _tmbService.GetBusByIdAsync(ubicationId).ConfigureAwait(false),
-      UbicationTypeConstants.METRO => await _tmbService.GetMetroByIdAsync(ubicationId).ConfigureAwait(false),
-      UbicationTypeConstants.CHARGING => await _chargingStationsRepository.GetChargingStationDetails(ubicationId).ConfigureAwait(false),
-      _ => null,
+      UbicationTypeConstants.BICING => (object?)await GetBicingStationWithStatus(ubicationId).ConfigureAwait(false),
+      UbicationTypeConstants.BUS => (object?)await _tmbService.GetBusByIdAsync(ubicationId).ConfigureAwait(false),
+      UbicationTypeConstants.METRO => (object?)await _tmbService.GetMetroByIdAsync(ubicationId).ConfigureAwait(false),
+      UbicationTypeConstants.CHARGING => (object?)await _chargingStationsRepository.GetChargingStationDetails(ubicationId).ConfigureAwait(false),
+      _ => (object?)null,
     };
+    var latitude = stationType switch
+    {
+      UbicationTypeConstants.BICING => ((BicingStationWithStatusDto)result).StationInfo.Latitude,
+      UbicationTypeConstants.BUS => ((BusDto)result).Latitude,
+      UbicationTypeConstants.METRO => ((MetroDto)result).Latitude,
+      UbicationTypeConstants.CHARGING => ((ChargingStationDto)result).LocationLatitude,
+      _ => 0.0
+    };
+    var longitude = stationType switch
+    {
+      UbicationTypeConstants.BICING => ((BicingStationWithStatusDto)result).StationInfo.Longitude,
+      UbicationTypeConstants.BUS => ((BusDto)result).Longitude,
+      UbicationTypeConstants.METRO => ((MetroDto)result).Longitude,
+      UbicationTypeConstants.CHARGING => ((ChargingStationDto)result).LocationLongitude,
+      _ => 0.0
+    };
+    var sensors = await _aireLliureHelper.GetAllAirSensorsAsync().ConfigureAwait(false);
+    var airQuality = _aireLliureHelper.FindClosestSensor(sensors, longitude, latitude);
+    return (result, airQuality);
+
   }
   public async Task<bool> UpdateUbication(UbicationInfoDto savedUbication)
   {
@@ -80,15 +105,15 @@ public class UbicationService : IUbicationService
     return result;
   }
 
-  private async Task<object?> GetBicingStationWithStatus(int stationId)
+  private async Task<BicingStationWithStatusDto?> GetBicingStationWithStatus(int stationId)
   {
     var info = await _bicingStationRepository.GetBicingStationDetails(stationId).ConfigureAwait(false);
     var status = await _stateBicingRepository.GetStateBicingById(stationId).ConfigureAwait(false);
 
-    return new
+    return new BicingStationWithStatusDto
     {
-      stationInfo = info,
-      realTimeStatus = status
+        StationInfo = info,
+        RealTimeStatus = status
     };
   }
 
