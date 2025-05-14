@@ -21,4 +21,5 @@ public class SavedUbicationDto
   public required double Longitude { get; set; }
   public int? Valoration { get; set; }
   public string? Comment { get; set; }
+  public double? airQuality { get; set; }
 }

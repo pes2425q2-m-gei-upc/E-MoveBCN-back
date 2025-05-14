@@ -5,6 +5,7 @@ using Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using plantilla.Web.src.Services.Interface;
+using src.Dto;
 
 namespace plantilla.Web.src.Controllers;
 
@@ -22,7 +23,7 @@ public class UbicationController(IUbicationService ubicationService) : Controlle
   {
     if (string.IsNullOrEmpty(userEmail))
     {
-      return BadRequest("Username is required.");
+      return BadRequest("User email is required.");
     }
 
     var savedUbications = await _ubicationService.GetUbicationsByUserIdAsync(userEmail).ConfigureAwait(false);
@@ -93,10 +94,15 @@ public class UbicationController(IUbicationService ubicationService) : Controlle
       [FromQuery] string stationType)
   {
     var result = await _ubicationService.GetUbicationDetails(ubicationId, stationType).ConfigureAwait(false);
-    if (result == null)
+    if (result.Item1 == null && result.Item2 == null)
     {
       return NotFound("Ubication not found or invalid type.");
     }
-    return Ok(result);
+    UbicationDetailWithAir ubicationDetailWithAir = new UbicationDetailWithAir
+    {
+      Detail = result.Item1,
+      AirQualityIndex = result.Item2
+    };
+    return Ok(ubicationDetailWithAir);
   }
 }

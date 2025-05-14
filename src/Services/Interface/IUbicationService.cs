@@ -11,5 +11,5 @@ public interface IUbicationService
   Task<bool> SaveUbicationAsync(SavedUbicationDto savedUbication);
   Task<bool> DeleteUbication(UbicationInfoDto ubicationDeleteDto);
   Task<bool> UpdateUbication(UbicationInfoDto savedUbication);
-  Task<Object> GetUbicationDetails(int ubicationId, string stationType);
+  Task<(Object,double?)> GetUbicationDetails(int ubicationId, string stationType);
 }
