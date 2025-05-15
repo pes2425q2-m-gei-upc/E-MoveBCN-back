@@ -1,10 +1,10 @@
-name: CI/CD para .NET
+name: CI/CD for .NET
 
 on:
   push:
     branches-ignore:
       - main
-      - develop  # Ignoramos estas ramas para evitar redundancias en PRs
+      - develop 
   pull_request:
     branches:
       - develop
@@ -13,11 +13,11 @@ on:
       - opened
       - synchronize
       - reopened
-      - closed  # Detecta cuando se fusiona un PR
+      - closed 
 
 jobs:
   build-and-test:
-    name: Compilar y Ejecutar Pruebas
+    name: Compile and execute
     runs-on: ubuntu-latest
 
     steps:
@@ -29,13 +29,13 @@ jobs:
         with:
           dotnet-version: '8.0.100'
 
-      - name: Restaurar dependencias
+      - name: Restore dependencies
         run: dotnet restore
 
-      - name: Compilar el proyecto
+      - name: Compile project
         run: dotnet build --configuration Release --no-restore
 
-      - name: Ejecutar pruebas
+      - name: execute tests
         run: dotnet test --configuration Release --no-build --verbosity normal
 
   deploy:
