@@ -26,6 +26,10 @@ public class ApiDbContext : DbContext
   public DbSet<RouteEntity> Routes { get; set; }
   public DbSet<PublishedRouteEntity> PublishedRoutes { get; set; }
 
+  public DbSet<ChatEntity> Chats { get; set; }
+
+  public DbSet<MessageEntity> Messages { get; set; }
+
 
 
   protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -437,6 +441,67 @@ public class ApiDbContext : DbContext
           .WithMany()
           .HasForeignKey(e => e.RouteId);
       });
+
+    modelBuilder.Entity<ChatEntity>(entity =>
+      {
+        entity.ToTable("chat");
+        entity.HasKey(e => e.ChatId);
+
+        entity.Property(e => e.ChatId)
+          .HasColumnName("chat_id")
+          .HasColumnType("uuid");
+        entity.Property(e => e.RouteId)
+          .HasColumnName("route_id")
+          .HasColumnType("uuid");
+        entity.Property(e => e.User1Id)
+          .HasColumnName("user_id1")
+          .HasColumnType("uuid");
+        entity.Property(e => e.User2Id)
+          .HasColumnName("user_id2")
+          .HasColumnType("uuid");
+        entity.HasOne(e => e.UserId1Navigation)
+          .WithMany()
+          .HasForeignKey(e => e.User1Id);
+
+        entity.HasOne(e => e.UserId2Navigation)
+          .WithMany()
+          .HasForeignKey(e => e.User2Id);
+        entity.HasOne(e => e.PublicRouteNavigation)
+          .WithMany()
+          .HasForeignKey(e => e.RouteId);
+
+      });
+    modelBuilder.Entity<MessageEntity>(entity =>
+      {
+        entity.ToTable("message");
+        entity.HasKey(e => e.MessageId);
+
+        entity.Property(e => e.MessageId)
+          .HasColumnName("message_id")
+          .HasColumnType("uuid");
+        entity.Property(e => e.ChatId)
+          .HasColumnName("chat_id")
+          .HasColumnType("uuid");
+        entity.Property(e => e.UserId)
+          .HasColumnName("user_id")
+          .HasColumnType("uuid");
+        entity.Property(e => e.Message)
+          .HasColumnName("message_text")
+          .HasColumnType("text");
+        entity.Property(e => e.CreatedAt)
+          .HasColumnName("created_at")
+          .HasColumnType("timestamp with time zone");
+
+        entity.HasOne(e => e.ChatIdNavigation)
+        .WithMany()
+        .HasForeignKey(e => e.ChatId);
+
+        entity.HasOne(e => e.UserIdNavigation)
+            .WithMany()
+            .HasForeignKey(e => e.UserId);
+      });
+
+
   }
 }
 

@@ -28,6 +28,17 @@ public class MapperProfiles : Profile
     .ForMember(dest => dest.Instructions, opt => opt.MapFrom(src => DeserializeInstructions(src.InstructionsJson)));
     CreateMap<PublishedRouteEntity, PublishedRouteDto>()
         .ForMember(dest => dest.Route, opt => opt.MapFrom(src => src.RouteIdNavigation));
+    CreateMap<ChatEntity, ChatResponseDto>()
+    .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.ChatId))
+    .ForMember(dest => dest.RutaId, opt => opt.MapFrom(src => src.RouteId))
+    .ForMember(dest => dest.Usuario1Id, opt => opt.MapFrom(src => src.User1Id))
+    .ForMember(dest => dest.Usuario2Id, opt => opt.MapFrom(src => src.User2Id));
+    CreateMap<MessageEntity, MessageDto>()
+    .ForMember(dest => dest.MessageText, opt => opt.MapFrom(src => src.Message));
+
+    CreateMap<MessageDto, MessageEntity>()
+        .ForMember(dest => dest.Message, opt => opt.MapFrom(src => src.MessageText));
+    
         
   }
 
