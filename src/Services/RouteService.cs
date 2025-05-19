@@ -339,4 +339,13 @@ public class RouteService : IRouteService
   {
     return await _routeRepository.GetRoutesNearAsync(lat, lon, radiusInMeters).ConfigureAwait(false);
   }
+  public async Task<List<RouteDto>> GetSavedRoute(string userId)
+  {
+    var user = await _userRepository.GetUserById(userId).ConfigureAwait(false);
+    if (user == null)
+    {
+      throw new Exception("Usuario no encontrado");
+    }
+    return await _routeRepository.GetSavedRoute(user.UserId).ConfigureAwait(false);
+  }
 }

@@ -78,4 +78,13 @@ public class RutasController : ControllerBase
     }
     return Ok(result);
   }
+  [HttpGet("savedroute")] // api/rutas/savedroute
+  public async Task<IActionResult> GetSavedRoute([FromQuery]string userId) {
+    var result = await _routeService.GetSavedRoute(userId);
+    if (result == null)
+    {
+      return NotFound("No routes found");
+    }
+    return Ok(result);
+  }
 }
