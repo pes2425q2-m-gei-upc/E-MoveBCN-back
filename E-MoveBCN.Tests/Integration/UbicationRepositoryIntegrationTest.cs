@@ -84,5 +84,5 @@ public class UbicationRepositoryIntegrationTest : IAsyncLifetime
 {
     await _dbContext.SavedUbications.ExecuteDeleteAsync();
     await _dbContext.Users.ExecuteDeleteAsync();
-}*/
 }
+}*/
