@@ -37,14 +37,14 @@ namespace Repositories
                 (c.User1Id == user2Guid && c.User2Id == user1Guid))
             ).ConfigureAwait(false);
 
-            return _mapper.Map<ChatResponseDto>(chat);
+            return chat == null ? null : _mapper.Map<ChatResponseDto>(chat);
         }
 
         public async Task<bool> DeleteChatAsync(Guid chatId)
         {
             var messages = _dbcontext.Messages.Where(m => m.ChatId == chatId);
             _dbcontext.Messages.RemoveRange(messages); // Borra los mensajes primero
-            
+
             var chat = await _dbcontext.Chats.FindAsync(chatId).ConfigureAwait(false);
             if (chat == null)
                 return false;

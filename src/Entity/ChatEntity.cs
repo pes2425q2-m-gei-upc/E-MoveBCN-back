@@ -6,10 +6,10 @@ namespace Entity;
 
 public class ChatEntity
 {
-  public Guid ChatId { get; set; }
-  public Guid RouteId { get; set; }
-  public Guid User1Id{ get; set; }
-  public Guid User2Id { get; set; }
+  public required Guid ChatId { get; set; }
+  public required Guid RouteId { get; set; }
+  public required Guid User1Id{ get; set; }
+  public required Guid User2Id { get; set; }
 
   public  virtual UserEntity UserId1Navigation { get; set; }
   public virtual  UserEntity UserId2Navigation { get; set; }

@@ -13,9 +13,9 @@ namespace Services
         
         private readonly IUserRepository _userRepository;
 
-        private readonly IRouteRepository _routeRepository;
-        public ChatService(IChatRepository chatRepository)
+        public ChatService(IChatRepository chatRepository, IUserRepository userRepository)
         {
+            _userRepository = userRepository;
             _chatRepository = chatRepository;
         }
 
@@ -29,6 +29,11 @@ namespace Services
             {
                 throw new Exception("Ya existe un chat entre estos usuarios para esta ruta.");
             }
+            var isBlocked =  await _userRepository.IsUserBlockedAsync(request.User1Id, request.User2Id).ConfigureAwait(false)
+                  || await _userRepository.IsUserBlockedAsync(request.User2Id, request.User1Id).ConfigureAwait(false);
+
+            if (isBlocked)
+                throw new Exception("No se puede crear un chat porque uno de los usuarios bloqueó al otro.");
 
             var chatEntity = new ChatEntity
             {
