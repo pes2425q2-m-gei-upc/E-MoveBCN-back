@@ -133,4 +133,34 @@ public class UserRepository : IUserRepository
       return false;
     }
   }
+
+  public async Task<bool> IsUserBlockedAsync(Guid blockerId, Guid blockedId)
+  {
+      return await _Dbcontext.UserBlocks.AnyAsync(ub => ub.BlockerId == blockerId && ub.BlockedId == blockedId);
+  }
+
+  public async Task<bool> BlockUserAsync(Guid blockerId, Guid blockedId)
+  {
+      if (await IsUserBlockedAsync(blockerId, blockedId)) return false;
+
+      _Dbcontext.UserBlocks.Add(new UserBlockEntity
+      {
+          BlockerId = blockerId,
+          BlockedId = blockedId
+      });
+
+      return await _Dbcontext.SaveChangesAsync() > 0;
+  }
+
+  public async Task<bool> UnblockUserAsync(Guid blockerId, Guid blockedId)
+  {
+      var block = await _Dbcontext.UserBlocks
+          .FirstOrDefaultAsync(ub => ub.BlockerId == blockerId && ub.BlockedId == blockedId);
+
+      if (block == null) return false;
+
+      _Dbcontext.UserBlocks.Remove(block);
+      return await _Dbcontext.SaveChangesAsync() > 0;
+  }
+
 }

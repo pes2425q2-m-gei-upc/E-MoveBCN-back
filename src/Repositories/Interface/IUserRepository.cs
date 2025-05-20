@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dto;
+using System;
 
 namespace Repositories.Interface;
 
@@ -13,4 +14,8 @@ public interface IUserRepository
   public Task<UserDto?> GetUserById(string userId);
   Task<UserDto?> GetUserByEmailAsync(string email);
   Task<bool> CreateGoogleUserAsync(string name, string email);
+
+  Task<bool> IsUserBlockedAsync(Guid blockerId, Guid blockedId);
+  Task<bool> BlockUserAsync(Guid blockerId, Guid blockedId);
+  Task<bool> UnblockUserAsync(Guid blockerId, Guid blockedId);
 }

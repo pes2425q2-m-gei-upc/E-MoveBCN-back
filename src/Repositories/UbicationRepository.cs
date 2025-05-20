@@ -53,15 +53,22 @@ public class UbicationRepository : IUbicationRepository
     return await _context.SaveChangesAsync().ConfigureAwait(false) > 0;
   }
   public async Task<bool> UpdateUbication(UbicationInfoDto savedUbication)
-  {
+{
     var savedUbicationEntity = await _context.SavedUbications
-        .FirstOrDefaultAsync(u => u.UserEmail == savedUbication.UserEmail && u.UbicationId == savedUbication.UbicationId).ConfigureAwait(false);
+        .FirstOrDefaultAsync(u =>
+            u.UserEmail == savedUbication.UserEmail &&
+            u.UbicationId == savedUbication.UbicationId &&
+            u.StationType == savedUbication.StationType
+        ).ConfigureAwait(false);
+
     if (savedUbicationEntity == null)
     {
-      return false;
+        return false;
     }
+
     savedUbicationEntity.Valoration = savedUbication.Valoration;
     savedUbicationEntity.Comment = savedUbication.Comment;
+
     return await _context.SaveChangesAsync().ConfigureAwait(false) > 0;
-  }
+}
 }

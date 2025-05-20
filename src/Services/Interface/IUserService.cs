@@ -14,4 +14,8 @@ public interface IUserService
 
   Task<UserDto> LoginWithGoogleAsync(LoginGoogleDto dto);
 
+  Task<bool> BlockUserAsync(BlockRequestDto dto);
+
+  Task<bool> UnblockUserAsync(BlockRequestDto dto);
+
 }

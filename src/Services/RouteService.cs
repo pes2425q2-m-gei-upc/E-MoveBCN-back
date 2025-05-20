@@ -12,7 +12,7 @@ using Microsoft.Identity.Client;
 using Repositories.Interface;
 using src.Dto.Route;
 using src.Entity.Route;
-
+namespace src.Services;
 public class RouteService : IRouteService
 {
   private readonly IConfiguration _config;
@@ -274,35 +274,35 @@ public class RouteService : IRouteService
   }
   private async Task<string> GetStreetNameAsync(double lat, double lng)
   {
-      var apiKey = _config["APIKeys:GoogleMaps:ApiKey"];
-      var url = $"https://maps.googleapis.com/maps/api/geocode/json?latlng={lat.ToString(CultureInfo.InvariantCulture)},{lng.ToString(CultureInfo.InvariantCulture)}&key={apiKey}";
+    var apiKey = _config["APIKeys:GoogleMaps:ApiKey"];
+    var url = $"https://maps.googleapis.com/maps/api/geocode/json?latlng={lat.ToString(CultureInfo.InvariantCulture)},{lng.ToString(CultureInfo.InvariantCulture)}&key={apiKey}";
 
-      var res = await _httpClient.GetAsync(url);
-      if (!res.IsSuccessStatusCode) return "Unknown";
+    var res = await _httpClient.GetAsync(url);
+    if (!res.IsSuccessStatusCode) return "Unknown";
 
-      var json = await res.Content.ReadAsStringAsync();
-      using var doc = JsonDocument.Parse(json);
+    var json = await res.Content.ReadAsStringAsync();
+    using var doc = JsonDocument.Parse(json);
 
-      var results = doc.RootElement.GetProperty("results");
-      if (results.GetArrayLength() == 0) return "Unknown";
+    var results = doc.RootElement.GetProperty("results");
+    if (results.GetArrayLength() == 0) return "Unknown";
 
-      var addressComponents = results[0].GetProperty("address_components");
-      foreach (var component in addressComponents.EnumerateArray())
+    var addressComponents = results[0].GetProperty("address_components");
+    foreach (var component in addressComponents.EnumerateArray())
+    {
+      if (component.GetProperty("types").EnumerateArray().Any(t => t.GetString() == "route"))
       {
-          if (component.GetProperty("types").EnumerateArray().Any(t => t.GetString() == "route"))
-          {
-              return component.GetProperty("long_name").GetString();
-          }
+        return component.GetProperty("long_name").GetString();
       }
+    }
 
-      return results[0].GetProperty("formatted_address").GetString();
+    return results[0].GetProperty("formatted_address").GetString();
   }
   public async Task<bool> SaveRoute(RouteDto route)
   {
     var user = await _userRepository.GetUserById(route.UserId).ConfigureAwait(false);
     if (user == null)
     {
-      throw new Exception("Usuario no encontrado");
+      return false;
     }
     var routeEntity = new RouteEntity
     {
@@ -338,5 +338,14 @@ public class RouteService : IRouteService
   public async Task<List<PublishedRouteDto>> GetRoutesNearAsync(double lat, double lon, double radiusInMeters)
   {
     return await _routeRepository.GetRoutesNearAsync(lat, lon, radiusInMeters).ConfigureAwait(false);
+  }
+  public async Task<List<RouteDto>> GetSavedRoute(string userId)
+  {
+    var user = await _userRepository.GetUserById(userId).ConfigureAwait(false);
+    if (user == null)
+    {
+      throw new Exception("Usuario no encontrado");
+    }
+    return await _routeRepository.GetSavedRoute(user.UserId).ConfigureAwait(false);
   }
 }
