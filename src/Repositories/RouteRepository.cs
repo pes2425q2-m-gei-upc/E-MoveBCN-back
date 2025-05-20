@@ -62,31 +62,39 @@ public class RouteRepository : IRouteRepository
     return await _dbContext.SaveChangesAsync().ConfigureAwait(false) > 0;
   }
   public async Task<List<PublishedRouteDto>> GetRoutesNearAsync(double lat, double lon, double radiusInMeters)
-{
-    const double EarthRadius = 6371000;
+  {
+      const double EarthRadius = 6371000;
 
-    // Traer todas las rutas publicadas y sus rutas base
-    var publishedRoutes = await _dbContext.PublishedRoutes
-        .Include(p => p.RouteIdNavigation)
-        .ToListAsync().ConfigureAwait(false);
+      // Traer todas las rutas publicadas y sus rutas base
+      var publishedRoutes = await _dbContext.PublishedRoutes
+          .Include(p => p.RouteIdNavigation)
+          .ToListAsync().ConfigureAwait(false);
 
-    // Calcular distancia en memoria
-    var result = publishedRoutes
-        .Where(p =>
-        {
-            var originLat = p.RouteIdNavigation.OriginLat;
-            var originLng = p.RouteIdNavigation.OriginLng;
+      // Calcular distancia en memoria
+      var result = publishedRoutes
+          .Where(p =>
+          {
+              var originLat = p.RouteIdNavigation.OriginLat;
+              var originLng = p.RouteIdNavigation.OriginLng;
 
-            double distance = EarthRadius * Math.Acos(
-                Math.Cos(DegToRad(lat)) * Math.Cos(DegToRad(originLat)) *
-                Math.Cos(DegToRad(originLng - lon)) +
-                Math.Sin(DegToRad(lat)) * Math.Sin(DegToRad(originLat))
-            );
+              double distance = EarthRadius * Math.Acos(
+                  Math.Cos(DegToRad(lat)) * Math.Cos(DegToRad(originLat)) *
+                  Math.Cos(DegToRad(originLng - lon)) +
+                  Math.Sin(DegToRad(lat)) * Math.Sin(DegToRad(originLat))
+              );
 
-            return distance < radiusInMeters;
-        })
-        .ToList();
-    return _mapper.Map<List<PublishedRouteDto>>(result);
-}
+              return distance < radiusInMeters;
+          })
+          .ToList();
+      return _mapper.Map<List<PublishedRouteDto>>(result);
+  }
   private static double DegToRad(double deg) => deg * (Math.PI / 180);
+
+  public async Task<List<RouteDto>> GetSavedRoute(string userId) 
+  {
+    var entities = await _dbContext.Routes
+      .Where(u => u.UserId == Guid.Parse(userId))
+      .ToListAsync().ConfigureAwait(false);
+    return _mapper.Map<List<RouteDto>>(entities);
+  }
 }
