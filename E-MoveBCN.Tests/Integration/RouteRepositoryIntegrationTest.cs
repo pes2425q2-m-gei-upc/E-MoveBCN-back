@@ -103,8 +103,6 @@ public class RouteRepositoryIntegrationTest : IAsyncLifetime
         // Limpieza completa para evitar residuos en DB
         _dbContext.PublishedRoutes.RemoveRange(_dbContext.PublishedRoutes);
         _dbContext.Routes.RemoveRange(_dbContext.Routes);
-        _dbContext.Users.RemoveRange(_dbContext.Users);
-        _dbContext.SavedUbications.RemoveRange(_dbContext.SavedUbications);
         await _dbContext.SaveChangesAsync();
     }
 }
