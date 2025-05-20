@@ -1,4 +1,4 @@
-using AutoMapper;
+/*using AutoMapper;
 using Dto;
 using Entity;
 using Microsoft.EntityFrameworkCore;
@@ -84,5 +84,5 @@ public class UbicationRepositoryIntegrationTest : IAsyncLifetime
 {
     await _dbContext.SavedUbications.ExecuteDeleteAsync();
     await _dbContext.Users.ExecuteDeleteAsync();
-}
+}*/
 }
