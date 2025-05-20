@@ -30,7 +30,9 @@ jobs:
           dotnet-version: '8.0.100'
 
       - name: Restore dependencies
-        run: dotnet restore src/E-MoveBCN-back.csproj
+        run: |
+          dotnet restore src/E-MoveBCN-back.csproj
+          dotnet restore E-MoveBCN.Tests/E-MoveBCN.Tests.csproj
 
       - name: Compile project
         run: dotnet build src/E-MoveBCN-back.csproj --configuration Release --no-restore
