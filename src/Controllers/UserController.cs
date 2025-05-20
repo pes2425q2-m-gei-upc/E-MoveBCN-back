@@ -112,4 +112,19 @@ public class UserController : ControllerBase
       return StatusCode(500, $"Error en el servidor: {ex.Message}");
     }
   }
+
+  [HttpPost("block")]
+  public async Task<IActionResult> BlockUser([FromBody] BlockRequestDto request)
+  {
+      var result = await _userService.BlockUserAsync(request).ConfigureAwait(false);
+      return result ? Ok("Usuario bloqueado") : BadRequest("Ya estaba bloqueado o error");
+  }
+
+  [HttpPost("unblock")]
+  public async Task<IActionResult> UnblockUser([FromBody] BlockRequestDto request)
+  {
+      var result = await _userService.UnblockUserAsync(request).ConfigureAwait(false);
+      return result ? Ok("Usuario desbloqueado") : NotFound("No estaba bloqueado");
+  }
+
 }

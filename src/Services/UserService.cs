@@ -85,4 +85,25 @@ public class UserService : IUserService
     return newUser;
   }
 
+   public async Task<bool> BlockUserAsync(BlockRequestDto dto)
+    {
+        if (dto.BlockerId == dto.BlockedId)
+            throw new ArgumentException("No puedes bloquearte a ti mismo.");
+        
+        if (await _userRepository.IsUserBlockedAsync(dto.BlockerId, dto.BlockedId).ConfigureAwait(false)) 
+            throw new ArgumentException("El usuario ya está bloqueado.");
+
+        return await _userRepository.BlockUserAsync(dto.BlockerId, dto.BlockedId).ConfigureAwait(false);
+    }
+    public async Task<bool> UnblockUserAsync(BlockRequestDto dto)
+    {
+        if (dto.BlockerId == dto.BlockedId)
+            throw new ArgumentException("No puedes desbloquearte a ti mismo.");
+
+        if (!await _userRepository.IsUserBlockedAsync(dto.BlockerId, dto.BlockedId).ConfigureAwait(false))
+            throw new ArgumentException("El usuario no está bloqueado.");
+
+        return await _userRepository.UnblockUserAsync(dto.BlockerId, dto.BlockedId).ConfigureAwait(false);
+    }
+
 }

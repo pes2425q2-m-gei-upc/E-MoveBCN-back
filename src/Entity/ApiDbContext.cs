@@ -30,6 +30,8 @@ public class ApiDbContext : DbContext
 
   public DbSet<MessageEntity> Messages { get; set; }
 
+  public DbSet<UserBlockEntity> UserBlocks { get; set; }
+
 
 
   protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -499,6 +501,27 @@ public class ApiDbContext : DbContext
         entity.HasOne(e => e.UserIdNavigation)
             .WithMany()
             .HasForeignKey(e => e.UserId);
+      });
+    modelBuilder.Entity<UserBlockEntity>(entity =>
+      {
+        entity.ToTable("user_block");
+        entity.HasKey(e => new { e.BlockerId, e.BlockedId });
+
+        entity.Property(e => e.BlockerId)
+          .HasColumnName("blocker_id")
+          .HasColumnType("uuid");
+
+        entity.Property(e => e.BlockedId)
+          .HasColumnName("blocked_id")
+          .HasColumnType("uuid");
+
+        entity.HasOne(e => e.Blocker)
+          .WithMany()
+          .HasForeignKey(e => e.BlockerId);
+
+        entity.HasOne(e => e.Blocked)
+          .WithMany()
+          .HasForeignKey(e => e.BlockedId);
       });
 
 
