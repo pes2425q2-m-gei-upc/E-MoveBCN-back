@@ -1,10 +1,10 @@
-name: CI/CD para .NET
+name: CI/CD for .NET
 
 on:
   push:
     branches-ignore:
       - main
-      - develop  # Ignoramos estas ramas para evitar redundancias en PRs
+      - develop 
   pull_request:
     branches:
       - develop
@@ -13,11 +13,11 @@ on:
       - opened
       - synchronize
       - reopened
-      - closed  # Detecta cuando se fusiona un PR
+      - closed 
 
 jobs:
   build-and-test:
-    name: Compilar y Ejecutar Pruebas
+    name: Compile and execute
     runs-on: ubuntu-latest
 
     steps:
@@ -29,14 +29,19 @@ jobs:
         with:
           dotnet-version: '8.0.100'
 
-      - name: Restaurar dependencias
-        run: dotnet restore
+      - name: Restore dependencies
+        run: |
+          dotnet restore src/E-MoveBCN-back.csproj
+          dotnet restore E-MoveBCN.Tests/E-MoveBCN.Tests.csproj
 
-      - name: Compilar el proyecto
-        run: dotnet build --configuration Release --no-restore
+      - name: Compile project
+        run: dotnet build src/E-MoveBCN-back.csproj --configuration Release --no-restore
 
-      - name: Ejecutar pruebas
-        run: dotnet test --configuration Release --no-build --verbosity normal
+      - name: Build test project
+        run: dotnet build E-MoveBCN.Tests/E-MoveBCN.Tests.csproj --configuration Release --no-restore
+
+      - name: Execute tests
+        run: dotnet test E-MoveBCN.Tests/E-MoveBCN.Tests.csproj --configuration Release --no-build --verbosity normal
 
   deploy:
     name: Desplegar en Servidor (solo en main)
@@ -54,7 +59,7 @@ jobs:
           dotnet-version: '8.0.100'
 
       - name: Publicar la aplicación
-        run: dotnet publish -c Release -o app_publish
+        run: dotnet publish src/E-MoveBCN-back.csproj -c Release -o app_publish
 
       - name: Desplegar en el servidor
         env:

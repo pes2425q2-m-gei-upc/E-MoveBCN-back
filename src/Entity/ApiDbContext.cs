@@ -431,7 +431,7 @@ public class ApiDbContext : DbContext
 
         entity.Property(e => e.Date)
           .HasColumnName("date")
-          .HasColumnType("timestamp");
+          .HasColumnType("timestamp with time zone");
 
         entity.Property(e => e.AvailableSeats)
           .HasColumnName("available_seats")

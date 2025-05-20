@@ -3,3 +3,7 @@
 /obj/
 E-MoveBCN-back.sln
 .vscode/
+/E-MoveBCN.Tests/obj/
+/E-MoveBCN.Tests/bin/
+/src/bin/
+/src/obj/
