@@ -6,7 +6,7 @@ WORKDIR /src
 RUN rm -f global.json
 
 # Copia el archivo .csproj a la imagen
-COPY E-MoveBCN-back.csproj ./src/E-MoveBCN-back.csproj
+COPY src/E-MoveBCN-back.csproj ./src/E-MoveBCN-back.csproj
 
 # Verifica que el archivo .csproj se haya copiado correctamente
 RUN ls -l
