@@ -1,19 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
+using Entity.Bicing;
+using Entity.Chat;
+using Entity.Route;
+using Entity.Ubication;
+using Entity.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using src.Entity.Route;
 
 namespace Entity;
 
-public class ApiDbContext : DbContext
+public class ApiDbContext(DbContextOptions<ApiDbContext> options, IConfiguration configuration) : DbContext(options)
 {
-  private readonly IConfiguration _configuration;
-
-  public ApiDbContext(DbContextOptions<ApiDbContext> options, IConfiguration configuration) : base(options)
-  {
-    _configuration = configuration;
-  }
+  private readonly IConfiguration _configuration = configuration;
 
   public DbSet<UserEntity> Users { get; set; }
   public DbSet<LocationEntity> Locations { get; set; }
@@ -36,22 +34,30 @@ public class ApiDbContext : DbContext
 
   protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
   {
+    if (optionsBuilder == null)
+    {
+      throw new ArgumentNullException(nameof(optionsBuilder));
+    }
     if (!optionsBuilder.IsConfigured)
     {
-      var connectionString = _configuration.GetConnectionString("DefaultConnection");
+      var connectionString = this._configuration.GetConnectionString("DefaultConnection");
       optionsBuilder.UseNpgsql(connectionString, options =>
       {
         options.UseNetTopologySuite();
         options.EnableRetryOnFailure(
                 maxRetryCount: 5,
                 maxRetryDelay: TimeSpan.FromSeconds(5),
-                errorCodesToAdd: new List<string>());
+                errorCodesToAdd: []);
       });
     }
   }
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
+    if (modelBuilder == null)
+    {
+      throw new ArgumentNullException(nameof(modelBuilder));
+    }
     modelBuilder.HasPostgresExtension("postgis");
 
     modelBuilder.Entity<UserEntity>(entity =>

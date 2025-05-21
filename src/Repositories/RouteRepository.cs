@@ -1,100 +1,97 @@
-﻿using src.Dto.Route;
-using System.Threading.Tasks;
-using Entity;
-using src.Entity.Route;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 using AutoMapper;
-
-
-
-public class RouteRepository : IRouteRepository
+using Dto.Route;
+using Entity;
+using Entity.Route;
+using Microsoft.EntityFrameworkCore;
+using Repositories.Interface;
+namespace Repositories;
+public class RouteRepository(ApiDbContext dbContext, IMapper mapper) : IRouteRepository
 {
-  private readonly ApiDbContext _dbContext;
-  private readonly IMapper _mapper;
-
-  public RouteRepository(ApiDbContext dbContext, IMapper mapper)
-  {
-    _mapper = mapper;
-    _dbContext = dbContext;
-  }
+  private readonly ApiDbContext _dbContext = dbContext;
+  private readonly IMapper _mapper = mapper;
 
   public async Task<bool> GuardarRutaAsync(RouteEntity ruta)
   {
-    _dbContext.Routes.Add(ruta); // to-do: guardar en UserRoutes
-    return await _dbContext.SaveChangesAsync().ConfigureAwait(false) > 0;
+    this._dbContext.Routes.Add(ruta); // to-do: guardar en UserRoutes
+    return await this._dbContext.SaveChangesAsync().ConfigureAwait(false) > 0;
   }
   public async Task<bool> DeleteRoute(string rutaId)
   {
-    var ruta = await _dbContext.Routes.FindAsync(Guid.Parse(rutaId)).ConfigureAwait(false);
+    var ruta = await this._dbContext.Routes.FindAsync(Guid.Parse(rutaId, System.Globalization.CultureInfo.InvariantCulture)).ConfigureAwait(false);
     if (ruta == null)
     {
       return false;
     }
-    _dbContext.Routes.Remove(ruta);
-    return await _dbContext.SaveChangesAsync().ConfigureAwait(false) > 0;
+    this._dbContext.Routes.Remove(ruta);
+    return await this._dbContext.SaveChangesAsync().ConfigureAwait(false) > 0;
   }
   public async Task<bool> PublishRoute(PublishedRouteDto publishedRouteDto)
   {
-    var ruta = await _dbContext.Routes.FindAsync(Guid.Parse(publishedRouteDto.RouteId)).ConfigureAwait(false);
+    if (publishedRouteDto == null)
+    {
+      throw new ArgumentNullException(nameof(publishedRouteDto));
+    }
+    var ruta = await this._dbContext.Routes.FindAsync(Guid.Parse(publishedRouteDto.RouteId, System.Globalization.CultureInfo.InvariantCulture)).ConfigureAwait(false);
     if (ruta == null)
     {
       return false;
     }
-    await _dbContext.PublishedRoutes.AddAsync(new PublishedRouteEntity
+    await this._dbContext.PublishedRoutes.AddAsync(new PublishedRouteEntity
     {
-      RouteId = Guid.Parse(publishedRouteDto.RouteId),
+      RouteId = Guid.Parse(publishedRouteDto.RouteId, System.Globalization.CultureInfo.InvariantCulture),
       Date = publishedRouteDto.Date,
       AvailableSeats = publishedRouteDto.AvailableSeats,
     }).ConfigureAwait(false);
-    return await _dbContext.SaveChangesAsync().ConfigureAwait(false) > 0;
+    return await this._dbContext.SaveChangesAsync().ConfigureAwait(false) > 0;
   }
   public async Task<bool> DeletePublishedRoute(string routeId)
   {
-    var publishedRoute = await _dbContext.PublishedRoutes.FindAsync(Guid.Parse(routeId)).ConfigureAwait(false);
+    var publishedRoute = await this._dbContext.PublishedRoutes.FindAsync(Guid.Parse(routeId, System.Globalization.CultureInfo.InvariantCulture)).ConfigureAwait(false);
     if (publishedRoute == null)
     {
       return false;
     }
-    _dbContext.PublishedRoutes.Remove(publishedRoute);
-    return await _dbContext.SaveChangesAsync().ConfigureAwait(false) > 0;
+    this._dbContext.PublishedRoutes.Remove(publishedRoute);
+    return await this._dbContext.SaveChangesAsync().ConfigureAwait(false) > 0;
   }
   public async Task<List<PublishedRouteDto>> GetRoutesNearAsync(double lat, double lon, double radiusInMeters)
   {
-      const double EarthRadius = 6371000;
+    const double EarthRadius = 6371000;
 
-      // Traer todas las rutas publicadas y sus rutas base
-      var publishedRoutes = await _dbContext.PublishedRoutes
-          .Include(p => p.RouteIdNavigation)
-          .ToListAsync().ConfigureAwait(false);
+    // Traer todas las rutas publicadas y sus rutas base
+    var publishedRoutes = await this._dbContext.PublishedRoutes
+        .Include(p => p.RouteIdNavigation)
+        .ToListAsync().ConfigureAwait(false);
 
-      // Calcular distancia en memoria
-      var result = publishedRoutes
-          .Where(p =>
-          {
-              var originLat = p.RouteIdNavigation.OriginLat;
-              var originLng = p.RouteIdNavigation.OriginLng;
+    // Calcular distancia en memoria
+    var result = publishedRoutes
+        .Where(p =>
+        {
+          var originLat = p.RouteIdNavigation.OriginLat;
+          var originLng = p.RouteIdNavigation.OriginLng;
 
-              double distance = EarthRadius * Math.Acos(
-                  Math.Cos(DegToRad(lat)) * Math.Cos(DegToRad(originLat)) *
-                  Math.Cos(DegToRad(originLng - lon)) +
-                  Math.Sin(DegToRad(lat)) * Math.Sin(DegToRad(originLat))
-              );
+          double distance = EarthRadius * Math.Acos(
+                Math.Cos(DegToRad(lat)) * Math.Cos(DegToRad(originLat)) *
+                Math.Cos(DegToRad(originLng - lon)) +
+                Math.Sin(DegToRad(lat)) * Math.Sin(DegToRad(originLat))
+            );
 
-              return distance < radiusInMeters;
-          })
-          .ToList();
-      return _mapper.Map<List<PublishedRouteDto>>(result);
+          return distance < radiusInMeters;
+        })
+        .ToList();
+    return this._mapper.Map<List<PublishedRouteDto>>(result);
   }
   private static double DegToRad(double deg) => deg * (Math.PI / 180);
 
-  public async Task<List<RouteDto>> GetSavedRoute(string userId) 
+  public async Task<List<RouteDto>> GetSavedRoute(string userId)
   {
-    var entities = await _dbContext.Routes
-      .Where(u => u.UserId == Guid.Parse(userId))
+    var entities = await this._dbContext.Routes
+      .Where(u => u.UserId == Guid.Parse(userId, System.Globalization.CultureInfo.InvariantCulture))
       .ToListAsync().ConfigureAwait(false);
-    return _mapper.Map<List<RouteDto>>(entities);
+    return this._mapper.Map<List<RouteDto>>(entities);
   }
 }

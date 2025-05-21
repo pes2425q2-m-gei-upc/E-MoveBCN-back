@@ -1,55 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using AutoMapper;
-using Dto;
+using Dto.Bicing;
 using Entity;
+using Entity.Bicing;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Repositories.Interface;
 namespace Repositories;
-
-public class BicingStationRepository : IBicingStationRepository
+public class BicingStationRepository(ApiDbContext dbContext, IMapper mapper) : IBicingStationRepository
 {
-  private readonly ApiDbContext _dbContext;
-  private readonly IMapper _mapper;
-
-  private readonly ILogger<BicingStationRepository> _logger;
-
-  public BicingStationRepository(ApiDbContext dbContext, IMapper mapper, ILogger<BicingStationRepository> logger)
-  {
-    _dbContext = dbContext;
-    _mapper = mapper;
-    _logger = logger;
-  }
+  private readonly ApiDbContext _dbContext = dbContext;
+  private readonly IMapper _mapper = mapper;
 
   public async Task BulkInsertAsync(
       List<BicingStationEntity> bicingstations)
   {
-    using (var transaction = await _dbContext.Database.BeginTransactionAsync().ConfigureAwait(false))
+    using var transaction = await this._dbContext.Database.BeginTransactionAsync().ConfigureAwait(false);
+    try
     {
-      try
-      {
-        await _dbContext.Database.ExecuteSqlRawAsync("TRUNCATE TABLE bicing_station CASCADE").ConfigureAwait(false);
+      await this._dbContext.Database.ExecuteSqlRawAsync("TRUNCATE TABLE bicing_station CASCADE").ConfigureAwait(false);
 
-        await _dbContext.BicingStations.AddRangeAsync(bicingstations).ConfigureAwait(false);
-        await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+      await this._dbContext.BicingStations.AddRangeAsync(bicingstations).ConfigureAwait(false);
+      await this._dbContext.SaveChangesAsync().ConfigureAwait(false);
 
-        await transaction.CommitAsync().ConfigureAwait(false);
-      }
-      catch (Exception)
-      {
-        await transaction.RollbackAsync().ConfigureAwait(false);
-        throw;
-      }
+      await transaction.CommitAsync().ConfigureAwait(false);
+    }
+    catch (Exception)
+    {
+      await transaction.RollbackAsync().ConfigureAwait(false);
+      throw;
     }
   }
 
   public async Task<List<BicingStationDto>> GetAllBicingStations()
   {
-    var entities = await _dbContext.BicingStations
+    var entities = await this._dbContext.BicingStations
         .Select(s => new BicingStationEntity
         {
           BicingId = s.BicingId,
@@ -65,11 +52,11 @@ public class BicingStationRepository : IBicingStationRepository
         })
         .ToListAsync().ConfigureAwait(false);
 
-    return _mapper.Map<List<BicingStationDto>>(entities);
+    return this._mapper.Map<List<BicingStationDto>>(entities);
   }
   public async Task<BicingStationDto> GetBicingStationDetails(int id)
   {
-    var entity = await _dbContext.BicingStations
+    var entity = await this._dbContext.BicingStations
         .FirstOrDefaultAsync(s => s.BicingId == id).ConfigureAwait(false);
 
     if (entity == null)
@@ -77,6 +64,6 @@ public class BicingStationRepository : IBicingStationRepository
       return null;
     }
 
-    return _mapper.Map<BicingStationDto>(entity);
+    return this._mapper.Map<BicingStationDto>(entity);
   }
 }

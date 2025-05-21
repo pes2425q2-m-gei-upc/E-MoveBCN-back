@@ -1,13 +1,13 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Dto;
+using Dto.Tmb;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using Services.Interface;
-
 namespace Services;
 public class TmbService : ITmbService
 {
@@ -20,14 +20,14 @@ public class TmbService : ITmbService
 
   public TmbService(HttpClient httpClient, IConfiguration configuration)
   {
-    _httpClient = httpClient;
-    _configuration = configuration;
+    this._httpClient = httpClient;
+    this._configuration = configuration;
 
-    _apiKey = _configuration["TmbApi:ApiKey"];
-    _appId = _configuration["TmbApi:AppId"];
-    _baseUrl = _configuration["TmbApi:BaseUrl"];
+    this._apiKey = this._configuration["TmbApi:ApiKey"]!;
+    this._appId = this._configuration["TmbApi:AppId"]!;
+    this._baseUrl = this._configuration["TmbApi:BaseUrl"]!;
 
-    if (string.IsNullOrEmpty(_apiKey) || string.IsNullOrEmpty(_appId) || string.IsNullOrEmpty(_baseUrl))
+    if (string.IsNullOrEmpty(this._apiKey) || string.IsNullOrEmpty(this._appId) || string.IsNullOrEmpty(this._baseUrl))
     {
       throw new Exception("API Key, App ID o Base URL no están configurados en appsettings.json");
     }
@@ -35,40 +35,42 @@ public class TmbService : ITmbService
 
   public async Task<List<MetroDto>> GetAllMetrosAsync()
   {
-    var metrosEndpoint = _configuration["TmbApi:Metros"];
-    var requestUrl = $"{_baseUrl}{metrosEndpoint}?app_id={_appId}&app_key={_apiKey}";
+    var metrosEndpoint = this._configuration["TmbApi:Metros"];
+    var requestUrl = $"{this._baseUrl}{metrosEndpoint}?app_id={this._appId}&app_key={this._apiKey}";
 
-    var metrosResponse = await _httpClient.GetAsync(requestUrl).ConfigureAwait(false);
+    var metrosResponse = await this._httpClient.GetAsync(new Uri(requestUrl)).ConfigureAwait(false);
 
     if (!metrosResponse.IsSuccessStatusCode)
     {
       Console.WriteLine($"Error en la API: {metrosResponse.StatusCode}");
-      return null;
+      return [];
     }
 
     var metrosContent = await metrosResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
 
     if (string.IsNullOrWhiteSpace(metrosContent))
     {
+#pragma warning disable CA1303 // Do not pass literals as localized parameters
       Console.WriteLine("Respuesta vacía de la API de metros.");
-      return new List<MetroDto>();
+      return [];
     }
 
     var jsonObject = JObject.Parse(metrosContent);
     if (!jsonObject.ContainsKey("features"))
     {
+#pragma warning disable CA1303 // Do not pass literals as localized parameters
       Console.WriteLine("La respuesta no contiene 'features'.");
-      return new List<MetroDto>();
+      return [];
     }
 
-    var metroStationsJson = jsonObject["features"] as JArray;
-    if (metroStationsJson == null || !metroStationsJson.Any())
+    if (jsonObject["features"] is not JArray metroStationsJson || !metroStationsJson.Any())
     {
+#pragma warning disable CA1303 // Do not pass literals as localized parameters
       Console.WriteLine("No se encontraron datos en la API de metros.");
-      return new List<MetroDto>();
+      return [];
     }
 
-    List<MetroDto> metroList = new List<MetroDto>();
+    List<MetroDto> metroList = [];
 
     foreach (var metro in metroStationsJson)
     {
@@ -108,27 +110,27 @@ public class TmbService : ITmbService
 
   public async Task<List<BusDto>> GetAllBusAsync()
   {
-    var busEndpoint = _configuration["TmbApi:Bus"];
-    var requestUrl = $"{_baseUrl}{busEndpoint}?app_id={_appId}&app_key={_apiKey}";
+    var busEndpoint = this._configuration["TmbApi:Bus"];
+    var requestUrl = $"{this._baseUrl}{busEndpoint}?app_id={this._appId}&app_key={this._apiKey}";
 
-    var busResponse = await _httpClient.GetAsync(requestUrl).ConfigureAwait(false);
+    var busResponse = await this._httpClient.GetAsync(new Uri(requestUrl)).ConfigureAwait(false);
 
     if (!busResponse.IsSuccessStatusCode)
     {
       Console.WriteLine($"Error en la API: {busResponse.StatusCode}");
-      return null;
+      return [];
     }
 
     var busContent = await busResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-    var busStopsJson = JObject.Parse(busContent)["features"] as JArray;
-    if (busStopsJson == null)
+    if (JObject.Parse(busContent)["features"] is not JArray busStopsJson)
     {
+#pragma warning disable CA1303 // Do not pass literals as localized parameters
       Console.WriteLine("No se encontraron datos en la API de buses.");
-      return new List<BusDto>();
+      return [];
     }
 
-    List<BusDto> busList = new List<BusDto>();
+    List<BusDto> busList = [];
 
     foreach (var busStop in busStopsJson)
     {

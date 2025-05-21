@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Dto;
-
+using Dto.Ubication;
 namespace Repositories.Interface;
-
 public interface IUbicationRepository
 {
   Task<List<SavedUbicationDto>> GetUbicationsByEmailAsync(string userEmail);

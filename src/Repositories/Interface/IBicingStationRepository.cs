@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Dto;
-using Entity;
+using Dto.Bicing;
+using Entity.Bicing;
 namespace Repositories.Interface;
-
 public interface IBicingStationRepository
 {
   Task<List<BicingStationDto>> GetAllBicingStations();

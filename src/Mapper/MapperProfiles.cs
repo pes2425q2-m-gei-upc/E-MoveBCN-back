@@ -1,10 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json;
 using AutoMapper;
-using Dto;
-using Entity;
-using src.Dto.Route;
-using src.Entity.Route;
+using Dto.Bicing;
+using Dto.Chat;
+using Dto.Route;
+using Dto.Ubication;
+using Dto.User;
+using Entity.Bicing;
+using Entity.Chat;
+using Entity.Route;
+using Entity.Ubication;
+using Entity.User;
+
 namespace Mapper;
 public class MapperProfiles : Profile
 {
@@ -38,17 +45,17 @@ public class MapperProfiles : Profile
 
     CreateMap<MessageDto, MessageEntity>()
         .ForMember(dest => dest.Message, opt => opt.MapFrom(src => src.MessageText));
-    
-        
+
+
   }
 
   private static List<double[]> DeserializeGeometry(string json)
   {
-      return JsonSerializer.Deserialize<List<double[]>>(json) ?? new List<double[]>();
+    return JsonSerializer.Deserialize<List<double[]>>(json) ?? [];
   }
 
   private static List<RouteInstructionDto> DeserializeInstructions(string json)
   {
-      return JsonSerializer.Deserialize<List<RouteInstructionDto>>(json) ?? new List<RouteInstructionDto>();
+    return JsonSerializer.Deserialize<List<RouteInstructionDto>>(json) ?? [];
   }
 }

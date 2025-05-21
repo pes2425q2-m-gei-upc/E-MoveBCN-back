@@ -1,24 +1,17 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Dto;
+using Dto.Chat;
+using Dto.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Interface;
-
-
-namespace src.Controllers;
-
+namespace Controllers;
 [Route("api/[controller]")]  // Base route: api/user
 [ApiController]
 [Authorize]
-public class UserController : ControllerBase
+public class UserController(IUserService userService) : ControllerBase
 {
-  private readonly IUserService _userService;
-
-  public UserController(IUserService userService)
-  {
-    _userService = userService;
-  }
+  private readonly IUserService _userService = userService;
 
   // GET: /api/user/getuserstest
   [HttpGet("getuserstest")]
@@ -44,7 +37,7 @@ public class UserController : ControllerBase
 
     try
     {
-      var isCreated = _userService.CreateUser(user);
+      var isCreated = this._userService.CreateUser(user);
 
       if (isCreated)
       {
@@ -52,9 +45,18 @@ public class UserController : ControllerBase
       }
       return BadRequest("Error");
     }
-    catch (Exception ex)
+    catch (ArgumentException ex)
     {
-      return StatusCode(500, $"Error en el servidor: {ex.Message}");
+      return BadRequest($"Argument error: {ex.Message}");
+    }
+    catch (InvalidOperationException ex)
+    {
+      return StatusCode(500, $"Operation error: {ex.Message}");
+    }
+    catch (Exception)
+    {
+      // Optionally log the exception here
+      throw; // Rethrow to let the framework handle unexpected exceptions
     }
   }
   //DELETE /api/user/deleteuser
@@ -68,7 +70,7 @@ public class UserController : ControllerBase
 
     try
     {
-      var isDeleted = await _userService.DeleteUser(user).ConfigureAwait(false);
+      var isDeleted = await this._userService.DeleteUser(user).ConfigureAwait(false);
 
       if (isDeleted)
       {
@@ -76,16 +78,25 @@ public class UserController : ControllerBase
       }
       return BadRequest("Incorrect credentials");
     }
-    catch (Exception ex)
+    catch (ArgumentException ex)
     {
-      return StatusCode(500, $"Error en el servidor: {ex.Message}");
+      return BadRequest($"Argument error: {ex.Message}");
+    }
+    catch (InvalidOperationException ex)
+    {
+      return StatusCode(500, $"Operation error: {ex.Message}");
+    }
+    catch (Exception)
+    {
+      // Optionally log the exception here
+      throw; // Rethrow to let the framework handle unexpected exceptions
     }
   }
   // GET: /api/user/getusers
   [HttpGet("getusers")]
   public IActionResult GetUsers()
   {
-    var users = _userService.GetAllUsers();
+    var users = this._userService.GetAllUsers();
     return Ok(users);
   }
   // POST: /api/user/modify
@@ -99,7 +110,7 @@ public class UserController : ControllerBase
 
     try
     {
-      var isModified = await _userService.ModifyUser(user).ConfigureAwait(false);
+      var isModified = await this._userService.ModifyUser(user).ConfigureAwait(false);
 
       if (isModified)
       {
@@ -107,24 +118,33 @@ public class UserController : ControllerBase
       }
       return BadRequest("Incorrect credentials");
     }
-    catch (Exception ex)
+    catch (ArgumentException ex)
     {
-      return StatusCode(500, $"Error en el servidor: {ex.Message}");
+      return BadRequest($"Argument error: {ex.Message}");
+    }
+    catch (InvalidOperationException ex)
+    {
+      return StatusCode(500, $"Operation error: {ex.Message}");
+    }
+    catch (Exception)
+    {
+      // Optionally log the exception here
+      throw; // Rethrow to let the framework handle unexpected exceptions
     }
   }
 
-  [HttpPost("block")]
+  [HttpPost("block")] // api/user/block
   public async Task<IActionResult> BlockUser([FromBody] BlockRequestDto request)
   {
-      var result = await _userService.BlockUserAsync(request).ConfigureAwait(false);
-      return result ? Ok("Usuario bloqueado") : BadRequest("Ya estaba bloqueado o error");
+    var result = await this._userService.BlockUserAsync(request).ConfigureAwait(false);
+    return result ? Ok("Usuario bloqueado") : BadRequest("Ya estaba bloqueado o error");
   }
 
-  [HttpPost("unblock")]
+  [HttpPost("unblock")] // api/user/unblock
   public async Task<IActionResult> UnblockUser([FromBody] BlockRequestDto request)
   {
-      var result = await _userService.UnblockUserAsync(request).ConfigureAwait(false);
-      return result ? Ok("Usuario desbloqueado") : NotFound("No estaba bloqueado");
+    var result = await this._userService.UnblockUserAsync(request).ConfigureAwait(false);
+    return result ? Ok("Usuario desbloqueado") : NotFound("No estaba bloqueado");
   }
 
 }

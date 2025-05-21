@@ -1,33 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Dto;
+using Dto.Chat;
+using Dto.User;
 using Helpers;
 using Microsoft.AspNetCore.Identity;
 using Repositories.Interface;
 using Services.Interface;
-namespace src.Services;
+namespace Services;
 
-public class UserService : IUserService
+public class UserService(IUserRepository userRepository) : IUserService
 {
-  private readonly IUserRepository _userRepository;
-
-  public UserService(IUserRepository userRepository)
-  {
-    _userRepository = userRepository;
-  }
+  private readonly IUserRepository _userRepository = userRepository;
 
   public List<UserDto> GetAllUsers()
   {
-    return _userRepository.GetAllUsers();
+    return this._userRepository.GetAllUsers();
   }
   public bool CreateUser(UserCreate user)
   {
-    return _userRepository.CreateUser(user);
+    return this._userRepository.CreateUser(user);
   }
   public async Task<UserDto> Authenticate(UserCredentials userCredentials)
   {
-    var user = await _userRepository.GetUserByEmailAsync(userCredentials.UserEmail).ConfigureAwait(false);
+    if (userCredentials == null)
+    {
+      throw new ArgumentNullException(nameof(userCredentials));
+    }
+    var user = await this._userRepository.GetUserByEmailAsync(userCredentials.UserEmail).ConfigureAwait(false);
     if (user == null)
     {
       return null;
@@ -43,7 +43,11 @@ public class UserService : IUserService
 
   public async Task<bool> DeleteUser(UserCredentials userCredentials)
   {
-    var user = await _userRepository.GetUserByEmailAsync(userCredentials.UserEmail).ConfigureAwait(false);
+    if (userCredentials == null)
+    {
+      throw new ArgumentNullException(nameof(userCredentials));
+    }
+    var user = await this._userRepository.GetUserByEmailAsync(userCredentials.UserEmail).ConfigureAwait(false);
     if (user == null)
     {
       return false;
@@ -54,21 +58,25 @@ public class UserService : IUserService
     {
       return false;
     }
-    return await _userRepository.DeleteUser(user.UserId).ConfigureAwait(false);
+    return await this._userRepository.DeleteUser(user.UserId).ConfigureAwait(false);
   }
   public async Task<bool> ModifyUser(UserDto userModify)
   {
-    return await _userRepository.ModifyUser(userModify).ConfigureAwait(false);
+    return await this._userRepository.ModifyUser(userModify).ConfigureAwait(false);
   }
 
   public async Task<UserDto> LoginWithGoogleAsync(LoginGoogleDto dto)
   {
-    var existingUser = await _userRepository.GetUserByEmailAsync(dto.Email).ConfigureAwait(false);
+    if (dto == null)
+    {
+      throw new ArgumentNullException(nameof(dto));
+    }
+    var existingUser = await this._userRepository.GetUserByEmailAsync(dto.Email).ConfigureAwait(false);
     if (existingUser != null)
     {
       return existingUser;
     }
-    var created = await _userRepository.CreateGoogleUserAsync(dto.Username, dto.Email).ConfigureAwait(false);
+    var created = await this._userRepository.CreateGoogleUserAsync(dto.Username, dto.Email).ConfigureAwait(false);
 
     if (!created)
     {
@@ -76,34 +84,34 @@ public class UserService : IUserService
     }
 
 
-    var newUser = await _userRepository.GetUserByEmailAsync(dto.Email).ConfigureAwait(false);
-    if (newUser == null)
-    {
-      throw new Exception("Usuario creado pero no se puede obtener");
-    }
-
+    var newUser = await this._userRepository.GetUserByEmailAsync(dto.Email).ConfigureAwait(false) ?? throw new Exception("Usuario creado pero no se puede obtener");
     return newUser;
   }
 
-   public async Task<bool> BlockUserAsync(BlockRequestDto dto)
-    {
-        if (dto.BlockerId == dto.BlockedId)
-            throw new ArgumentException("No puedes bloquearte a ti mismo.");
-        
-        if (await _userRepository.IsUserBlockedAsync(dto.BlockerId, dto.BlockedId).ConfigureAwait(false)) 
-            throw new ArgumentException("El usuario ya está bloqueado.");
+  public async Task<bool> BlockUserAsync(BlockRequestDto dto)
+  {
+    if (dto == null)
+      throw new ArgumentNullException(nameof(dto));
 
-        return await _userRepository.BlockUserAsync(dto.BlockerId, dto.BlockedId).ConfigureAwait(false);
-    }
-    public async Task<bool> UnblockUserAsync(BlockRequestDto dto)
-    {
-        if (dto.BlockerId == dto.BlockedId)
-            throw new ArgumentException("No puedes desbloquearte a ti mismo.");
+    if (dto.BlockerId == dto.BlockedId)
+      throw new ArgumentException("No puedes bloquearte a ti mismo.");
 
-        if (!await _userRepository.IsUserBlockedAsync(dto.BlockerId, dto.BlockedId).ConfigureAwait(false))
-            throw new ArgumentException("El usuario no está bloqueado.");
+    if (await this._userRepository.IsUserBlockedAsync(dto.BlockerId, dto.BlockedId).ConfigureAwait(false))
+      throw new ArgumentException("El usuario ya está bloqueado.");
 
-        return await _userRepository.UnblockUserAsync(dto.BlockerId, dto.BlockedId).ConfigureAwait(false);
-    }
+    return await this._userRepository.BlockUserAsync(dto.BlockerId, dto.BlockedId).ConfigureAwait(false);
+  }
+  public async Task<bool> UnblockUserAsync(BlockRequestDto dto)
+  {
+    if (dto == null)
+      throw new ArgumentNullException(nameof(dto));
 
+    if (dto.BlockerId == dto.BlockedId)
+      throw new ArgumentException("No puedes desbloquearte a ti mismo.");
+
+    if (!await this._userRepository.IsUserBlockedAsync(dto.BlockerId, dto.BlockedId).ConfigureAwait(false))
+      throw new ArgumentException("El usuario no está bloqueado.");
+
+    return await this._userRepository.UnblockUserAsync(dto.BlockerId, dto.BlockedId).ConfigureAwait(false);
+  }
 }

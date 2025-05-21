@@ -1,13 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Dto;
-
+using Dto.Bicing;
 namespace Services.Interface;
-
 public interface IBicingStationService
 {
-  Task<List<BicingStationDto>> GetAllBicingStationsAsync();
+  Task<List<BicingStationDto>> GetAllBicingStations();
   Task FetchAndStoreBicingStationsAsync();
-
-
 }

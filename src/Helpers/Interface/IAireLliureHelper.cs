@@ -1,12 +1,11 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using src.Dto.Air;
+using Dto.Air;
 
-namespace src.Helpers.Interface
+namespace Helpers.Interface;
+
+public interface IAireLliureHelper
 {
-    public interface IAireLliureHelper
-    {
-        Task<List<AirSensorDto>> GetAllAirSensorsAsync();
-        double? FindClosestSensor(List<AirSensorDto> sensors, double targetLat, double targetLon);
-    }
+  Task<List<AirSensorDto>> GetAllAirSensorsAsync();
+  double? FindClosestSensor(List<AirSensorDto> sensors, double targetLat, double targetLon);
 }
