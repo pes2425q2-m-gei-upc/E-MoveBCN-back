@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dto.User;
 namespace Repositories.Interface;
+
 public interface IUserRepository
 {
   public List<UserDto> GetAllUsers();

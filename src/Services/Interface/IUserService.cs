@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Dto.Chat;
 using Dto.User;
 namespace Services.Interface;
+
 public interface IUserService
 {
   List<UserDto> GetAllUsers();
