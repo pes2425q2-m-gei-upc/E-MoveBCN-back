@@ -1,11 +1,14 @@
-using src.Dto.Route;
-using Dto;
+using Dto.Route;
+using Dto.User;
 
 namespace TestUtils;
 
     public static class TestRouteFactory
 {
-    public static RouteDto CreateValidRouteDto(string? userId = null)
+  private static readonly double[] _item = [2.15899, 41.38879];
+  private static readonly double[] _itemArray = [2.1700, 41.4000];
+
+  public static RouteDto CreateValidRouteDto(string? userId = null)
     {
         return new RouteDto
         {
@@ -18,13 +21,9 @@ namespace TestUtils;
         Preference = "shortest",
         Distance = 1200.0,
         Duration = 600.0,
-        Geometry = new List<double[]>
-                    {
-                        new double[] { 2.15899, 41.38879 },
-                        new double[] { 2.1700, 41.4000 }
-                    },
-        Instructions = new List<RouteInstructionDto>
-                    {
+        Geometry = [_item, _itemArray],
+        Instructions =
+                    [
                         new RouteInstructionDto
                         {
                             Instruction = "Start at Plaça Catalunya",
@@ -37,7 +36,7 @@ namespace TestUtils;
                             Distance = 900.0,
                             Mode = "bike"
                         }
-                    },
+                    ],
         OriginStreetName = "Plaça Catalunya",
         DestinationStreetName = "Carrer d'Aragó",
         UserId = userId ?? Guid.NewGuid().ToString(),

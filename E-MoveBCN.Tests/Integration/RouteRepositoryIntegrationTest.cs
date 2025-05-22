@@ -1,12 +1,14 @@
 using AutoMapper;
 using Entity;
 using Microsoft.EntityFrameworkCore;
-using src.Dto.Route;
-using src.Entity.Route;
+using Dto.Route;
+using Entity.Route;
 using TestUtils;
 using Xunit;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
+using Repositories;
+using Entity.User;
 
 public class RouteRepositoryIntegrationTest : IAsyncLifetime
 {
@@ -28,33 +30,33 @@ public class RouteRepositoryIntegrationTest : IAsyncLifetime
             .UseNpgsql(configuration.GetConnectionString("DefaultConnection"))
             .Options;
 
-        _mapper = AutoMapperFactory.CreateMapper();
-        _dbContext = new ApiDbContext(options, configuration);
-        _routeRepository = new RouteRepository(_dbContext, _mapper);
+        this._mapper = AutoMapperFactory.CreateMapper();
+        this._dbContext = new ApiDbContext(options, configuration);
+        this._routeRepository = new RouteRepository(this._dbContext, this._mapper);
     }
 
     public async Task InitializeAsync()
     {
-        _userId = Guid.NewGuid();
-        _routeId = Guid.NewGuid();
+        this._userId = Guid.NewGuid();
+        this._routeId = Guid.NewGuid();
 
         // Eliminar si existe previamente
-        var existingUser = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == _userEmail);
+        var existingUser = await this._dbContext.Users.FirstOrDefaultAsync(u => u.Email == this._userEmail).ConfigureAwait(false);
         if (existingUser != null)
         {
-            _dbContext.Users.Remove(existingUser);
-            await _dbContext.SaveChangesAsync();
+            this._dbContext.Users.Remove(existingUser);
+            await this._dbContext.SaveChangesAsync().ConfigureAwait(false);
         }
 
-        _dbContext.Users.Add(new UserEntity
+        this._dbContext.Users.Add(new UserEntity
         {
-            UserId = _userId,
-            Email = _userEmail,
+            UserId = this._userId,
+            Email = this._userEmail,
             Username = "Test User",
             PasswordHash = "hashed"
         });
 
-        await _dbContext.SaveChangesAsync();
+        await this._dbContext.SaveChangesAsync().ConfigureAwait(false);
     }
 
     [Fact]
@@ -62,8 +64,8 @@ public class RouteRepositoryIntegrationTest : IAsyncLifetime
     {
         var route = new RouteEntity
         {
-            RouteId = _routeId,
-            UserId = _userId,
+            RouteId = this._routeId,
+            UserId = this._userId,
             OriginLat = 41.38f,
             OriginLng = 2.17f,
             DestinationLat = 41.39f,
@@ -78,31 +80,31 @@ public class RouteRepositoryIntegrationTest : IAsyncLifetime
             DestinationStreetName = "Destination"
         };
 
-        var saveResult = await _routeRepository.GuardarRutaAsync(route);
+        var saveResult = await this._routeRepository.GuardarRutaAsync(route).ConfigureAwait(false);
         saveResult.Should().BeTrue();
 
         var publishDto = new PublishedRouteDto
         {
-            RouteId = _routeId.ToString(),
+            RouteId = this._routeId.ToString(),
             Date = DateTime.UtcNow,
             AvailableSeats = 3
         };
 
-        var publishResult = await _routeRepository.PublishRoute(publishDto);
+        var publishResult = await this._routeRepository.PublishRoute(publishDto).ConfigureAwait(false);
         publishResult.Should().BeTrue();
 
-        var deletePublishedResult = await _routeRepository.DeletePublishedRoute(_routeId.ToString());
+        var deletePublishedResult = await this._routeRepository.DeletePublishedRoute(this._routeId.ToString()).ConfigureAwait(false);
         deletePublishedResult.Should().BeTrue();
 
-        var deleteRouteResult = await _routeRepository.DeleteRoute(_routeId.ToString());
+        var deleteRouteResult = await this._routeRepository.DeleteRoute(this._routeId.ToString()).ConfigureAwait(false);
         deleteRouteResult.Should().BeTrue();
     }
 
     public async Task DisposeAsync()
     {
         // Limpieza completa para evitar residuos en DB
-        _dbContext.PublishedRoutes.RemoveRange(_dbContext.PublishedRoutes);
-        _dbContext.Routes.RemoveRange(_dbContext.Routes);
-        await _dbContext.SaveChangesAsync();
+        this._dbContext.PublishedRoutes.RemoveRange(this._dbContext.PublishedRoutes);
+        this._dbContext.Routes.RemoveRange(this._dbContext.Routes);
+        await this._dbContext.SaveChangesAsync().ConfigureAwait(false);
     }
 }

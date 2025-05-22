@@ -13,8 +13,8 @@ public class RouteDto
   public string Preference { get; set; } = "fastest";
   public double Distance { get; set; }
   public double Duration { get; set; }
-  public List<double[]> Geometry { get; } = [];
-  public List<RouteInstructionDto> Instructions { get; } = [];
+  public List<double[]> Geometry { get; set; }
+  public List<RouteInstructionDto> Instructions { get; set; }
   public required string OriginStreetName { get; set; }
   public required string DestinationStreetName { get; set; }
   public string UserId { get; set; }

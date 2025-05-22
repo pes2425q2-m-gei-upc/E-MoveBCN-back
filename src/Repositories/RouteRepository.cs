@@ -31,10 +31,7 @@ public class RouteRepository(ApiDbContext dbContext, IMapper mapper) : IRouteRep
   }
   public async Task<bool> PublishRoute(PublishedRouteDto publishedRouteDto)
   {
-    if (publishedRouteDto == null)
-    {
-      throw new ArgumentNullException(nameof(publishedRouteDto));
-    }
+    ArgumentNullException.ThrowIfNull(publishedRouteDto);
     var ruta = await this._dbContext.Routes.FindAsync(Guid.Parse(publishedRouteDto.RouteId, System.Globalization.CultureInfo.InvariantCulture)).ConfigureAwait(false);
     if (ruta == null)
     {
