@@ -1,34 +1,26 @@
-﻿using System;
-using System.Threading.Tasks;
-using Dto;
+﻿using System.Threading.Tasks;
+using Dto.Route;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Services.Interface;
-using src.Dto.Route;
-
+namespace Controllers;
 [ApiController]
 [Route("api/public")]
-public class PublicRutasController : ControllerBase
+public class PublicRutasController(IRouteService service, IConfiguration config) : ControllerBase
 {
-  private readonly IRouteService _service;
-  private readonly IConfiguration _config;
-
-  public PublicRutasController(IRouteService service, IConfiguration config)
-  {
-    _service = service;
-    _config = config;
-  }
+  private readonly IRouteService _service = service;
+  private readonly IConfiguration _config = config;
 
   [HttpPost("calcular")]
   public async Task<IActionResult> CalcularRutaPublica([FromBody] RouteRequestDto dto, [FromHeader(Name = "x-api-key")] string apiKey)
   {
-    var expectedKey = _config["ApiKeys:PublicRouteKey"];
+    var expectedKey = this._config["ApiKeys:PublicRouteKey"];
     if (apiKey != expectedKey)
     {
       return Unauthorized("Invalid API Key");
     }
 
-    var resultado = await _service.CalcularRutaAsync(dto, Guid.Empty).ConfigureAwait(false);
+    var resultado = await this._service.CalcularRutaAsync(dto).ConfigureAwait(false);
     return Ok(resultado);
   }
 }

@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Entity;
-
+using Dto.Bicing;
 namespace Services.Interface;
-
 public interface IChargingStationsService
 {
   Task<List<ChargingStationDto>> GetAllChargingStationsAsync();

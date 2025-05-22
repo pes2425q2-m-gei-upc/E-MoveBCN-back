@@ -1,4 +1,4 @@
-﻿namespace src.Dto.Route;
+﻿namespace Dto.Route;
 public class RouteInstructionDto
 {
   public string Instruction { get; set; }

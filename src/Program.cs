@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using AutoMapper;
 using Entity;
 using ExtensionMethods;
 using Mapper;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -14,9 +12,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using Services;
-
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -85,6 +80,11 @@ builder.Services.AddSwaggerGen(c =>
       Email = "tuemail@example.com",
       Url = new Uri("https://tuweb.com")
     }
+  });
+
+  builder.Services.Configure<HostOptions>(options =>
+  {
+      options.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.Ignore;
   });
 
   // Add Swagger authentication

@@ -5,22 +5,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Services.Interface;
-
 namespace Services;
-
-public class StateBicingBackgroundService : BackgroundService
+public class StateBicingBackgroundService(
+    IServiceProvider serviceProvider,  // Inyectamos IServiceProvider
+    ILogger<StateBicingBackgroundService> logger) : BackgroundService
 {
-  private readonly IServiceProvider _serviceProvider;  // Usamos IServiceProvider
-  private readonly ILogger<StateBicingBackgroundService> _logger;
+  private readonly IServiceProvider _serviceProvider = serviceProvider;  // Usamos IServiceProvider
+  private readonly ILogger<StateBicingBackgroundService> _logger = logger;
   private readonly TimeSpan _interval = TimeSpan.FromMinutes(30);
-
-  public StateBicingBackgroundService(
-      IServiceProvider serviceProvider,  // Inyectamos IServiceProvider
-      ILogger<StateBicingBackgroundService> logger)
-  {
-    _serviceProvider = serviceProvider;
-    _logger = logger;
-  }
 
   protected override async Task ExecuteAsync(CancellationToken stoppingToken)
   {
@@ -39,23 +31,28 @@ public class StateBicingBackgroundService : BackgroundService
           elapsedSeconds++;
         }
 
-        _logger.LogInformation("Starting periodic update of the state of bicing stations");
+        this._logger.LogInformation("Starting periodic update of the state of bicing stations");
 
         // Crear un scope y obtener el servicio scoped dentro del scope
-        using (var scope = _serviceProvider.CreateScope())
+        using (var scope = this._serviceProvider.CreateScope())
         {
           var stateBicingService = scope.ServiceProvider.GetRequiredService<IStateBicingService>();
           await stateBicingService.FetchAndStoreStateBicingStationsAsync().ConfigureAwait(false);
         }
 
-        _logger.LogInformation("Completed periodic update of the state of bicing stations");
+        this._logger.LogInformation("Completed periodic update of the state of bicing stations");
+      }
+      catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+      {
+        // Graceful shutdown, no action needed.
       }
       catch (Exception ex)
       {
-        _logger.LogError(ex, "Error during periodic update of the state of bicing stations");
+        this._logger.LogError(ex, "Error during periodic update of the state of bicing stations");
+        throw; // Rethrow to avoid swallowing unexpected exceptions
       }
 
-      await Task.Delay(_interval, stoppingToken).ConfigureAwait(false);
+      await Task.Delay(this._interval, stoppingToken).ConfigureAwait(false);
     }
   }
 }

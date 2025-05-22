@@ -1,6 +1,6 @@
 ﻿using System;
-using Entity;
-namespace src.Entity.Route;
+using Entity.User;
+namespace Entity.Route;
 public class RouteEntity
 {
   public required Guid RouteId { get; set; }
@@ -17,5 +17,5 @@ public class RouteEntity
   public required string OriginStreetName { get; set; }
   public required string DestinationStreetName { get; set; }
   public required Guid UserId { get; set; }
-  public virtual UserEntity? UserIdNavigation { get; set; } = null!;
+  public virtual UserEntity UserIdNavigation { get; set; } = null!;
 }

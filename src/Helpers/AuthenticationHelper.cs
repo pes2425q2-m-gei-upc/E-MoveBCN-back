@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Constants;
-using Dto;
+using Dto.User;
 using Helpers.Interface;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Repositories.Interface;
-
 namespace Helpers;
-
 public class AuthenticationHelper : IAuthenticationHelper
 {
   public AuthenticationHelper()
@@ -20,11 +16,15 @@ public class AuthenticationHelper : IAuthenticationHelper
 
   public (ClaimsIdentity ClaimsIdentity, AuthenticationProperties AuthenticationProperties) AuthenticationClaims(UserDto user)
   {
+    if (user == null)
+    {
+      throw new ArgumentNullException(nameof(user));
+    }
     var claims = new List<Claim>
         {
-            new Claim(ApiClaimTypes.Name, user.Username),
-            new Claim(ApiClaimTypes.Email, user.Email),
-            new Claim(ApiClaimTypes.UserId, user.UserId.ToString())
+            new(ApiClaimTypes.Name, user.Username),
+            new(ApiClaimTypes.Email, user.Email),
+            new(ApiClaimTypes.UserId, user.UserId.ToString())
         };
     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
     var expirationDate = DateTimeOffset.UtcNow.AddDays(1);

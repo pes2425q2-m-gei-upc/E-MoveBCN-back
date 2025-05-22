@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Dto;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using src.Dto.Route;
-
+using Dto.Route;
+namespace Services.Interface;
 public interface IRouteService
 {
-  public Task<RouteResponseDto> CalcularRutaAsync(RouteRequestDto request, Guid usuarioId);
+  public Task<RouteResponseDto> CalcularRutaAsync(RouteRequestDto request);
   public Task<bool> SaveRoute(RouteDto route);
   public Task<bool> DeleteRoute(string routeId);
   public Task<bool> PublishRoute(PublishedRouteDto publishedRouteDto);

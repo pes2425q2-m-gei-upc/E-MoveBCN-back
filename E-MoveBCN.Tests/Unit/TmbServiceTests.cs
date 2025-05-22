@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Services;
 using System.Text;
 using Moq.Protected;
-
+namespace E_MoveBCN.Tests.Unit;
 public class TmbServiceTests
 {
     private readonly Mock<IConfiguration> _configMock = new();
@@ -15,15 +15,15 @@ public class TmbServiceTests
 
     public TmbServiceTests()
     {
-        _httpClient = new HttpClient(_httpHandlerMock.Object);
+        this._httpClient = new HttpClient(this._httpHandlerMock.Object);
 
-        _configMock.Setup(c => c["TmbApi:ApiKey"]).Returns("dummy-api-key");
-        _configMock.Setup(c => c["TmbApi:AppId"]).Returns("dummy-app-id");
-        _configMock.Setup(c => c["TmbApi:BaseUrl"]).Returns("https://dummy.api/");
-        _configMock.Setup(c => c["TmbApi:Metros"]).Returns("metros");
-        _configMock.Setup(c => c["TmbApi:Bus"]).Returns("bus");
+        this._configMock.Setup(c => c["TmbApi:ApiKey"]).Returns("dummy-api-key");
+        this._configMock.Setup(c => c["TmbApi:AppId"]).Returns("dummy-app-id");
+        this._configMock.Setup(c => c["TmbApi:BaseUrl"]).Returns("https://dummy.api/");
+        this._configMock.Setup(c => c["TmbApi:Metros"]).Returns("metros");
+        this._configMock.Setup(c => c["TmbApi:Bus"]).Returns("bus");
 
-        _tmbService = new TmbService(_httpClient, _configMock.Object);
+        this._tmbService = new TmbService(this._httpClient, this._configMock.Object);
     }
 
     [Fact]
@@ -43,7 +43,7 @@ public class TmbServiceTests
         SetupHttpResponse("https://dummy.api/metros?app_id=dummy-app-id&app_key=dummy-api-key", jsonResponse);
 
         // Act
-        var result = await _tmbService.GetAllMetrosAsync();
+        var result = await this._tmbService.GetAllMetrosAsync().ConfigureAwait(false);
 
         // Assert
         Assert.Single(result);
@@ -68,7 +68,7 @@ public class TmbServiceTests
         SetupHttpResponse("https://dummy.api/bus?app_id=dummy-app-id&app_key=dummy-api-key", jsonResponse);
 
         // Act
-        var result = await _tmbService.GetAllBusAsync();
+        var result = await this._tmbService.GetAllBusAsync().ConfigureAwait(false);
 
         // Assert
         Assert.Single(result);
@@ -97,7 +97,7 @@ public class TmbServiceTests
         SetupHttpResponse("https://dummy.api/metros?app_id=dummy-app-id&app_key=dummy-api-key", jsonResponse);
 
         // Act
-        var result = await _tmbService.GetMetroByIdAsync(20);
+        var result = await this._tmbService.GetMetroByIdAsync(20).ConfigureAwait(false);
 
         // Assert
         Assert.NotNull(result);
@@ -126,7 +126,7 @@ public class TmbServiceTests
         SetupHttpResponse("https://dummy.api/bus?app_id=dummy-app-id&app_key=dummy-api-key", jsonResponse);
 
         // Act
-        var result = await _tmbService.GetBusByIdAsync(2);
+        var result = await this._tmbService.GetBusByIdAsync(2).ConfigureAwait(false);
 
         // Assert
         Assert.NotNull(result);
@@ -136,13 +136,13 @@ public class TmbServiceTests
 
     private void SetupHttpResponse(string expectedUrl, string content)
 {
-    _httpHandlerMock
+    this._httpHandlerMock
         .Protected()
         .Setup<Task<HttpResponseMessage>>(
             "SendAsync",
             ItExpr.Is<HttpRequestMessage>(req =>
                 req.Method == HttpMethod.Get &&
-                req.RequestUri.ToString() == expectedUrl),
+                req.RequestUri != null && req.RequestUri.ToString() == expectedUrl),
             ItExpr.IsAny<CancellationToken>())
         .ReturnsAsync(new HttpResponseMessage
         {
