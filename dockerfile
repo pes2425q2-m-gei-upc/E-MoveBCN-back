@@ -2,6 +2,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0.100 AS build
 WORKDIR /src
 
+
 # Copia el archivo .csproj y restaura dependencias
 COPY src/E-MoveBCN-back.csproj ./E-MoveBCN-back.csproj
 RUN dotnet restore E-MoveBCN-back.csproj
