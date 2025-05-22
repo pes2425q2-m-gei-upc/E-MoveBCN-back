@@ -1,37 +1,26 @@
-﻿using System;
-using System.Threading.Tasks;
-using AutoMapper;
-using Dto;
-using Entity;
+﻿using System.Threading.Tasks;
+using Dto.Route;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Services;
 using Services.Interface;
-using src.Dto.Route;
-
+namespace Controllers;
 [ApiController]
 [Route("api/[controller]")] // api/rutas
 [Authorize]
-public class RutasController : ControllerBase
+public class RutasController(IRouteService routeService) : ControllerBase
 {
-  private readonly IRouteService _routeService;
-
-  public RutasController(IRouteService routeService)
-  {
-    _routeService = routeService;
-  }
+  private readonly IRouteService _routeService = routeService;
 
   [HttpPost("calcular")] // api/rutas/calcular
-  public async Task<IActionResult> CalcularRuta([FromBody] RouteRequestDto dto)
+  public async Task<IActionResult> CalcularRuta([FromBody] RouteRequestDto route)
   {
-    Guid usuarioId = Guid.Parse("11111111-1111-1111-1111-111111111111"); // to-do: poner usuario autenticado
-    var resultado = await _routeService.CalcularRutaAsync(dto, usuarioId).ConfigureAwait(false);
-    return Ok(resultado);
+    var result = await this._routeService.CalcularRutaAsync(route).ConfigureAwait(false);
+    return Ok(result);
   }
   [HttpPost("save")] // api/rutas/save
   public async Task<IActionResult> SaveRoute([FromBody] RouteDto dto)
   {
-    var result = await _routeService.SaveRoute(dto).ConfigureAwait(false);
+    var result = await this._routeService.SaveRoute(dto).ConfigureAwait(false);
     if (result == false)
     {
       return BadRequest("Error saving route");
@@ -41,7 +30,7 @@ public class RutasController : ControllerBase
   [HttpDelete("delete")] // api/rutas/delete
   public async Task<IActionResult> DeleteRoute([FromBody] string routeId)
   {
-    var result = await _routeService.DeleteRoute(routeId).ConfigureAwait(false);
+    var result = await this._routeService.DeleteRoute(routeId).ConfigureAwait(false);
     if (result == false)
     {
       return BadRequest("Error deleting route");
@@ -51,7 +40,7 @@ public class RutasController : ControllerBase
   [HttpPost("publish")] // api/rutas/publish
   public async Task<IActionResult> PublishRoute([FromBody] PublishedRouteDto publishedRouteDto)
   {
-    var result = await _routeService.PublishRoute(publishedRouteDto).ConfigureAwait(false);
+    var result = await this._routeService.PublishRoute(publishedRouteDto).ConfigureAwait(false);
     if (result == false)
     {
       return BadRequest("Error publishing route");
@@ -61,7 +50,7 @@ public class RutasController : ControllerBase
   [HttpDelete("deletepublished")] // api/rutas/deletepublished
   public async Task<IActionResult> DeletePublishedRoute([FromBody] string routeId)
   {
-    var result = await _routeService.DeletePublishedRoute(routeId).ConfigureAwait(false);
+    var result = await this._routeService.DeletePublishedRoute(routeId).ConfigureAwait(false);
     if (result == false)
     {
       return BadRequest("Error deleting published route");
@@ -71,7 +60,7 @@ public class RutasController : ControllerBase
   [HttpGet("getroutesnear")] // api/rutas/getroutesnear
   public async Task<IActionResult> GetRoutesNear([FromQuery] double lat, [FromQuery] double lon, [FromQuery] double radiusInMeters)
   {
-    var result = await _routeService.GetRoutesNearAsync(lat, lon, radiusInMeters).ConfigureAwait(false);
+    var result = await this._routeService.GetRoutesNearAsync(lat, lon, radiusInMeters).ConfigureAwait(false);
     if (result == null)
     {
       return NotFound("No routes found");
@@ -79,8 +68,9 @@ public class RutasController : ControllerBase
     return Ok(result);
   }
   [HttpGet("savedroute")] // api/rutas/savedroute
-  public async Task<IActionResult> GetSavedRoute([FromQuery]string userId) {
-    var result = await _routeService.GetSavedRoute(userId);
+  public async Task<IActionResult> GetSavedRoute([FromQuery] string userId)
+  {
+    var result = await this._routeService.GetSavedRoute(userId).ConfigureAwait(false);
     if (result == null)
     {
       return NotFound("No routes found");

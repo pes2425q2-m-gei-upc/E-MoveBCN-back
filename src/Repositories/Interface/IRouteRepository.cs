@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Entity;
-using src.Dto.Route;
-using src.Entity.Route;
-
+using Dto.Route;
+using Entity.Route;
+namespace Repositories.Interface;
 public interface IRouteRepository
 {
   Task<bool> GuardarRutaAsync(RouteEntity ruta);

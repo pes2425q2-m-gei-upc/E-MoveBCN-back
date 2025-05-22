@@ -2,12 +2,12 @@ using Microsoft.Extensions.Configuration;
 using Moq;
 using Repositories.Interface;
 using Dto;
-using src.Dto.Route;
-using src.Entity.Route;
+using Dto.Route;
+using Entity.Route;
 using TestUtils;
 using Xunit;
-using src.Services;
-
+using Services;
+namespace E_MoveBCN.Tests.Unit;
 public class RouteServiceTests
 {
     private readonly Mock<IRouteRepository> _routeRepositoryMock = new();
@@ -19,8 +19,8 @@ public class RouteServiceTests
 
     public RouteServiceTests()
     {
-        _httpClient = new HttpClient(_httpMessageHandlerMock.Object);
-        _routeService = new RouteService(_configMock.Object, _httpClient, _routeRepositoryMock.Object, _userRepositoryMock.Object);
+        this._httpClient = new HttpClient(this._httpMessageHandlerMock.Object);
+        this._routeService = new RouteService(this._configMock.Object, this._httpClient, this._routeRepositoryMock.Object, this._userRepositoryMock.Object);
     }
 
     [Fact]
@@ -28,10 +28,10 @@ public class RouteServiceTests
     {
         // Arrange
         var routeId = Guid.NewGuid().ToString();
-        _routeRepositoryMock.Setup(r => r.DeleteRoute(routeId)).ReturnsAsync(true);
+        this._routeRepositoryMock.Setup(r => r.DeleteRoute(routeId)).ReturnsAsync(true);
 
         // Act
-        var result = await _routeService.DeleteRoute(routeId);
+        var result = await this._routeService.DeleteRoute(routeId).ConfigureAwait(false);
 
         // Assert
         Assert.True(result);
@@ -42,10 +42,10 @@ public class RouteServiceTests
     {
         // Arrange
         var routeId = Guid.NewGuid().ToString();
-        _routeRepositoryMock.Setup(r => r.DeletePublishedRoute(routeId)).ReturnsAsync(true);
+        this._routeRepositoryMock.Setup(r => r.DeletePublishedRoute(routeId)).ReturnsAsync(true);
 
         // Act
-        var result = await _routeService.DeletePublishedRoute(routeId);
+        var result = await this._routeService.DeletePublishedRoute(routeId).ConfigureAwait(false);
 
         // Assert
         Assert.True(result);
@@ -56,10 +56,10 @@ public class RouteServiceTests
     {
         // Arrange
         var dto = new PublishedRouteDto();
-        _routeRepositoryMock.Setup(r => r.PublishRoute(dto)).ReturnsAsync(true);
+        this._routeRepositoryMock.Setup(r => r.PublishRoute(dto)).ReturnsAsync(true);
 
         // Act
-        var result = await _routeService.PublishRoute(dto);
+        var result = await this._routeService.PublishRoute(dto).ConfigureAwait(false);
 
         // Assert
         Assert.True(result);
@@ -69,12 +69,12 @@ public class RouteServiceTests
     public async Task GetRoutesNearAsync_ShouldReturnRoutes()
     {
         // Arrange
-        var expectedRoutes = new List<PublishedRouteDto> { new PublishedRouteDto(), new PublishedRouteDto() };
-        _routeRepositoryMock.Setup(r => r.GetRoutesNearAsync(It.IsAny<double>(), It.IsAny<double>(), It.IsAny<double>()))
+        var expectedRoutes = new List<PublishedRouteDto> { new(), new() };
+        this._routeRepositoryMock.Setup(r => r.GetRoutesNearAsync(It.IsAny<double>(), It.IsAny<double>(), It.IsAny<double>()))
                             .ReturnsAsync(expectedRoutes);
 
         // Act
-        var result = await _routeService.GetRoutesNearAsync(41.4, 2.16, 1000);
+        var result = await this._routeService.GetRoutesNearAsync(41.4, 2.16, 1000).ConfigureAwait(false);
 
         // Assert
         Assert.Equal(expectedRoutes.Count, result.Count);

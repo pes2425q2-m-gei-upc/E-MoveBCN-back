@@ -3,33 +3,32 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Dto.Route;
+using Entity.Route;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Identity.Client;
 using Repositories.Interface;
-using src.Dto.Route;
-using src.Entity.Route;
-namespace src.Services;
-public class RouteService : IRouteService
+using Services.Interface;
+namespace Services;
+[System.Diagnostics.CodeAnalysis.SuppressMessage(
+    "Globalization",
+    "CA1305: Especifique IFormatProvider",
+    Justification = "Guid.Parse no depende de la configuración regional")]
+public class RouteService(IConfiguration config, HttpClient httpClient, IRouteRepository routeRepository, IUserRepository userRepository) : IRouteService
 {
-  private readonly IConfiguration _config;
-  private readonly HttpClient _httpClient;
-  private readonly IRouteRepository _routeRepository;
-  private readonly IUserRepository _userRepository;
+  private readonly IConfiguration _config = config;
+  private readonly HttpClient _httpClient = httpClient;
+  private readonly IRouteRepository _routeRepository = routeRepository;
+  private readonly IUserRepository _userRepository = userRepository;
 
-  public RouteService(IConfiguration config, HttpClient httpClient, IRouteRepository routeRepository, IUserRepository userRepository)
+  public async Task<RouteResponseDto> CalcularRutaAsync(RouteRequestDto request)
   {
-    _config = config;
-    _httpClient = httpClient;
-    _routeRepository = routeRepository;
-    _userRepository = userRepository;
-  }
-
-  public async Task<RouteResponseDto> CalcularRutaAsync(RouteRequestDto request, Guid usuarioId)
-  {
+    if (request == null)
+    {
+      throw new ArgumentNullException(nameof(request), "El parámetro request no puede ser null.");
+    }
     var streetNameOrigin = await GetStreetNameAsync(request.OriginLat, request.OriginLng).ConfigureAwait(false);
     var streetNameDestination = await GetStreetNameAsync(request.DestinationLat, request.DestinationLng).ConfigureAwait(false);
     var response = request.Mode == "transit"
@@ -56,15 +55,15 @@ public class RouteService : IRouteService
       _ => "cycling-regular"
     };
 
-    var apiKey = _config["APIKeys:ORS:ApiKey"];
+    var apiKey = this._config["APIKeys:ORS:ApiKey"];
     var url = $"https://api.openrouteservice.org/v2/directions/{profile}";
-    _httpClient.DefaultRequestHeaders.Add("Authorization", apiKey);
+    this._httpClient.DefaultRequestHeaders.Add("Authorization", apiKey);
 
     var body = new
     {
       coordinates = new[]
         {
-                new[] { request.OriginLng, request.OriginLat },
+                [request.OriginLng, request.OriginLat],
                 new[] { request.DestinationLng, request.DestinationLat }
             },
       preference = request.Preference switch
@@ -75,8 +74,8 @@ public class RouteService : IRouteService
 
     };
 
-    var content = new StringContent(JsonSerializer.Serialize(body), Encoding.UTF8, "application/json");
-    var res = await _httpClient.PostAsync(url, content).ConfigureAwait(false);
+    using var content = new StringContent(JsonSerializer.Serialize(body), Encoding.UTF8, "application/json");
+    var res = await this._httpClient.PostAsync(new Uri(url), content).ConfigureAwait(false);
     var json = await res.Content.ReadAsStringAsync().ConfigureAwait(false);
     Console.WriteLine("ORS response: " + json);
 
@@ -139,7 +138,7 @@ public class RouteService : IRouteService
 
   private async Task<RouteResponseDto> CalcularConGoogleMapsAsync(RouteRequestDto request)
   {
-    var apiKey = _config["APIKeys:GoogleMaps:ApiKey"];
+    var apiKey = this._config["APIKeys:GoogleMaps:ApiKey"];
     string origin = $"{request.OriginLat.ToString(System.Globalization.CultureInfo.InvariantCulture)},{request.OriginLng.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
     string destination = $"{request.DestinationLat.ToString(System.Globalization.CultureInfo.InvariantCulture)},{request.DestinationLng.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
     var queryParams = new List<string>
@@ -163,7 +162,7 @@ public class RouteService : IRouteService
     }
 
     var url = $"https://maps.googleapis.com/maps/api/directions/json?{string.Join("&", queryParams)}&key={apiKey}";
-    var res = await _httpClient.GetAsync(url).ConfigureAwait(false);
+    var res = await this._httpClient.GetAsync(new Uri(url)).ConfigureAwait(false);
     if (!res.IsSuccessStatusCode)
     {
       throw new Exception($"Error en la solicitud a Google Maps: {res.StatusCode}");
@@ -215,7 +214,7 @@ public class RouteService : IRouteService
         var stepDistance = step.TryGetProperty("distance", out var dist)
             ? dist.GetProperty("value").GetDouble() : 0.0;
         var travelMode = step.TryGetProperty("travel_mode", out var mode)
-            ? mode.GetString().ToLower() : "unknown";
+            ? mode.GetString().ToUpperInvariant() : "unknown";
 
         instructions.Add(new RouteInstructionDto
         {
@@ -267,20 +266,20 @@ public class RouteService : IRouteService
       int dlng = ((result & 1) != 0) ? ~(result >> 1) : result >> 1;
       lng += dlng;
 
-      coords.Add(new double[] { lng / 1E5, lat / 1E5 });
+      coords.Add([lng / 1E5, lat / 1E5]);
     }
 
     return coords;
   }
   private async Task<string> GetStreetNameAsync(double lat, double lng)
   {
-    var apiKey = _config["APIKeys:GoogleMaps:ApiKey"];
+    var apiKey = this._config["APIKeys:GoogleMaps:ApiKey"];
     var url = $"https://maps.googleapis.com/maps/api/geocode/json?latlng={lat.ToString(CultureInfo.InvariantCulture)},{lng.ToString(CultureInfo.InvariantCulture)}&key={apiKey}";
 
-    var res = await _httpClient.GetAsync(url);
+    var res = await this._httpClient.GetAsync(new Uri(url)).ConfigureAwait(false);
     if (!res.IsSuccessStatusCode) return "Unknown";
 
-    var json = await res.Content.ReadAsStringAsync();
+    var json = await res.Content.ReadAsStringAsync().ConfigureAwait(false);
     using var doc = JsonDocument.Parse(json);
 
     var results = doc.RootElement.GetProperty("results");
@@ -299,11 +298,16 @@ public class RouteService : IRouteService
   }
   public async Task<bool> SaveRoute(RouteDto route)
   {
-    var user = await _userRepository.GetUserById(route.UserId).ConfigureAwait(false);
+    if (route == null)
+    {
+      throw new ArgumentNullException(nameof(route), "El parámetro route no puede ser null.");
+    }
+    var user = await this._userRepository.GetUserById(route.UserId).ConfigureAwait(false);
     if (user == null)
     {
       return false;
     }
+
     var routeEntity = new RouteEntity
     {
       RouteId = Guid.Parse(route.RouteId),
@@ -321,31 +325,27 @@ public class RouteService : IRouteService
       DestinationStreetName = route.DestinationStreetName,
       UserId = Guid.Parse(user.UserId)
     };
-    return await _routeRepository.GuardarRutaAsync(routeEntity).ConfigureAwait(false);
+    return await this._routeRepository.GuardarRutaAsync(routeEntity).ConfigureAwait(false);
   }
   public async Task<bool> DeleteRoute(string routeId)
   {
-    return await _routeRepository.DeleteRoute(routeId).ConfigureAwait(false);
+    return await this._routeRepository.DeleteRoute(routeId).ConfigureAwait(false);
   }
   public async Task<bool> PublishRoute(PublishedRouteDto publishedRouteDto)
   {
-    return await _routeRepository.PublishRoute(publishedRouteDto).ConfigureAwait(false);
+    return await this._routeRepository.PublishRoute(publishedRouteDto).ConfigureAwait(false);
   }
   public async Task<bool> DeletePublishedRoute(string routeId)
   {
-    return await _routeRepository.DeletePublishedRoute(routeId).ConfigureAwait(false);
+    return await this._routeRepository.DeletePublishedRoute(routeId).ConfigureAwait(false);
   }
   public async Task<List<PublishedRouteDto>> GetRoutesNearAsync(double lat, double lon, double radiusInMeters)
   {
-    return await _routeRepository.GetRoutesNearAsync(lat, lon, radiusInMeters).ConfigureAwait(false);
+    return await this._routeRepository.GetRoutesNearAsync(lat, lon, radiusInMeters).ConfigureAwait(false);
   }
   public async Task<List<RouteDto>> GetSavedRoute(string userId)
   {
-    var user = await _userRepository.GetUserById(userId).ConfigureAwait(false);
-    if (user == null)
-    {
-      throw new Exception("Usuario no encontrado");
-    }
-    return await _routeRepository.GetSavedRoute(user.UserId).ConfigureAwait(false);
+    var user = await this._userRepository.GetUserById(userId).ConfigureAwait(false) ?? throw new Exception("Usuario no encontrado");
+    return await this._routeRepository.GetSavedRoute(user.UserId).ConfigureAwait(false);
   }
 }

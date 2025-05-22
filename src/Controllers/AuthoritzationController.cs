@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Dto;
+using Dto.User;
 using Helpers.Interface;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -12,15 +12,10 @@ namespace Controllers;
 [ApiController]
 [Route("api/[controller]")]
 
-public class AuthorizationController : ControllerBase
+public class AuthorizationController(IUserService userService, IAuthenticationHelper authenticationHelper) : ControllerBase
 {
-  private readonly IUserService _userService;
-  private readonly IAuthenticationHelper _authenticationHelper;
-  public AuthorizationController(IUserService userService, IAuthenticationHelper authenticationHelper)
-  {
-    _userService = userService;
-    _authenticationHelper = authenticationHelper;
-  }
+  private readonly IUserService _userService = userService;
+  private readonly IAuthenticationHelper _authenticationHelper = authenticationHelper;
 
   // POST: /api/authorization/login
   [HttpPost("login")]
@@ -33,18 +28,22 @@ public class AuthorizationController : ControllerBase
 
     try
     {
-      var user = await _userService.Authenticate(userCredentials).ConfigureAwait(false);
+      var user = await this._userService.Authenticate(userCredentials).ConfigureAwait(false);
       if (user == null)
       {
         return Unauthorized("Invalid credentials");
       }
-      var (claimsIdentity, authenticationProperties) = _authenticationHelper.AuthenticationClaims(user);
+      var (claimsIdentity, authenticationProperties) = this._authenticationHelper.AuthenticationClaims(user);
       await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authenticationProperties).ConfigureAwait(false);
       return Ok("Authorized");
     }
-    catch (Exception ex)
+    catch (InvalidOperationException ex)
     {
       return StatusCode(500, $"Error en el servidor: {ex.Message}");
+    }
+    catch (Exception)
+    {
+      throw;
     }
   }
 
@@ -52,19 +51,26 @@ public class AuthorizationController : ControllerBase
   [HttpPost("googlelogin")]
   public async Task<IActionResult> GoogleLogin([FromBody] LoginGoogleDto dto)
   {
+    if (dto == null)
+      return BadRequest("Request body cannot be null.");
+
     if (string.IsNullOrEmpty(dto.Email) || string.IsNullOrEmpty(dto.Username))
       return BadRequest("Invalid Data");
 
     try
     {
-      var user = await _userService.LoginWithGoogleAsync(dto).ConfigureAwait(false);
-      var (claimsIdentity, authenticationProperties) = _authenticationHelper.AuthenticationClaims(user);
+      var user = await this._userService.LoginWithGoogleAsync(dto).ConfigureAwait(false);
+      var (claimsIdentity, authenticationProperties) = this._authenticationHelper.AuthenticationClaims(user);
       await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authenticationProperties).ConfigureAwait(false);
       return Ok(user);
     }
-    catch (Exception ex)
+    catch (InvalidOperationException ex)
     {
       return StatusCode(500, $"Server error: {ex.Message}");
+    }
+    catch (Exception)
+    {
+      throw;
     }
   }
 }

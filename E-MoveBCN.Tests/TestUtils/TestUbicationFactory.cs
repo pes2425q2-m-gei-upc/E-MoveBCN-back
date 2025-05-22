@@ -1,6 +1,5 @@
-
-using System;
-using Dto;
+using Dto.Bicing;
+using Dto.Ubication;
 namespace TestUtils;
 public static class TestUbicationFactory
 {

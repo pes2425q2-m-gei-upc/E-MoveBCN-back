@@ -1,6 +1,8 @@
 using AutoMapper;
-using Dto;
-using Entity;
+using Dto.Ubication;
+using Dto.User;
+using Entity.Ubication;
+using Entity.User;
 namespace TestUtils;
 public static class AutoMapperFactory
 {

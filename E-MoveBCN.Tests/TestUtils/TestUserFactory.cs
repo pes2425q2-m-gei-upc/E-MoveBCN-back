@@ -1,7 +1,5 @@
-using Dto;
-
+using Dto.User;
 namespace TestUtils;
-
 public static class TestUserFactory
 {
     public static UserDto CreateValidUserDto(

@@ -1,31 +1,26 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
-using Dto;
-using Microsoft.AspNetCore.Authorization;
+using Dto.Chat;
 using Microsoft.AspNetCore.Mvc;
-
+using Services.Interface;
+namespace Controllers;
 [ApiController]
 [Route("api/messages")]
-public class MessageController : ControllerBase
+public class MessageController(IMessageService messageService) : ControllerBase
 {
-    private readonly IMessageService _messageService;
+  private readonly IMessageService _messageService = messageService;
 
-    public MessageController(IMessageService messageService)
-    {
-        _messageService = messageService;
-    }
+  [HttpPost("send")]
+  public async Task<IActionResult> SendMessage([FromBody] SendMessageDto dto)
+  {
+    var result = await this._messageService.SendMessageAsync(dto).ConfigureAwait(false);
+    return Ok(result);
+  }
 
-    [HttpPost("send")]
-    public async Task<IActionResult> SendMessage([FromBody] SendMessageDto dto)
-    {
-        var result = await _messageService.SendMessageAsync(dto);
-        return Ok(result);
-    }
-
-    [HttpGet("getMessages/{chatId}")]
-    public async Task<IActionResult> GetMessages(Guid chatId)
-    {
-        var messages = await _messageService.GetMessagesByChatIdAsync(chatId);
-        return Ok(messages);
-    }
+  [HttpGet("getMessages/{chatId}")]
+  public async Task<IActionResult> GetMessages(Guid chatId)
+  {
+    var messages = await this._messageService.GetMessagesByChatIdAsync(chatId).ConfigureAwait(false);
+    return Ok(messages);
+  }
 }

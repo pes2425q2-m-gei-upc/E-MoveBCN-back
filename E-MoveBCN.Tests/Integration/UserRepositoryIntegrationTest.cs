@@ -1,5 +1,5 @@
 using AutoMapper;
-using Dto;
+using Dto.User;
 using Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -25,11 +25,11 @@ public class UserRepositoryIntegrationTest : IAsyncDisposable
             .UseNpgsql(configuration.GetConnectionString("DefaultConnection"))
             .Options;
 
-        _mapper = AutoMapperFactory.CreateMapper();
-        _dbContext = new ApiDbContext(options, configuration);
-        _userRepository = new UserRepository(_dbContext, _mapper);
+        this._mapper = AutoMapperFactory.CreateMapper();
+        this._dbContext = new ApiDbContext(options, configuration);
+        this._userRepository = new UserRepository(this._dbContext, this._mapper);
 
-        _testUser = new UserCreate
+        this._testUser = new UserCreate
         {
             Username = "integration_test_user",
             Email = "integration_test@example.com",
@@ -41,47 +41,48 @@ public class UserRepositoryIntegrationTest : IAsyncDisposable
     public async Task CreateUser_ThenGetUserByEmail_ShouldReturnSameUser()
     {
         // Act
-        var created = _userRepository.CreateUser(_testUser);
-        var fetchedUser = await _userRepository.GetUserByEmailAsync(_testUser.Email);
+        var created = this._userRepository.CreateUser(this._testUser);
+        var fetchedUser = await this._userRepository.GetUserByEmailAsync(this._testUser.Email).ConfigureAwait(false);
 
         // Assert
         Assert.True(created);
         Assert.NotNull(fetchedUser);
-        Assert.Equal(_testUser.Email, fetchedUser.Email);
+        Assert.Equal(this._testUser.Email, fetchedUser.Email);
     }
 
     [Fact]
     public async Task DeleteUser_ShouldRemoveFromDatabase()
     {
         // Arrange
-        _userRepository.CreateUser(_testUser);
-        var fetched = await _userRepository.GetUserByEmailAsync(_testUser.Email);
+        this._userRepository.CreateUser(this._testUser);
+        var fetched = await this._userRepository.GetUserByEmailAsync(this._testUser.Email).ConfigureAwait(false);
 
         // Act
-        var deleted = await _userRepository.DeleteUser(fetched.UserId);
+        Assert.NotNull(fetched); // Ensure fetched is not null before accessing UserId
+        var deleted = await this._userRepository.DeleteUser(fetched.UserId).ConfigureAwait(false);
 
         // Assert
         Assert.True(deleted);
-        var afterDelete = await _userRepository.GetUserByEmailAsync(_testUser.Email);
+        var afterDelete = await this._userRepository.GetUserByEmailAsync(this._testUser.Email).ConfigureAwait(false);
         Assert.Null(afterDelete);
     }
 
     public async ValueTask DisposeAsync()
     {
         // Elimina ubicaciones guardadas antes de eliminar el usuario
-        await _dbContext.SavedUbications
-            .Where(u => u.UserEmail == _testUser.Email)
+        await this._dbContext.SavedUbications
+            .Where(u => u.UserEmail == this._testUser.Email)
             .ExecuteDeleteAsync()
             .ConfigureAwait(false);
 
-        var existingUser = await _dbContext.Users
-            .FirstOrDefaultAsync(u => u.Email == _testUser.Email)
+        var existingUser = await this._dbContext.Users
+            .FirstOrDefaultAsync(u => u.Email == this._testUser.Email)
             .ConfigureAwait(false);
 
         if (existingUser != null)
         {
-            _dbContext.Users.Remove(existingUser);
-            await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+            this._dbContext.Users.Remove(existingUser);
+            await this._dbContext.SaveChangesAsync().ConfigureAwait(false);
         }
     }
 }

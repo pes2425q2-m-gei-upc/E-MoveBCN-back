@@ -1,14 +1,12 @@
 using Xunit;
 using Moq;
 using Repositories.Interface;
-using Dto;
 using Microsoft.AspNetCore.Identity;
 using FluentAssertions;
-using src.Services;
 using TestUtils;
-
-namespace Unit;
-
+using Services;
+using Dto.User;
+namespace E_MoveBCN.Tests.Unit;
 public class UserServiceTests
 {
     private readonly Mock<IUserRepository> _userRepositoryMock;
@@ -16,8 +14,8 @@ public class UserServiceTests
 
     public UserServiceTests()
     {
-        _userRepositoryMock = new Mock<IUserRepository>();
-        _userService = new UserService(_userRepositoryMock.Object);
+        this._userRepositoryMock = new Mock<IUserRepository>();
+        this._userService = new UserService(this._userRepositoryMock.Object);
     }
 
     [Fact]
@@ -29,9 +27,9 @@ public class UserServiceTests
             TestUserFactory.CreateValidUserDto()
         };
 
-        _userRepositoryMock.Setup(repo => repo.GetAllUsers()).Returns(expectedUsers);
+        this._userRepositoryMock.Setup(repo => repo.GetAllUsers()).Returns(expectedUsers);
 
-        var result = _userService.GetAllUsers();
+        var result = this._userService.GetAllUsers();
 
         result.Should().BeEquivalentTo(expectedUsers);
     }
@@ -40,9 +38,9 @@ public class UserServiceTests
     public void CreateUser_ShouldReturnTrue_WhenRepositoryReturnsTrue()
     {
         var user = TestUserFactory.CreateValidUserCreate();
-        _userRepositoryMock.Setup(repo => repo.CreateUser(user)).Returns(true);
+        this._userRepositoryMock.Setup(repo => repo.CreateUser(user)).Returns(true);
 
-        var result = _userService.CreateUser(user);
+        var result = this._userService.CreateUser(user);
 
         result.Should().BeTrue();
     }
@@ -54,9 +52,9 @@ public class UserServiceTests
         var passwordHash = new PasswordHasher<string>().HashPassword(null, credentials.Password);
         var userFromDb = TestUserFactory.CreateValidUserDto(email: credentials.UserEmail, passwordHash: passwordHash);
 
-        _userRepositoryMock.Setup(repo => repo.GetUserByEmailAsync(credentials.UserEmail)).ReturnsAsync(userFromDb);
+        this._userRepositoryMock.Setup(repo => repo.GetUserByEmailAsync(credentials.UserEmail)).ReturnsAsync(userFromDb);
 
-        var result = await _userService.Authenticate(credentials);
+        var result = await this._userService.Authenticate(credentials).ConfigureAwait(false);
 
         result.Should().NotBeNull();
         result.Email.Should().Be(credentials.UserEmail);
@@ -66,9 +64,9 @@ public class UserServiceTests
     public async Task Authenticate_ShouldReturnNull_WhenUserNotFound()
     {
         var credentials = TestUserFactory.CreateUserCredentials("notfound@example.com", "password");
-        _userRepositoryMock.Setup(repo => repo.GetUserByEmailAsync(credentials.UserEmail)).ReturnsAsync((UserDto)null);
+        this._userRepositoryMock.Setup(repo => repo.GetUserByEmailAsync(credentials.UserEmail)).ReturnsAsync((UserDto?)null);
 
-        var result = await _userService.Authenticate(credentials);
+        var result = await this._userService.Authenticate(credentials).ConfigureAwait(false);
 
         result.Should().BeNull();
     }
@@ -79,12 +77,12 @@ public class UserServiceTests
         var credentials = TestUserFactory.CreateUserCredentials("fail@example.com", "wrong");
         var user = TestUserFactory.CreateValidUserDto(
             email: "fail@example.com",
-            passwordHash: new PasswordHasher<string>().HashPassword(null, "correct")
+            passwordHash: new PasswordHasher<string>().HashPassword(string.Empty, "correct")
         );
 
-        _userRepositoryMock.Setup(r => r.GetUserByEmailAsync(credentials.UserEmail)).ReturnsAsync(user);
+        this._userRepositoryMock.Setup(r => r.GetUserByEmailAsync(credentials.UserEmail)).ReturnsAsync(user);
 
-        var result = await _userService.DeleteUser(credentials);
+        var result = await this._userService.DeleteUser(credentials).ConfigureAwait(false);
 
         result.Should().BeFalse();
     }
@@ -93,13 +91,13 @@ public class UserServiceTests
     public async Task DeleteUser_ShouldReturnTrue_WhenUserIsValid()
     {
         var credentials = TestUserFactory.CreateUserCredentials("success@example.com", "pass");
-        var hash = new PasswordHasher<string>().HashPassword(null, "pass");
+        var hash = new PasswordHasher<string>().HashPassword(string.Empty, "pass");
         var user = TestUserFactory.CreateValidUserDto(email: credentials.UserEmail, passwordHash: hash);
 
-        _userRepositoryMock.Setup(r => r.GetUserByEmailAsync(credentials.UserEmail)).ReturnsAsync(user);
-        _userRepositoryMock.Setup(r => r.DeleteUser(It.IsAny<string>())).ReturnsAsync(true);
+        this._userRepositoryMock.Setup(r => r.GetUserByEmailAsync(credentials.UserEmail)).ReturnsAsync(user);
+        this._userRepositoryMock.Setup(r => r.DeleteUser(It.IsAny<string>())).ReturnsAsync(true);
 
-        var result = await _userService.DeleteUser(credentials);
+        var result = await this._userService.DeleteUser(credentials).ConfigureAwait(false);
 
         result.Should().BeTrue();
     }
@@ -108,9 +106,9 @@ public class UserServiceTests
     public async Task ModifyUser_ShouldCallRepositoryAndReturnResult()
     {
         var userDto = TestUserFactory.CreateValidUserDto();
-        _userRepositoryMock.Setup(r => r.ModifyUser(userDto)).ReturnsAsync(true);
+        this._userRepositoryMock.Setup(r => r.ModifyUser(userDto)).ReturnsAsync(true);
 
-        var result = await _userService.ModifyUser(userDto);
+        var result = await this._userService.ModifyUser(userDto).ConfigureAwait(false);
 
         result.Should().BeTrue();
     }
@@ -121,9 +119,9 @@ public class UserServiceTests
         var dto = TestUserFactory.CreateGoogleDto("exists@example.com", "existinguser");
         var existingUser = TestUserFactory.CreateValidUserDto(email: dto.Email);
 
-        _userRepositoryMock.Setup(r => r.GetUserByEmailAsync(dto.Email)).ReturnsAsync(existingUser);
+        this._userRepositoryMock.Setup(r => r.GetUserByEmailAsync(dto.Email)).ReturnsAsync(existingUser);
 
-        var result = await _userService.LoginWithGoogleAsync(dto);
+        var result = await this._userService.LoginWithGoogleAsync(dto).ConfigureAwait(false);
 
         result.Should().BeEquivalentTo(existingUser);
     }
@@ -133,13 +131,13 @@ public class UserServiceTests
     {
         var dto = TestUserFactory.CreateGoogleDto("new@example.com", "newuser");
 
-        _userRepositoryMock.Setup(r => r.GetUserByEmailAsync(dto.Email)).ReturnsAsync((UserDto)null);
-        _userRepositoryMock.Setup(r => r.CreateGoogleUserAsync(dto.Username, dto.Email)).ReturnsAsync(true);
-        _userRepositoryMock.Setup(r => r.GetUserByEmailAsync(dto.Email)).ReturnsAsync(
+        this._userRepositoryMock.Setup(r => r.GetUserByEmailAsync(dto.Email)).ReturnsAsync((UserDto?)null);
+        this._userRepositoryMock.Setup(r => r.CreateGoogleUserAsync(dto.Username, dto.Email)).ReturnsAsync(true);
+        this._userRepositoryMock.Setup(r => r.GetUserByEmailAsync(dto.Email)).ReturnsAsync(
             TestUserFactory.CreateValidUserDto(email: dto.Email)
         );
 
-        var result = await _userService.LoginWithGoogleAsync(dto);
+        var result = await this._userService.LoginWithGoogleAsync(dto).ConfigureAwait(false);
 
         result.Email.Should().Be(dto.Email);
     }
@@ -149,9 +147,9 @@ public class UserServiceTests
     {
         var dto = TestUserFactory.CreateGoogleDto("error@example.com", "user");
 
-        _userRepositoryMock.Setup(r => r.GetUserByEmailAsync(dto.Email)).ReturnsAsync((UserDto)null);
-        _userRepositoryMock.Setup(r => r.CreateGoogleUserAsync(dto.Username, dto.Email)).ReturnsAsync(false);
+        this._userRepositoryMock.Setup(r => r.GetUserByEmailAsync(dto.Email)).ReturnsAsync((UserDto?)null);
+        this._userRepositoryMock.Setup(r => r.CreateGoogleUserAsync(dto.Username, dto.Email)).ReturnsAsync(false);
 
-        await Assert.ThrowsAsync<Exception>(() => _userService.LoginWithGoogleAsync(dto));
+        await Assert.ThrowsAsync<Exception>(() => this._userService.LoginWithGoogleAsync(dto)).ConfigureAwait(false);
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Dto;
-
+using Dto.Chat;
+using Dto.User;
 namespace Services.Interface;
 
 public interface IUserService
@@ -11,11 +11,7 @@ public interface IUserService
   Task<bool> DeleteUser(UserCredentials userCredentials);
   Task<UserDto> Authenticate(UserCredentials userCredentials);
   Task<bool> ModifyUser(UserDto userModify);
-
   Task<UserDto> LoginWithGoogleAsync(LoginGoogleDto dto);
-
   Task<bool> BlockUserAsync(BlockRequestDto dto);
-
   Task<bool> UnblockUserAsync(BlockRequestDto dto);
-
 }

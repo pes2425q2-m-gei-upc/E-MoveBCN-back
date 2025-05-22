@@ -1,5 +1,5 @@
 ﻿using System.Security.Claims;
-using Dto;
+using Dto.User;
 using Microsoft.AspNetCore.Authentication;
 
 namespace Helpers.Interface;
