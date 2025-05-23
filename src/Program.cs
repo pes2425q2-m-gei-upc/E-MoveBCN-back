@@ -22,6 +22,8 @@ builder.Services.AddControllers();
 
 // API Services Helpers and Repos
 builder.Services.AddServices();
+var connStr = builder.Configuration.GetConnectionString("DefaultConnection");
+Console.WriteLine($"DefaultConnection: {connStr ?? "NULL"}");
 
 // Configura el acceso a la base de datos
 builder.Services.AddDbContext<ApiDbContext>(options =>
@@ -65,6 +67,10 @@ builder.Services.AddCors(options =>
                       .AllowAnyHeader());
 });
 
+builder.Services.Configure<HostOptions>(options =>
+  {
+      options.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.Ignore;
+  });
 
 // Swagger configuration
 builder.Services.AddSwaggerGen(c =>
@@ -80,11 +86,6 @@ builder.Services.AddSwaggerGen(c =>
       Email = "tuemail@example.com",
       Url = new Uri("https://tuweb.com")
     }
-  });
-
-  builder.Services.Configure<HostOptions>(options =>
-  {
-      options.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.Ignore;
   });
 
   // Add Swagger authentication
