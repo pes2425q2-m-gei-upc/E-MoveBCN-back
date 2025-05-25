@@ -271,10 +271,10 @@ public class RouteService(IConfiguration config, HttpClient httpClient, IRouteRe
 
     return coords;
   }
-  private async Task<string> GetStreetNameAsync(double lat, double lng)
+  public async Task<string> GetStreetNameAsync(double lat, double lon)
   {
     var apiKey = this._config["APIKeys:GoogleMaps:ApiKey"];
-    var url = $"https://maps.googleapis.com/maps/api/geocode/json?latlng={lat.ToString(CultureInfo.InvariantCulture)},{lng.ToString(CultureInfo.InvariantCulture)}&key={apiKey}";
+    var url = $"https://maps.googleapis.com/maps/api/geocode/json?latlng={lat.ToString(CultureInfo.InvariantCulture)},{lon.ToString(CultureInfo.InvariantCulture)}&key={apiKey}";
 
     var res = await this._httpClient.GetAsync(new Uri(url)).ConfigureAwait(false);
     if (!res.IsSuccessStatusCode) return "Unknown";

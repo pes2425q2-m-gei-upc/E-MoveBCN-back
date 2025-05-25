@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dto.Route;
+using Microsoft.Extensions.Localization;
 namespace Services.Interface;
 public interface IRouteService
 {
@@ -11,4 +12,5 @@ public interface IRouteService
   public Task<bool> DeletePublishedRoute(string routeId);
   public Task<List<PublishedRouteDto>> GetRoutesNearAsync(double lat, double lon, double radiusInMeters);
   public Task<List<RouteDto>> GetSavedRoute(string userId);
+  public Task<string> GetStreetNameAsync(double lat, double lon);
 }
