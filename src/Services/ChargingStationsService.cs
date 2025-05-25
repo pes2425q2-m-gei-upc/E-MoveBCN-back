@@ -41,7 +41,7 @@ public class ChargingStationsService(HttpClient httpClient, ILogger<ChargingStat
 
         if (!response.IsSuccessStatusCode)
         {
-          this._logger.LogError("HTTP {StatusCode} al obtener estaciones de carga: {ReasonPhrase}", 
+          this._logger.LogError("HTTP {StatusCode} al obtener estaciones de carga: {ReasonPhrase}",
             response.StatusCode, response.ReasonPhrase);
           return;
         }
