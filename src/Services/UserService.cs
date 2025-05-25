@@ -115,4 +115,9 @@ public class UserService(IUserRepository userRepository) : IUserService
     return await this._userRepository.UnblockUserAsync(dto.BlockerId, dto.BlockedId).ConfigureAwait(false);
   }
 
+  public async Task<bool> IsUserBlockedAsync(BlockRequestDto dto)
+  {
+    return await this._userRepository.IsUserBlockedAsync(dto.BlockerId, dto.BlockedId).ConfigureAwait(false);
+  }
+
 }

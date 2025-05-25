@@ -12,6 +12,8 @@ public interface IUserService
   Task<UserDto> Authenticate(UserCredentials userCredentials);
   Task<bool> ModifyUser(UserDto userModify);
   Task<UserDto> LoginWithGoogleAsync(LoginGoogleDto dto);
+
+  Task<bool> IsUserBlockedAsync(BlockRequestDto dto);
   Task<bool> BlockUserAsync(BlockRequestDto dto);
   Task<bool> UnblockUserAsync(BlockRequestDto dto);
 }
