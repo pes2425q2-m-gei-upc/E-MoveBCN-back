@@ -11,23 +11,25 @@ public class ChatService(IChatRepository chatRepository, IUserRepository userRep
 
   private readonly IUserRepository _userRepository = userRepository;
 
-  public async Task<bool> CreateChatAsync(ChatRequestDto request)
+  public async Task<string> CreateChatAsync(ChatRequestDto request)
   {
     if (request == null)
-      throw new ArgumentNullException(nameof(request));
+    {
+      return "Request cannot be null.";
+    }
 
     var existingChat = await this._chatRepository.GetExistingChatAsync(
         request.RutaId.ToString(), request.User1Id.ToString(), request.User2Id.ToString()).ConfigureAwait(false);
 
     if (existingChat != null)
     {
-      throw new Exception("Ya existe un chat entre estos usuarios para esta ruta.");
+      return "Chat already exists for these users and route.";
     }
     var isBlocked = await this._userRepository.IsUserBlockedAsync(request.User1Id, request.User2Id).ConfigureAwait(false)
           || await this._userRepository.IsUserBlockedAsync(request.User2Id, request.User1Id).ConfigureAwait(false);
 
     if (isBlocked)
-      throw new Exception("No se puede crear un chat porque uno de los usuarios bloqueó al otro.");
+      return "Cannot create chat: one of the users is blocked by the other.";
 
     var chatEntity = new ChatEntity
     {
@@ -36,7 +38,15 @@ public class ChatService(IChatRepository chatRepository, IUserRepository userRep
       User1Id = request.User1Id,
       User2Id = request.User2Id
     };
-    return await this._chatRepository.CreateChatAsync(chatEntity).ConfigureAwait(false);
+    var isDone = await this._chatRepository.CreateChatAsync(chatEntity).ConfigureAwait(false);
+    if(isDone)
+    {
+      return "Chat created successfully.";
+    }
+    else
+    {
+      return "Couldnt create chat.";
+    }
   }
 
   public async Task<bool> DeleteChatAsync(Guid chatId)

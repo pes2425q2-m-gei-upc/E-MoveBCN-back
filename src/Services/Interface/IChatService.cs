@@ -4,6 +4,6 @@ using Dto.Chat;
 namespace Services.Interface;
 public interface IChatService
 {
-  Task<bool> CreateChatAsync(ChatRequestDto request);
+  Task<string> CreateChatAsync(ChatRequestDto request);
   Task<bool> DeleteChatAsync(Guid chatId);
 }

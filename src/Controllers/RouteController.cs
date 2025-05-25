@@ -77,4 +77,14 @@ public class RutasController(IRouteService routeService) : ControllerBase
     }
     return Ok(result);
   }
+  [HttpGet("streetname")] // api/rutas/streetname
+  public async Task<IActionResult> GetStreetName([FromQuery] double lat, [FromQuery] double lon)
+  {
+    var result = await this._routeService.GetStreetNameAsync(lat, lon).ConfigureAwait(false);
+    if (result == null)
+    {
+      return NotFound("No street found");
+    }
+    return Ok(result);
+  }
 }
