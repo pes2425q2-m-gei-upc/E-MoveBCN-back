@@ -62,6 +62,7 @@ public class RouteRepository(ApiDbContext dbContext, IMapper mapper) : IRouteRep
     // Traer todas las rutas publicadas y sus rutas base
     var publishedRoutes = await this._dbContext.PublishedRoutes
         .Include(p => p.RouteIdNavigation)
+        .Include(p => p.RouteIdNavigation.UserIdNavigation)
         .ToListAsync().ConfigureAwait(false);
 
     // Calcular distancia en memoria
