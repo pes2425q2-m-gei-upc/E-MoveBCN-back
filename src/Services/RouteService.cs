@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Repositories.Interface;
 using Services.Interface;
 namespace Services;
+
 [System.Diagnostics.CodeAnalysis.SuppressMessage(
     "Globalization",
     "CA1305: Especifique IFormatProvider",
@@ -348,4 +349,15 @@ public class RouteService(IConfiguration config, HttpClient httpClient, IRouteRe
     var user = await this._userRepository.GetUserById(userId).ConfigureAwait(false) ?? throw new Exception("Usuario no encontrado");
     return await this._routeRepository.GetSavedRoute(user.UserId).ConfigureAwait(false);
   }
+  
+  public async Task<List<PublishedRouteDto>> GetPublishedRoutesByUserIdAsync(string userId)
+  {
+      var user = await this._userRepository.GetUserById(userId).ConfigureAwait(false)
+                ?? throw new Exception("Usuario no encontrado");
+      
+      return await this._routeRepository
+      .GetPublishedRoutesByUserIdAsync(user.UserId)
+      .ConfigureAwait(false);
+  }
+
 }

@@ -9,6 +9,7 @@ using Entity.Route;
 using Microsoft.EntityFrameworkCore;
 using Repositories.Interface;
 namespace Repositories;
+
 public class RouteRepository(ApiDbContext dbContext, IMapper mapper) : IRouteRepository
 {
   private readonly ApiDbContext _dbContext = dbContext;
@@ -92,4 +93,17 @@ public class RouteRepository(ApiDbContext dbContext, IMapper mapper) : IRouteRep
       .ToListAsync().ConfigureAwait(false);
     return this._mapper.Map<List<RouteDto>>(entities);
   }
+  
+  public async Task<List<PublishedRouteDto>> GetPublishedRoutesByUserIdAsync(string userId)
+  {
+      var publishedRoutes = await this._dbContext.PublishedRoutes
+          .Include(p => p.RouteIdNavigation)
+          .Where(p => p.RouteIdNavigation.UserId == Guid.Parse(userId, System.Globalization.CultureInfo.InvariantCulture))
+
+          .ToListAsync()
+          .ConfigureAwait(false);
+
+      return this._mapper.Map<List<PublishedRouteDto>>(publishedRoutes);
+  }
+
 }
