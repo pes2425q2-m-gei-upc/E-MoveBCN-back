@@ -148,11 +148,17 @@ public class UserController(IUserService userService) : ControllerBase
     return result ? Ok("Usuario desbloqueado") : NotFound("No estaba bloqueado");
   }
   
-  [HttpPost("isblocked")]
-  public async Task<IActionResult> IsUserBlocked([FromBody] BlockRequestDto request)
+  [HttpGet("isblocked")]
+  public async Task<ActionResult<bool>> IsUserBlocked([FromQuery] string blockerId, [FromQuery] string blockedId)
   {
-    var isBlocked = await this._userService.IsUserBlockedAsync(request).ConfigureAwait(false);
-    return Ok(new { isBlocked });
+      if (string.IsNullOrWhiteSpace(blockerId) || string.IsNullOrWhiteSpace(blockedId))
+      {
+          return BadRequest("blockerId and blockedId are required.");
+      }
+
+      var isBlocked = await this._userService.IsUserBlockedAsync(blockerId, blockedId).ConfigureAwait(false);
+      return Ok(isBlocked); 
   }
+
 
 }

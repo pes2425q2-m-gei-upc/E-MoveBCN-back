@@ -13,7 +13,7 @@ public interface IUserService
   Task<bool> ModifyUser(UserDto userModify);
   Task<UserDto> LoginWithGoogleAsync(LoginGoogleDto dto);
 
-  Task<bool> IsUserBlockedAsync(BlockRequestDto dto);
+  Task<bool> IsUserBlockedAsync(string blockerId, string blockedId);
   Task<bool> BlockUserAsync(BlockRequestDto dto);
   Task<bool> UnblockUserAsync(BlockRequestDto dto);
 }
