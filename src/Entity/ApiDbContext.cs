@@ -444,6 +444,12 @@ public class ApiDbContext(DbContextOptions<ApiDbContext> options, IConfiguration
         entity.Property(e => e.AvailableSeats)
           .HasColumnName("available_seats")
           .HasColumnType("integer");
+        
+        entity.Property(e => e.Hour)
+              .HasColumnName("hour")
+              .HasColumnType("time")
+              .HasDefaultValueSql("CURRENT_TIME");
+
         //Relations
         entity.HasOne(e => e.RouteIdNavigation)
           .WithMany()
