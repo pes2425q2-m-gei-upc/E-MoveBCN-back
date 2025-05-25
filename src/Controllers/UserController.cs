@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Interface;
 namespace Controllers;
+
 [Route("api/[controller]")]  // Base route: api/user
 [ApiController]
 [Authorize]
@@ -145,6 +146,13 @@ public class UserController(IUserService userService) : ControllerBase
   {
     var result = await this._userService.UnblockUserAsync(request).ConfigureAwait(false);
     return result ? Ok("Usuario desbloqueado") : NotFound("No estaba bloqueado");
+  }
+  
+  [HttpPost("isblocked")]
+  public async Task<IActionResult> IsUserBlocked([FromBody] BlockRequestDto request)
+  {
+    var isBlocked = await this._userService.IsUserBlockedAsync(request).ConfigureAwait(false);
+    return Ok(new { isBlocked });
   }
 
 }
