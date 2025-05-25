@@ -14,19 +14,9 @@ public class ChatController(IChatService chatService) : ControllerBase
   [HttpPost("create")]
   public async Task<IActionResult> CreateChat([FromBody] ChatRequestDto request)
   {
-    try
-    {
       var created = await this._chatService.CreateChatAsync(request).ConfigureAwait(false);
-      return created ? Ok("Chat creado") : StatusCode(500, "No se pudo crear el chat");
-    }
-    catch (ArgumentException ex)
-    {
-      return BadRequest(ex.Message);
-    }
-    catch
-    {
-      throw;
-    }
+      return Ok(created);
+
   }
 
   [HttpDelete("deletechat")]
