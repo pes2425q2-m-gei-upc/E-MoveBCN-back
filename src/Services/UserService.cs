@@ -115,9 +115,17 @@ public class UserService(IUserRepository userRepository) : IUserService
     return await this._userRepository.UnblockUserAsync(dto.BlockerId, dto.BlockedId).ConfigureAwait(false);
   }
 
-  public async Task<bool> IsUserBlockedAsync(BlockRequestDto dto)
+  public async Task<bool> IsUserBlockedAsync(string blockerId, string blockedId)
   {
-    return await this._userRepository.IsUserBlockedAsync(dto.BlockerId, dto.BlockedId).ConfigureAwait(false);
+      if (!Guid.TryParse(blockerId, out var blockerGuid) || !Guid.TryParse(blockedId, out var blockedGuid))
+      {
+          throw new ArgumentException("Invalid GUID format for blockerId or blockedId");
+      }
+
+      return await this._userRepository.IsUserBlockedAsync(blockerGuid, blockedGuid).ConfigureAwait(false);
   }
+
+
+  
 
 }

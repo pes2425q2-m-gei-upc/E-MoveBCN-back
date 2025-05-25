@@ -3,7 +3,10 @@ using Dto.Route;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Interface;
+using System.Linq;
+
 namespace Controllers;
+
 [ApiController]
 [Route("api/[controller]")] // api/rutas
 [Authorize]
@@ -87,4 +90,25 @@ public class RutasController(IRouteService routeService) : ControllerBase
     }
     return Ok(result);
   }
+  
+  [HttpGet("publishedbyuser")]
+  public async Task<IActionResult> GetPublishedRoutesByUser([FromQuery] string userId)
+  {
+      if (string.IsNullOrWhiteSpace(userId))
+      {
+          return BadRequest("UserId is required.");
+      }
+
+      var result = await this._routeService
+          .GetPublishedRoutesByUserIdAsync(userId)
+          .ConfigureAwait(false);
+
+      if (result == null || !result.Any())
+      {
+          return NotFound("No published routes found for this user.");
+      }
+
+      return Ok(result);
+  }
+
 }
