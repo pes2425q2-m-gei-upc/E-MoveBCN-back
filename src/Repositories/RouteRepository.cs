@@ -43,6 +43,7 @@ public class RouteRepository(ApiDbContext dbContext, IMapper mapper) : IRouteRep
       RouteId = Guid.Parse(publishedRouteDto.RouteId, System.Globalization.CultureInfo.InvariantCulture),
       Date = publishedRouteDto.Date,
       AvailableSeats = publishedRouteDto.AvailableSeats,
+      Hour = publishedRouteDto.Hour,
     }).ConfigureAwait(false);
     return await this._dbContext.SaveChangesAsync().ConfigureAwait(false) > 0;
   }
