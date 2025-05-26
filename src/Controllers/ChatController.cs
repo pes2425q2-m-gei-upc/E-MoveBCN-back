@@ -14,8 +14,18 @@ public class ChatController(IChatService chatService) : ControllerBase
   [HttpPost("create")]
   public async Task<IActionResult> CreateChat([FromBody] ChatRequestDto request)
   {
-      var created = await this._chatService.CreateChatAsync(request).ConfigureAwait(false);
-      return Ok(created);
+    try
+    {
+      var chatId = await this._chatService.CreateChatAsync(request);
+      if (chatId == null)
+        return StatusCode(500, "No se pudo crear el chat.");
+
+      return Ok(chatId);
+    }
+    catch (UnauthorizedAccessException)
+    {
+      return StatusCode(403, "Usuarios bloqueados entre sí.");
+    }
 
   }
 
@@ -46,6 +56,16 @@ public class ChatController(IChatService chatService) : ControllerBase
     {
       throw;
     }
+  }
+  
+  [HttpGet("getchats")]  // api/chat/getchats?userId=...
+  public async Task<IActionResult> GetChatsForUser([FromQuery] Guid userId)
+  {
+      if (userId == Guid.Empty)
+          return BadRequest("El parámetro userId es obligatorio.");
+
+      var chats = await _chatService.GetChatsForUserAsync(userId).ConfigureAwait(false);
+      return Ok(chats);
   }
 
 }
