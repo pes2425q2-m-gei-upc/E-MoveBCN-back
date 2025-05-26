@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using AutoMapper;
 using Dto.Chat;
 using Entity;
@@ -48,6 +49,15 @@ public class ChatRepository(ApiDbContext context, IMapper mapper) : IChatReposit
 
     this._dbcontext.Chats.Remove(chat);
     return await this._dbcontext.SaveChangesAsync().ConfigureAwait(false) > 0;
+  }
+
+  public async Task<List<ChatResponseDto>> GetChatsForUserAsync(Guid userId)
+  {
+    var chats = await _dbcontext.Chats
+      .Where(c => c.User1Id == userId || c.User2Id == userId)
+      .ToListAsync();
+
+    return _mapper.Map<List<ChatResponseDto>>(chats);
   }
 }
 

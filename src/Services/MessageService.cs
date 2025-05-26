@@ -7,9 +7,11 @@ using Entity.Chat;
 using Repositories.Interface;
 using Services.Interface;
 namespace Services;
+
 public class MessageService(IMessageRepository messageRepository) : IMessageService
 {
   private readonly IMessageRepository _messageRepository = messageRepository;
+  private readonly IChatRepository _chatRepository;
 
   public async Task<MessageDto> SendMessageAsync(SendMessageDto dto)
   {
@@ -41,6 +43,41 @@ public class MessageService(IMessageRepository messageRepository) : IMessageServ
   public async Task<List<MessageDto>> GetMessagesByChatIdAsync(Guid chatId)
   {
     var messages = await this._messageRepository.GetMessagesByChatIdAsync(chatId).ConfigureAwait(false);
+
+    return messages.Select(m => new MessageDto
+    {
+      MessageId = m.MessageId,
+      UserId = m.UserId,
+      MessageText = m.MessageText,
+      CreatedAt = m.CreatedAt
+    }).ToList();
+  }
+
+  public async Task<List<MessageDto>> GetMessagesBetweenAsync(Guid chatId, DateTime from, DateTime to)
+  {
+    if (from >= to)
+    {
+      throw new ArgumentException("La fecha de inicio debe ser anterior a la fecha de fin.");
+    }
+    var messages = await this._messageRepository.GetMessagesBetweenAsync(chatId, from, to).ConfigureAwait(false);
+
+    return messages.Select(m => new MessageDto
+    {
+      MessageId = m.MessageId,
+      UserId = m.UserId,
+      MessageText = m.MessageText,
+      CreatedAt = m.CreatedAt
+    }).ToList();
+  }
+
+  public async Task<List<MessageDto>> GetLastMessagesAsync(Guid chatId, int count)
+  {
+    if (count <= 0)
+    {
+      throw new ArgumentException("El número de mensajes debe ser mayor que cero.");
+    }
+
+    var messages = await this._messageRepository.GetLastMessagesAsync(chatId, count).ConfigureAwait(false);
 
     return messages.Select(m => new MessageDto
     {

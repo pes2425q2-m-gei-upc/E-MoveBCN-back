@@ -38,8 +38,8 @@ public class MapperProfiles : Profile
     CreateMap<ChatEntity, ChatResponseDto>()
     .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.ChatId))
     .ForMember(dest => dest.RutaId, opt => opt.MapFrom(src => src.RouteId))
-    .ForMember(dest => dest.Usuario1Id, opt => opt.MapFrom(src => src.User1Id))
-    .ForMember(dest => dest.Usuario2Id, opt => opt.MapFrom(src => src.User2Id));
+    .ForMember(dest => dest.HostId, opt => opt.MapFrom(src => src.User1Id))
+    .ForMember(dest => dest.JoinerId, opt => opt.MapFrom(src => src.User2Id));
     CreateMap<MessageEntity, MessageDto>()
     .ForMember(dest => dest.MessageText, opt => opt.MapFrom(src => src.Message));
 

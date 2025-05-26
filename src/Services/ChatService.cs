@@ -3,55 +3,58 @@ using System.Threading.Tasks;
 using Dto.Chat;
 using Entity.Chat;
 using Repositories.Interface;
+using System.Collections.Generic;
 using Services.Interface;
 namespace Services;
+
 public class ChatService(IChatRepository chatRepository, IUserRepository userRepository) : IChatService
 {
   private readonly IChatRepository _chatRepository = chatRepository;
 
   private readonly IUserRepository _userRepository = userRepository;
 
-  public async Task<string> CreateChatAsync(ChatRequestDto request)
+  public async Task<Guid?> CreateChatAsync(ChatRequestDto request)
   {
-    if (request == null)
-    {
-      return "Request cannot be null.";
-    }
+    if (request == null) throw new ArgumentNullException(nameof(request));
 
-    var existingChat = await this._chatRepository.GetExistingChatAsync(
-        request.RutaId.ToString(), request.User1Id.ToString(), request.User2Id.ToString()).ConfigureAwait(false);
+    var existing = await _chatRepository.GetExistingChatAsync(
+        request.RutaId.ToString(),
+        request.HostId.ToString(),
+        request.JoinerId.ToString());
 
-    if (existingChat != null)
-    {
-      return "Chat already exists for these users and route.";
-    }
-    var isBlocked = await this._userRepository.IsUserBlockedAsync(request.User1Id, request.User2Id).ConfigureAwait(false)
-          || await this._userRepository.IsUserBlockedAsync(request.User2Id, request.User1Id).ConfigureAwait(false);
+    if (existing != null)
+        return existing.Id;
+
+    bool isBlocked = await _userRepository.IsUserBlockedAsync(request.HostId, request.JoinerId)
+                  || await _userRepository.IsUserBlockedAsync(request.JoinerId, request.HostId);
 
     if (isBlocked)
-      return "Cannot create chat: one of the users is blocked by the other.";
+        throw new UnauthorizedAccessException("Uno de los usuarios ha bloqueado al otro.");
 
-    var chatEntity = new ChatEntity
+    var chat = new ChatEntity
     {
-      ChatId = Guid.NewGuid(),
-      RouteId = request.RutaId,
-      User1Id = request.User1Id,
-      User2Id = request.User2Id
+        ChatId    = Guid.NewGuid(),
+        RouteId   = request.RutaId,
+        User1Id   = request.HostId,
+        User2Id   = request.JoinerId
     };
-    var isDone = await this._chatRepository.CreateChatAsync(chatEntity).ConfigureAwait(false);
-    if(isDone)
-    {
-      return "Chat created successfully.";
-    }
-    else
-    {
-      return "Couldnt create chat.";
-    }
+
+    bool isDone = await _chatRepository.CreateChatAsync(chat);
+    return isDone ? chat.ChatId : null;
   }
 
   public async Task<bool> DeleteChatAsync(Guid chatId)
   {
     return await this._chatRepository.DeleteChatAsync(chatId).ConfigureAwait(false);
+  }
+  
+  public Task<List<ChatResponseDto>> GetChatsForUserAsync(Guid userId)
+  {
+    if (userId == Guid.Empty)
+    {
+      throw new ArgumentException("El ID de usuario no puede ser vacío.", nameof(userId));
+    }
+    return this._chatRepository.GetChatsForUserAsync(userId);
   }
 }
 

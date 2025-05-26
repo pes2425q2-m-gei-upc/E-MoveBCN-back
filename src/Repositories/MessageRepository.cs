@@ -10,6 +10,7 @@ using Entity.Chat;
 using Microsoft.EntityFrameworkCore;
 using Repositories.Interface;
 namespace Repositories;
+
 public class MessageRepository(ApiDbContext dbcontext, IMapper mapper) : IMessageRepository
 {
   private readonly ApiDbContext _dbcontext = dbcontext;
@@ -31,6 +32,27 @@ public class MessageRepository(ApiDbContext dbcontext, IMapper mapper) : IMessag
         .ConfigureAwait(false);
 
     return this._mapper.Map<List<MessageDto>>(messages);
+  }
+
+  public async Task<List<MessageDto>> GetMessagesBetweenAsync(Guid chatId, DateTime from, DateTime to)
+  {
+    var messages = await _dbcontext.Messages
+      .Where(m => m.ChatId == chatId && m.CreatedAt >= from && m.CreatedAt <= to)
+      .OrderBy(m => m.CreatedAt)
+      .ToListAsync();
+
+    return _mapper.Map<List<MessageDto>>(messages);
+  }
+
+  public async Task<List<MessageDto>> GetLastMessagesAsync(Guid chatId, int count)
+  {
+    var messages = await _dbcontext.Messages
+      .Where(m => m.ChatId == chatId)
+      .OrderByDescending(m => m.CreatedAt)
+      .Take(count)
+      .ToListAsync();
+
+    return _mapper.Map<List<MessageDto>>(messages);
   }
 }
 
