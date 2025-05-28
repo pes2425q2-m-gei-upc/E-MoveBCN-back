@@ -54,6 +54,9 @@ public class ChatRepository(ApiDbContext context, IMapper mapper) : IChatReposit
   public async Task<List<ChatResponseDto>> GetChatsForUserAsync(Guid userId)
   {
     var chats = await _dbcontext.Chats
+      .Include(c => c.PublicRouteNavigation)  
+        .ThenInclude(p => p.RouteIdNavigation) 
+      .Include(c => c.UserId2Navigation)
       .Where(c => c.User1Id == userId || c.User2Id == userId)
       .ToListAsync();
 
