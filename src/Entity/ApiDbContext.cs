@@ -482,7 +482,8 @@ public class ApiDbContext(DbContextOptions<ApiDbContext> options, IConfiguration
           .HasForeignKey(e => e.User2Id);
         entity.HasOne(e => e.PublicRouteNavigation)
           .WithMany()
-          .HasForeignKey(e => e.RouteId);
+          .HasForeignKey(e => e.RouteId)
+          .OnDelete(DeleteBehavior.Cascade);
 
       });
     modelBuilder.Entity<MessageEntity>(entity =>
