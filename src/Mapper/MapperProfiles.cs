@@ -39,7 +39,9 @@ public class MapperProfiles : Profile
     .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.ChatId))
     .ForMember(dest => dest.RutaId, opt => opt.MapFrom(src => src.RouteId))
     .ForMember(dest => dest.HostId, opt => opt.MapFrom(src => src.User1Id))
-    .ForMember(dest => dest.JoinerId, opt => opt.MapFrom(src => src.User2Id));
+    .ForMember(dest => dest.JoinerId, opt => opt.MapFrom(src => src.User2Id))
+    .ForMember(dest => dest.User2, opt => opt.MapFrom(src => src.UserId2Navigation)) 
+    .ForMember(dest => dest.Route, opt => opt.MapFrom(src => src.PublicRouteNavigation));
     CreateMap<MessageEntity, MessageDto>()
     .ForMember(dest => dest.MessageText, opt => opt.MapFrom(src => src.Message));
 
